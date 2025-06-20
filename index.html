@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GrappA Guest Guide</title>
     <meta name="description" content="Your complete resort companion for GrappA. Access guides, links, and information, even offline.">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#475569">
     <link rel="manifest" href="data:application/manifest+json,{
-        "name": "GrappA Guest Guide",
-        "short_name": "GrappA Guide",
-        "start_url": ".",
-        "display": "standalone",
-        "background_color": "#ffffff",
-        "theme_color": "#ffffff",
-        "description": "Your resort guide for GrappA.",
-        "icons": [
-            { "src": "https://i.imgur.com/s6g6A4b.png", "type": "image/png", "sizes": "192x192" },
-            { "src": "https://i.imgur.com/s6g6A4b.png", "type": "image/png", "sizes": "512x512" }
+        &quot;name&quot;: &quot;GrappA Guest Guide&quot;,
+        &quot;short_name&quot;: &quot;GrappA Guide&quot;,
+        &quot;start_url&quot;: &quot;.&quot;,
+        &quot;display&quot;: &quot;standalone&quot;,
+        &quot;background_color&quot;: &quot;#475569&quot;,
+        &quot;theme_color&quot;: &quot;#475569&quot;,
+        &quot;description&quot;: &quot;Your resort guide for GrappA.&quot;,
+        &quot;icons&quot;: [
+            { &quot;src&quot;: &quot;https://i.imgur.com/s6g6A4b.png&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;sizes&quot;: &quot;192x192&quot; },
+            { &quot;src&quot;: &quot;https://i.imgur.com/s6g6A4b.png&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;sizes&quot;: &quot;512x512&quot; }
         ]
     }">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,14 +27,94 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <style> body { margin: 0; min-height: 100vh; } </style>
+
+    <style>
+        body { 
+            margin: 0; 
+            min-height: 100vh; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+        .floating-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.05;
+        }
+        .shape-1 {
+            width: 128px;
+            height: 128px;
+            background: linear-gradient(45deg, #cbd5e1, #475569);
+            top: 10%;
+            left: 10%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .shape-2 {
+            width: 96px;
+            height: 96px;
+            background: linear-gradient(45deg, #9ca3af, #4b5563);
+            top: 60%;
+            right: 16%;
+            animation: bounce 1s ease-in-out infinite;
+        }
+        .shape-3 {
+            width: 112px;
+            height: 112px;
+            background: linear-gradient(45deg, #94a3b8, #374151);
+            bottom: 20%;
+            left: 20%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 0.05; transform: scale(1); }
+            50% { opacity: 0.1; transform: scale(1.05); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateY(100px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes zoomIn {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .animate-in {
+            animation-duration: 0.3s;
+            animation-fill-mode: both;
+        }
+        .fade-in { animation-name: fadeIn; }
+        .slide-in-from-bottom { animation-name: slideIn; animation-duration: 0.5s; }
+        .zoom-in { animation-name: zoomIn; animation-duration: 0.5s; }
+    </style>
 </head>
 <body>
     <div id="root"></div>
     <script type="text/babel">
         // --- PWA Service Worker ---
         const serviceWorkerCode = `
-            const CACHE_NAME = 'grappa-guide-cache-v5';
+            const CACHE_NAME = 'grappa-guide-cache-v6';
             const urlsToCache = [
                 '.',
                 'https://cdn.tailwindcss.com',
@@ -83,80 +163,325 @@
 
         // --- React Component ---
         const BnBGuestGuide = () => {
-            const { useState } = React;
+            const { useState, useEffect } = React;
             const [openDialog, setOpenDialog] = useState(null);
             const [zoomedImg, setZoomedImg] = useState(null);
+            const [isLoaded, setIsLoaded] = useState(false);
+
+            useEffect(() => {
+                setIsLoaded(true);
+            }, []);
 
             const openImage = (src) => setZoomedImg(src);
             const closeImage = () => setZoomedImg(null);
-            
-            // Reusable icon style for the new theme
-            const iconStyle = "w-8 h-8 text-gray-700";
-            const cardIconBg = "p-3 bg-gray-200 rounded-full";
 
-
-            const cards = [
-                { id: 'gate', title: 'Gate', icon: <Car className={iconStyle} /> },
-                { id: 'trips', title: 'Trips', icon: <MapPin className={iconStyle} /> },
-                { id: 'wifi', title: 'WiFi', icon: <Wifi className={iconStyle} /> },
-                { id: 'tv', title: 'TV Services', icon: <Tv className={iconStyle} /> },
-                { id: 'grocery', title: 'Grocery', icon: <Coffee className={iconStyle} /> },
-                { id: 'sushi', title: 'Sushi', icon: <Utensils className={iconStyle} /> },
-                { id: 'pool', title: 'Pool', icon: <Waves className={iconStyle} /> },
-                { id: 'spa', title: 'Spa', icon: <Sparkles className={iconStyle} /> }
+            const cardColors = [
+                'from-slate-600 to-slate-700',     // Gate
+                'from-slate-700 to-slate-800',     // Trips
+                'from-slate-600 to-slate-700',     // WiFi
+                'from-slate-600 to-gray-700',      // TV
+                'from-slate-700 to-slate-800',     // Grocery
+                'from-slate-700 to-gray-800',      // Sushi
+                'from-slate-600 to-slate-700',     // Pool
+                'from-slate-500 to-slate-600'      // Spa
             ];
 
-             const getCardContent = (id) => {
-                switch (id) {
-                    case 'gate': return (<div className="text-right" dir="rtl"><p className="mb-4 text-gray-700">זהו קישור להורדת אפליקציה לפתיחת שער הקיבוץ.<br/>יש להתקין את האפליקציה, למלא אחר ההנחיות ואז ניתן לפתוח את השער בעצמך.<br/>צריך להתקרב ממש אל השער, כמעט להצמד, ואז ללחוץ על פתיחת השער באפליקציה.</p><div className="space-y-3"><a href="https://goo.gl/fZTz4u" target="_blank" rel="noopener noreferrer" className="block bg-gray-800 text-white px-4 py-3 rounded-lg text-center hover:bg-gray-700 transition-colors">iPhone App</a><a href="https://goo.gl/Giopvd" target="_blank" rel="noopener noreferrer" className="block bg-green-600 text-white px-4 py-3 rounded-lg text-center hover:bg-green-700 transition-colors">Android App</a></div></div>);
-                    case 'trips': return (<div className="text-right space-y-4" dir="rtl"><div><h4 className="font-semibold mb-2 text-gray-800">קישור לאפליקציית ניווט וטיולים באזור</h4><a href="https://play.google.com/store/apps/details?id=altitude.alarm.erol.apps" target="_blank" rel="noopener noreferrer" className="block bg-blue-600 text-white px-4 py-2 rounded-lg text-center hover:bg-blue-700 transition-colors">הורד אפליקציית טיולים</a></div><div><h4 className="font-semibold mb-2 text-gray-800">מיקום השער ליציאה למסלולים</h4><a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" className="block bg-red-600 text-white px-4 py-2 rounded-lg text-center hover:bg-red-700 transition-colors">פתח במפות</a></div><div><h4 className="font-semibold mb-2 text-gray-800">לוגיסטיקה, ציוד ותחבורה</h4><div className="bg-gray-100 p-2 rounded-lg"><img src="https://i.imgur.com/MBYTWps.png" alt="פבלו פנתנות - מידע ליצירת קשר וקיבוץ זהר" className="w-full rounded cursor-pointer" onClick={(e) => { e.stopPropagation(); openImage('https://i.imgur.com/MBYTWps.png'); }} /><p className="text-xs text-gray-600 mt-1 text-center">מידע ליצירת קשר עם פבלו פנתנות</p></div></div><div><h4 className="font-semibold mb-2 text-gray-800">קישור למסלול הטיול (GPX)</h4><a href="https://1drv.ms/u/c/bc77fb4698589053/ET-apfF7XM9EqR4IIf7yf-MBj7_bUns6qp3f40UeoRFgRQ?e=Z26pGp" target="_blank" rel="noopener noreferrer" className="block w-full bg-purple-600 text-white px-4 py-2 rounded-lg text-center hover:bg-purple-700 transition-colors">פתח קישור למסלול</a></div></div>);
-                    case 'wifi': return (<div className="text-center"><div className="bg-blue-50 p-6 rounded-lg"><h4 className="font-semibold text-lg mb-4 text-gray-800">WiFi Details</h4><div className="space-y-3"><div><span className="font-medium text-gray-600">Network:</span><p className="text-xl font-mono bg-white p-2 rounded border">GrappA Fiber</p></div><div><span className="font-medium text-gray-600">Password:</span><p className="text-xl font-mono bg-white p-2 rounded border">grappA321</p></div></div></div></div>);
-                    case 'tv': return (<div className="space-y-4"><div className="bg-purple-50 p-4 rounded-lg"><h4 className="font-semibold text-lg mb-3 text-purple-800 flex items-center"><span className="mr-2">🎬</span> Disney+</h4><div className="space-y-2"><div><span className="font-medium text-gray-600">Profile:</span><span className="ml-2 font-mono">GrappA</span></div><div><span className="font-medium text-gray-600">Password:</span><span className="ml-2 font-mono">4114</span></div></div></div><div className="bg-red-50 p-4 rounded-lg"><h4 className="font-semibold text-lg mb-3 text-red-800 flex items-center"><span className="mr-2">📺</span> Netflix</h4><div><span className="font-medium text-gray-600">Profile:</span><span className="ml-2 font-mono">GrappA</span></div></div></div>);
-                    case 'grocery': return (<div className="text-right" dir="rtl"><h4 className="font-semibold mb-4 text-gray-800">קישור למיקום המרכולית</h4><a href="https://maps.app.goo.gl/ZQu19jrZTdUjW7pF6" target="_blank" rel="noopener noreferrer" className="block bg-green-600 text-white px-6 py-3 rounded-lg text-center hover:bg-green-700 transition-colors font-medium">פתח במפות Google</a></div>);
-                    case 'sushi': return (<div className="text-right" dir="rtl"><h4 className="font-semibold mb-4 text-gray-800">מסעדת הסושי המקומית</h4><div className="bg-gray-100 p-2 rounded-lg"><img src="https://i.imgur.com/ChMRT7d.jpg" alt="תפריט סושי" className="w-full rounded cursor-pointer" onClick={(e) => { e.stopPropagation(); openImage('https://i.imgur.com/ChMRT7d.jpg'); }}/><p className="text-xs text-gray-600 mt-1 text-center">תפריט מלא עם מחירים</p></div></div>);
-                    case 'pool': return (<div className="text-right space-y-4" dir="rtl"><h4 className="font-semibold text-gray-800">שעות פתיחה ומיקום</h4><div className="bg-blue-50 p-2 rounded-lg"><img src="https://i.imgur.com/2AahzMz.png" alt="שעות פתיחה של הבריכה" className="w-full rounded cursor-pointer" onClick={(e) => { e.stopPropagation(); openImage('https://i.imgur.com/2AahzMz.png'); }}/><p className="text-xs text-gray-600 mt-1 text-center">שעות פתיחה מעודכנות</p></div><a href="https://maps.app.goo.gl/2DS7aXFMvxGATqcY8" target="_blank" rel="noopener noreferrer" className="block bg-blue-600 text-white px-6 py-3 rounded-lg text-center hover:bg-blue-700 transition-colors font-medium">פתח במפות Google</a></div>);
-                    case 'spa': return (<div className="text-center"><div className="bg-purple-50 p-8 rounded-lg"><Sparkles className="w-16 h-16 text-purple-400 mx-auto mb-4" /><h4 className="font-semibold text-lg text-gray-800 mb-2">Spa Services</h4><p className="text-gray-600">Information coming soon...</p></div></div>);
-                    default: return null;
+            const cards = [
+                {
+                    id: 'gate',
+                    title: 'Gate',
+                    icon: <Car className="w-8 h-8" />,
+                    gradient: cardColors[0],
+                    content: (
+                        <div className="text-right" dir="rtl">
+                            <p className="mb-6 text-gray-700 leading-relaxed">
+                                זהו קישור להורדת אפליקציה לפתיחת שער הקיבוץ.<br/>
+                                יש להתקין את האפליקציה, למלא אחר ההנחיות ואז ניתן לפתוח את השער בעצמך.<br/>
+                                צריך להתקרב ממש אל השער, כמעט להצמד, ואז ללחוץ על פתיחת השער באפליקציה.
+                            </p>
+                            <div className="space-y-4">
+                                <a href="https://goo.gl/fZTz4u" target="_blank" rel="noopener noreferrer" 
+                                   className="block bg-gradient-to-r from-slate-700 to-slate-800 text-white px-6 py-4 rounded-lg text-center hover:from-slate-600 hover:to-slate-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold">
+                                   iPhone App
+                                </a>
+                                <a href="https://goo.gl/Giopvd" target="_blank" rel="noopener noreferrer" 
+                                   className="block bg-gradient-to-r from-green-700 to-green-800 text-white px-6 py-4 rounded-lg text-center hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold">
+                                   Android App
+                                </a>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'trips',
+                    title: 'Trips',
+                    icon: <MapPin className="w-8 h-8" />,
+                    gradient: cardColors[1],
+                    content: (
+                        <div className="text-right space-y-6" dir="rtl">
+                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <h4 className="font-bold mb-3 text-slate-800 text-lg">אפליקציית ניווט וטיולים</h4>
+                                <a href="https://play.google.com/store/apps/details?id=altitude.alarm.erol.apps" target="_blank" rel="noopener noreferrer" 
+                                   className="block bg-gradient-to-r from-slate-600 to-slate-700 text-white px-6 py-3 rounded-lg text-center hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105 shadow-md font-semibold">
+                                   הורד אפליקציית טיולים
+                                </a>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <h4 className="font-bold mb-3 text-slate-800 text-lg">מיקום השער למסלולים</h4>
+                                <a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" 
+                                   className="block bg-gradient-to-r from-slate-600 to-slate-700 text-white px-6 py-3 rounded-lg text-center hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105 shadow-md font-semibold">
+                                   פתח במפות
+                                </a>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <h4 className="font-bold mb-3 text-slate-800 text-lg">לוגיסטיקה וציוד</h4>
+                                <div className="bg-white p-3 rounded-lg shadow-sm border">
+                                    <img src="https://i.imgur.com/MBYTWps.png" alt="פבלו פנתנות - מידע ליצירת קשר וקיבוץ זהר" 
+                                         className="w-full rounded-lg cursor-pointer hover:scale-105 transition-transform duration-300" 
+                                         onClick={() => openImage('https://i.imgur.com/MBYTWps.png')} />
+                                    <p className="text-sm text-gray-600 mt-2 text-center font-medium">מידע ליצירת קשר עם פבלו פנתנות</p>
+                                </div>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <h4 className="font-bold mb-3 text-slate-800 text-lg">קישור למסלול GPX</h4>
+                                <a href="https://1drv.ms/u/c/bc77fb4698589053/ET-apfF7XM9EqR4IIf7yf-MBj7_bUns6qp3f40UeoRFgRQ?e=Z26pGp" target="_blank" rel="noopener noreferrer" 
+                                   className="block bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-lg text-center hover:from-blue-500 hover:to-blue-600 transition-all duration-300 transform hover:scale-105 shadow-md font-semibold">
+                                   פתח קישור למסלול
+                                </a>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'wifi',
+                    title: 'WiFi',
+                    icon: <Wifi className="w-8 h-8" />,
+                    gradient: cardColors[2],
+                    content: (
+                        <div className="text-center">
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-8 rounded-xl border border-slate-200">
+                                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                                    <Wifi className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+                                    <h4 className="font-bold text-2xl mb-6 text-gray-800">WiFi Connection</h4>
+                                    <div className="space-y-5">
+                                        <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-4 rounded-lg border border-slate-200">
+                                            <span className="font-semibold text-slate-600 block mb-2">Network Name:</span>
+                                            <p className="text-2xl font-mono bg-white p-3 rounded-lg border-2 border-slate-300 text-slate-700 font-bold shadow-sm">GrappA Fiber</p>
+                                        </div>
+                                        <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-4 rounded-lg border border-slate-200">
+                                            <span className="font-semibold text-slate-600 block mb-2">Password:</span>
+                                            <p className="text-2xl font-mono bg-white p-3 rounded-lg border-2 border-slate-300 text-slate-700 font-bold shadow-sm">grappA321</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'tv',
+                    title: 'TV Services',
+                    icon: <Tv className="w-8 h-8" />,
+                    gradient: cardColors[3],
+                    content: (
+                        <div className="space-y-6">
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-6 rounded-xl border border-slate-200">
+                                <h4 className="font-bold text-2xl mb-4 text-slate-800 flex items-center justify-center">
+                                    Disney+
+                                </h4>
+                                <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4">
+                                    <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-3 rounded-lg border border-slate-200">
+                                        <span className="font-semibold text-slate-600">Profile:</span>
+                                        <span className="ml-3 font-mono text-lg font-bold text-slate-700">GrappA</span>
+                                    </div>
+                                    <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-3 rounded-lg border border-slate-200">
+                                        <span className="font-semibold text-slate-600">Password:</span>
+                                        <span className="ml-3 font-mono text-lg font-bold text-slate-700">4114</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-6 rounded-xl border border-slate-200">
+                                <h4 className="font-bold text-2xl mb-4 text-slate-800 flex items-center justify-center">
+                                    Netflix
+                                </h4>
+                                <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+                                    <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-3 rounded-lg border border-slate-200">
+                                        <span className="font-semibold text-slate-600">Profile:</span>
+                                        <span className="ml-3 font-mono text-lg font-bold text-slate-700">GrappA</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'grocery',
+                    title: 'Grocery',
+                    icon: <Coffee className="w-8 h-8" />,
+                    gradient: cardColors[4],
+                    content: (
+                        <div className="text-right" dir="rtl">
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-8 rounded-xl border border-slate-200">
+                                <h4 className="font-bold mb-6 text-slate-800 text-2xl text-center">המרכולית</h4>
+                                <a href="https://maps.app.goo.gl/ZQu19jrZTdUjW7pF6" target="_blank" rel="noopener noreferrer" 
+                                   className="block bg-gradient-to-r from-slate-600 to-slate-700 text-white px-8 py-4 rounded-xl text-center hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105 shadow-lg font-bold text-lg">
+                                   פתח במפות Google
+                                </a>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'sushi',
+                    title: 'Sushi',
+                    icon: <Utensils className="w-8 h-8" />,
+                    gradient: cardColors[5],
+                    content: (
+                        <div className="text-right" dir="rtl">
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-6 rounded-xl border border-slate-200">
+                                <h4 className="font-bold mb-6 text-slate-800 text-2xl text-center">מסעדת הסושי</h4>
+                                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                                    <img src="https://i.imgur.com/ChMRT7d.jpg" alt="תפריט סושי" 
+                                         className="w-full rounded-lg cursor-pointer hover:scale-105 transition-transform duration-300 shadow-md" 
+                                         onClick={() => openImage('https://i.imgur.com/ChMRT7d.jpg')} />
+                                    <p className="text-sm text-gray-600 mt-3 text-center font-semibold">תפריט מלא עם מחירים</p>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'pool',
+                    title: 'Pool',
+                    icon: <Waves className="w-8 h-8" />,
+                    gradient: cardColors[6],
+                    content: (
+                        <div className="text-right space-y-6" dir="rtl">
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-6 rounded-xl border border-slate-200">
+                                <h4 className="font-bold text-slate-800 text-2xl text-center mb-6">הבריכה</h4>
+                                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 mb-4">
+                                    <img src="https://i.imgur.com/2AahzMz.png" alt="שעות פתיחה של הבריכה" 
+                                         className="w-full rounded-lg cursor-pointer hover:scale-105 transition-transform duration-300" 
+                                         onClick={() => openImage('https://i.imgur.com/2AahzMz.png')} />
+                                    <p className="text-sm text-gray-600 mt-3 text-center font-semibold">שעות פתיחה מעודכנות</p>
+                                </div>
+                                <a href="https://maps.app.goo.gl/2DS7aXFMvxGATqcY8" target="_blank" rel="noopener noreferrer" 
+                                   className="block bg-gradient-to-r from-slate-600 to-slate-700 text-white px-8 py-4 rounded-xl text-center hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105 shadow-lg font-bold text-lg">
+                                   פתח במפות Google
+                                </a>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'spa',
+                    title: 'Spa',
+                    icon: <Sparkles className="w-8 h-8" />,
+                    gradient: cardColors[7],
+                    content: (
+                        <div className="text-center">
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-12 rounded-xl border border-slate-200">
+                                <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
+                                    <Sparkles className="w-20 h-20 text-slate-400 mx-auto mb-6" />
+                                    <h4 className="font-bold text-3xl text-gray-800 mb-4">Spa Services</h4>
+                                    <p className="text-gray-600 text-lg">Information coming soon...</p>
+                                </div>
+                            </div>
+                        </div>
+                    )
                 }
-            };
+            ];
 
             const openDialogHandler = (id) => setOpenDialog(id);
             const closeDialog = () => setOpenDialog(null);
-            
+
             return (
-                // UPDATED background color
-                <div className="min-h-screen bg-gray-100 p-4">
-                    <div className="text-center mb-8 pt-8">
-                        {/* UPDATED text color for better contrast */}
-                        <h1 className="text-4xl font-bold text-gray-800 mb-2">GrappA Guest Guide</h1>
-                        <p className="text-gray-500">Your complete resort companion</p>
+                <div className="min-h-screen bg-gradient-to-br from-gray-600 via-slate-700 to-gray-800 p-4 relative overflow-hidden">
+                    {/* Floating Background Shapes */}
+                    <div className="floating-shapes">
+                        <div className="shape shape-1"></div>
+                        <div className="shape shape-2"></div>
+                        <div className="shape shape-3"></div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
-                        {cards.map(card => (
-                            // UPDATED card styling
-                            <div key={card.id} onClick={() => openDialogHandler(card.id)} className="bg-white rounded-2xl p-6 cursor-pointer shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105">
-                                <div className="flex flex-col items-center text-center space-y-3">
-                                    <div className={cardIconBg}>{card.icon}</div>
-                                    <h3 className="text-gray-800 font-semibold text-lg">{card.title}</h3>
+
+                    {/* Header */}
+                    <div className={`text-center mb-12 pt-12 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+                        <div className="bg-white/15 backdrop-blur-lg rounded-2xl p-8 max-w-md mx-auto shadow-2xl border border-white/20">
+                            <h1 className="text-4xl font-bold text-white mb-3 drop-shadow-lg">
+                                GrappA Guest Guide
+                            </h1>
+                            <p className="text-lg text-white/80 drop-shadow font-medium">
+                                Resort Information & Services
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Cards Grid */}
+                    <div className="grid grid-cols-2 gap-6 max-w-lg mx-auto">
+                        {cards.map((card, index) => (
+                            <div 
+                                key={card.id} 
+                                onClick={() => openDialogHandler(card.id)} 
+                                className={`bg-white/15 backdrop-blur-lg border border-white/20 rounded-xl p-6 cursor-pointer transition-all duration-300 transform hover:scale-105 shadow-xl hover:bg-white/20 ${
+                                    isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+                                }`}
+                                style={{transitionDelay: `${index * 100}ms`}}
+                            >
+                                <div className="flex flex-col items-center text-center space-y-4">
+                                    <div className={`p-4 bg-gradient-to-br ${card.gradient} rounded-2xl shadow-xl text-white transform transition-transform duration-300 hover:scale-110`}>
+                                        {card.icon}
+                                    </div>
+                                    <h3 className="text-white font-bold text-xl drop-shadow-lg tracking-wide">
+                                        {card.title}
+                                    </h3>
                                 </div>
                             </div>
                         ))}
                     </div>
+
+                    {/* Dialog Modal */}
                     {openDialog && (
-                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={closeDialog}>
-                            <div className="bg-white rounded-2xl max-w-sm w-full max-h-[80vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
-                                <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-                                    <h2 className="text-xl font-bold text-gray-800">{cards.find(c => c.id === openDialog)?.title}</h2>
-                                    <button onClick={closeDialog} className="p-2 hover:bg-gray-100 rounded-full transition-colors"><X className="w-5 h-5 text-gray-500" /></button>
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-lg flex items-center justify-center p-4 z-50 animate-in fade-in duration-300">
+                            <div className="bg-white rounded-2xl max-w-md w-full max-h-[85vh] overflow-hidden shadow-2xl animate-in slide-in-from-bottom duration-500 border border-gray-200">
+                                <div className="sticky top-0 bg-gradient-to-r from-slate-50 to-gray-50 border-b border-gray-200 p-6 flex justify-between items-center rounded-t-2xl">
+                                    <div>
+                                        <h2 className="text-2xl font-black text-gray-800">
+                                            {cards.find(c => c.id === openDialog)?.title}
+                                        </h2>
+                                        <div className="w-12 h-1 bg-gradient-to-r from-slate-600 to-slate-700 rounded-full mt-2"></div>
+                                    </div>
+                                    <button 
+                                        onClick={closeDialog} 
+                                        className="p-3 hover:bg-white/80 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm border border-gray-200"
+                                    >
+                                        <X className="w-6 h-6 text-gray-500" />
+                                    </button>
                                 </div>
-                                <div className="p-6">{getCardContent(openDialog)}</div>
+                                <div className="p-6 overflow-y-auto max-h-[calc(85vh-120px)] bg-gradient-to-b from-white to-slate-50">
+                                    <div className="space-y-1">
+                                        {cards.find(c => c.id === openDialog)?.content}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}
+
+                    {/* Image Zoom Modal */}
                     {zoomedImg && (
-                        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={closeImage}>
-                            <button onClick={closeImage} className="absolute top-4 right-4 p-2 bg-white/20 rounded-full hover:bg-white/40 transition-colors"><X className="w-6 h-6 text-white"/></button>
-                            <img src={zoomedImg} alt="Zoomed in" className="max-w-full max-h-full rounded-lg shadow-2xl object-contain" />
+                        <div className="fixed inset-0 bg-black/80 backdrop-blur-lg flex items-center justify-center p-4 z-50 animate-in fade-in duration-300" onClick={closeImage}>
+                            <div className="relative max-w-full max-h-full">
+                                <img 
+                                    src={zoomedImg} 
+                                    alt="Zoomed view" 
+                                    className="max-w-full max-h-full rounded-xl shadow-2xl animate-in zoom-in duration-500 border border-white/20" 
+                                />
+                                <button 
+                                    onClick={closeImage}
+                                    className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm p-3 rounded-lg hover:bg-white/30 transition-all duration-300 border border-white/30 shadow-lg"
+                                >
+                                    <X className="w-6 h-6 text-white" />
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
