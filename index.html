@@ -39,8 +39,7 @@
     <link rel="preconnect" href="https://i.imgur.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=apk_install,ios_share,install_mobile" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=apk_install" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -111,6 +110,288 @@
         button:focus-visible, a:focus-visible { outline: 2px solid #334155; outline-offset: 4px; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 }
         .icon-gradient-text { background: linear-gradient(135deg, rgba(51, 65, 85, 0.95) 0%, rgba(71, 85, 105, 0.85) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block; }
+        
+        /* PWA Install Button */
+        .pwa-install-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+        }
+        .pwa-install-button.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        .pwa-install-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .pwa-install-button:active {
+            transform: scale(0.95);
+        }
+        .pwa-install-button .material-symbols-outlined {
+            font-size: 28px;
+            background: linear-gradient(135deg, #334155 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* iOS Install Banner */
+        .ios-install-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(51, 65, 85, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: white;
+            border-radius: 16px;
+            padding: 16px;
+            transform: translateY(120%);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 1000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .ios-install-banner.visible {
+            transform: translateY(0);
+        }
+        .ios-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .ios-banner-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            flex-shrink: 0;
+            background: white;
+            padding: 2px;
+        }
+        .ios-banner-text {
+            flex: 1;
+        }
+        .ios-banner-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        .ios-banner-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ios-share-icon {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 3px;
+            border-radius: 4px;
+            display: inline-flex;
+        }
+        .ios-banner-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .ios-banner-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* iOS Modal */
+        .ios-install-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1001;
+            display: none;
+        }
+        .ios-install-modal.active {
+            display: block;
+        }
+        .ios-modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .ios-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 340px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .ios-modal-content h3 {
+            margin: 0 0 24px 0;
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e293b;
+            text-align: center;
+        }
+        .ios-install-steps {
+            margin: 24px 0;
+        }
+        .ios-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .ios-step-number {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #334155 0%, #475569 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .ios-step p {
+            margin: 0;
+            color: #475569;
+            font-size: 15px;
+            line-height: 1.5;
+            padding-top: 2px;
+        }
+        .ios-modal-close {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #334155 0%, #475569 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .ios-modal-close:hover {
+            transform: translateY(-1px);
+        }
+        .ios-modal-close:active {
+            transform: translateY(0);
+        }
+
+        /* PWA Install Prompt (for Chrome/Edge) */
+        .pwa-install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120%);
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: calc(100% - 40px);
+            z-index: 1000;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .pwa-install-prompt.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+        .pwa-prompt-content {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .pwa-prompt-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            flex-shrink: 0;
+        }
+        .pwa-prompt-text {
+            flex: 1;
+        }
+        .pwa-prompt-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+        .pwa-prompt-subtitle {
+            font-size: 14px;
+            color: #64748b;
+        }
+        .pwa-prompt-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .pwa-prompt-actions button {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .pwa-prompt-dismiss {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        .pwa-prompt-dismiss:hover {
+            background: #e2e8f0;
+        }
+        .pwa-prompt-install {
+            background: linear-gradient(135deg, #334155 0%, #475569 100%);
+            color: white;
+        }
+        .pwa-prompt-install:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(71, 85, 105, 0.3);
+        }
+
         @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
     </style>
 </head>
@@ -147,10 +428,6 @@
             const [isLoaded, setIsLoaded] = useState(false);
             const [isOffline, setIsOffline] = useState(!navigator.onLine);
             const [lastVisited, setLastVisited] = useState([]);
-            const [deferredPrompt, setDeferredPrompt] = useState(null);
-            const [isStandalone, setIsStandalone] = useState(false);
-            const [isIOS, setIsIOS] = useState(false);
-            const [showInstallInstructions, setShowInstallInstructions] = useState(false);
 
             useEffect(() => {
                 setTimeout(() => {
@@ -161,55 +438,11 @@
                 const handleOnline = () => setIsOffline(false); const handleOffline = () => setIsOffline(true);
                 window.addEventListener('online', handleOnline); window.addEventListener('offline', handleOffline);
                 setLastVisited(JSON.parse(sessionStorage.getItem('lastVisited') || '[]'));
-                
-                // Detect iOS
-                const userAgent = window.navigator.userAgent.toLowerCase();
-                const ios = /iphone|ipad|ipod/.test(userAgent);
-                setIsIOS(ios);
-                
-                // Check if already installed
-                const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || false;
-                setIsStandalone(standalone);
-                
-                // Handle install prompt for browsers that support it
-                const handleInstallPrompt = (e) => {
-                    e.preventDefault();
-                    setDeferredPrompt(e);
-                };
-                
-                window.addEventListener('beforeinstallprompt', handleInstallPrompt);
-                
-                return () => {
-                    window.removeEventListener('online', handleOnline);
-                    window.removeEventListener('offline', handleOffline);
-                    window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
-                };
+                return () => { window.removeEventListener('online', handleOnline); window.removeEventListener('offline', handleOffline); };
             }, []);
 
             const openImage = (src) => { setZoomedImg(src); if (navigator.vibrate) navigator.vibrate(50); };
             const closeImage = () => setZoomedImg(null);
-            
-            const handleInstallClick = async () => {
-                if (deferredPrompt) {
-                    // Use the native install prompt if available
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    
-                    if (outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                        setIsStandalone(true);
-                    }
-                    
-                    setDeferredPrompt(null);
-                } else {
-                    // Show instructions for manual installation
-                    setShowInstallInstructions(true);
-                }
-            };
-            
-            const dismissInstructions = () => {
-                setShowInstallInstructions(false);
-            };
 
             const cards = [
                 { id: 'gate', title: 'Gate Access', icon: <GateIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
@@ -338,69 +571,6 @@
                     </div>
 
                     {isOffline && ( <div className="fixed top-4 left-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-slideUp z-50"><span className="font-semibold">Offline Mode</span> - Some features may be limited</div> )}
-                    
-                    {!isStandalone && (
-                        <button 
-                            onClick={handleInstallClick}
-                            className="fixed top-4 right-4 w-12 h-12 glass-enhanced rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform haptic z-40 animate-scaleIn"
-                            aria-label="Install app"
-                        >
-                            <span className="material-symbols-outlined text-slate-700" style={{fontSize: '24px'}}>apk_install</span>
-                        </button>
-                    )}
-                    
-                    {showInstallInstructions && (
-                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={dismissInstructions}>
-                            <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-slideUp" onClick={(e) => e.stopPropagation()}>
-                                <div className="text-center">
-                                    <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <span className="material-symbols-outlined text-blue-600" style={{fontSize: '40px'}}>install_mobile</span>
-                                    </div>
-                                    <h3 className="text-xl font-bold text-gray-800 mb-3">Install GrappA Guide</h3>
-                                    <p className="text-gray-600 mb-6">Add this app to your home screen for quick access and offline use</p>
-                                    <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                                        {isIOS ? (
-                                            <ol className="text-left text-sm text-gray-700 space-y-2">
-                                                <li className="flex items-start gap-2">
-                                                    <span className="font-bold text-blue-600">1.</span>
-                                                    <span>Tap the <span className="inline-flex items-center"><span className="material-symbols-outlined" style={{fontSize: '16px'}}>ios_share</span></span> share button</span>
-                                                </li>
-                                                <li className="flex items-start gap-2">
-                                                    <span className="font-bold text-blue-600">2.</span>
-                                                    <span>Scroll down and tap "Add to Home Screen"</span>
-                                                </li>
-                                                <li className="flex items-start gap-2">
-                                                    <span className="font-bold text-blue-600">3.</span>
-                                                    <span>Tap "Add" to install</span>
-                                                </li>
-                                            </ol>
-                                        ) : (
-                                            <ol className="text-left text-sm text-gray-700 space-y-2">
-                                                <li className="flex items-start gap-2">
-                                                    <span className="font-bold text-blue-600">1.</span>
-                                                    <span>Open browser menu (⋮)</span>
-                                                </li>
-                                                <li className="flex items-start gap-2">
-                                                    <span className="font-bold text-blue-600">2.</span>
-                                                    <span>Look for "Install app" or "Add to Home Screen"</span>
-                                                </li>
-                                                <li className="flex items-start gap-2">
-                                                    <span className="font-bold text-blue-600">3.</span>
-                                                    <span>Follow the prompts to install</span>
-                                                </li>
-                                            </ol>
-                                        )}
-                                    </div>
-                                    <button 
-                                        onClick={dismissInstructions}
-                                        className="w-full bg-slate-800 text-white py-3 rounded-lg font-semibold hover:bg-slate-700 transition-colors haptic"
-                                    >
-                                        Got it
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
                     <div className={`text-center mb-8 pt-8 transition-all duration-1000 ${isLoaded ? 'animate-fadeIn' : 'opacity-0'}`}>
                         <div className="glass-enhanced rounded-2xl p-6 max-w-md mx-auto shadow-xl">
