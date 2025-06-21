@@ -16,7 +16,19 @@
     <meta name="twitter:title" content="GrappA Guest Guide">
     <meta name="twitter:description" content="Your complete resort companion for GrappA. Access guides, links, and information, even offline.">
     <meta name="twitter:image" content="https://i.imgur.com/r4z8Ibx.png">
-    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiR3JhcHBBIEd1ZXN0IEd1aWRlIiwic2hvcnRfbmFtZSI6IkdyYXBwQSBHdWlkZSIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZjhmYWZjIiwidGhlbWVfY29sb3IiOiIjZjhmYWZjIiwiZGVzY3JpcHRpb24iOiJZb3VyIHJlc29ydCBndWlkZSBmb3IgR3JhcHBBLiIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2kuaW1ndXIuY29tL3M2ZzZBNGIucG5nIiwidHlwZSI6ImltYWdlL3BuZyIsInNpemVzIjoiMTkyeDE5MiJ9LHsic3JjIjoiaHR0cHM6Ly9pLmltZ3VyLmNvbS9zNmc2QTRiLnBuZyIsInR5cGUiOiJpbWFnZS9wbmciLCJzaXplcyI6IjUxMng1MTIifV19">
+    <link rel="manifest" href="data:application/manifest+json,{
+        &quot;name&quot;: &quot;GrappA Guest Guide&quot;,
+        &quot;short_name&quot;: &quot;GrappA Guide&quot;,
+        &quot;start_url&quot;: &quot;.&quot;,
+        &quot;display&quot;: &quot;standalone&quot;,
+        &quot;background_color&quot;: &quot;#f8fafc&quot;,
+        &quot;theme_color&quot;: &quot;#f8fafc&quot;,
+        &quot;description&quot;: &quot;Your resort guide for GrappA.&quot;,
+        &quot;icons&quot;: [
+            { &quot;src&quot;: &quot;https://i.imgur.com/s6g6A4b.png&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;sizes&quot;: &quot;192x192&quot; },
+            { &quot;src&quot;: &quot;https://i.imgur.com/s6g6A4b.png&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;sizes&quot;: &quot;512x512&quot; }
+        ]
+    }">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="GrappA Guide">
@@ -27,7 +39,6 @@
     <link rel="preconnect" href="https://i.imgur.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=apk_install,ios_share,install_mobile" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -108,20 +119,8 @@
     
     <script type="text/babel">
         // --- PWA Service Worker (concise version) ---
-        const serviceWorkerCode = `const CACHE_NAME='grappa-guide-cache-v16';const U=['.','https://cdn.tailwindcss.com','https://unpkg.com/react@18/umd/react.development.js','https://unpkg.com/react-dom@18/umd/react-dom.development.js','https://unpkg.com/@babel/standalone/babel.min.js','https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200','https://i.imgur.com/MBYTWps.png','https://i.imgur.com/ChMRT7d.jpg','https://i.imgur.com/2AahzMz.png'];self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(U)).then(()=>self.skipWaiting())));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok){const cRes=res.clone();caches.open(CACHE_NAME).then(c=>c.put(e.request,cRes))}return res})).catch(()=>new Response('Offline'))));self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>CACHE_NAME!==k?caches.delete(k):null))).then(()=>self.clients.claim())));`;
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register(URL.createObjectURL(new Blob([serviceWorkerCode],{type:'application/javascript'})))
-                    .then(r => {
-                        console.log('Service Worker registered successfully');
-                        // Force check for install prompt after SW registration
-                        if (window.matchMedia('(display-mode: browser)').matches && !window.navigator.standalone) {
-                            console.log('App is running in browser mode, install should be available');
-                        }
-                    })
-                    .catch(e => console.error('Service Worker registration failed:', e));
-            });
-        }
+        const serviceWorkerCode = `const CACHE_NAME='grappa-guide-cache-v17';const U=['.','https://cdn.tailwindcss.com','https://unpkg.com/react@18/umd/react.development.js','https://unpkg.com/react-dom@18/umd/react-dom.development.js','https://unpkg.com/@babel/standalone/babel.min.js','https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200','https://i.imgur.com/MBYTWps.png','https://i.imgur.com/ChMRT7d.jpg','https://i.imgur.com/2AahzMz.png', 'https://i.imgur.com/5vg5NXj.png'];self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(U)).then(()=>self.skipWaiting())));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok){const cRes=res.clone();caches.open(CACHE_NAME).then(c=>c.put(e.request,cRes))}return res})).catch(()=>new Response('Offline'))));self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>CACHE_NAME!==k?caches.delete(k):null))).then(()=>self.clients.claim())));`;
+        if ('serviceWorker' in navigator) window.addEventListener('load',() => navigator.serviceWorker.register(URL.createObjectURL(new Blob([serviceWorkerCode],{type:'application/javascript'}))).then(r=>console.log('SW reg')).catch(e=>console.log('SW err')));
 
         // --- Reusable Icon Gradient Definition ---
         const IconDefs = () => (<defs><linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="rgba(51, 65, 85, 0.95)" /><stop offset="100%" stopColor="rgba(71, 85, 105, 0.85)" /></linearGradient></defs>);
@@ -137,19 +136,10 @@
         const SpaIcon = () => ( <span className="material-symbols-outlined icon-gradient-text" style={{ fontSize: '32px' }}>spa</span> );
         const TrailServicesIcon = () => ( <span className="material-symbols-outlined icon-gradient-text" style={{ fontSize: '32px' }}>contact_phone</span> );
         const CheckoutIcon = () => ( <span className="material-symbols-outlined icon-gradient-text" style={{ fontSize: '32px' }}>logout</span> );
+        const InstallIcon = () => ( <span className="material-symbols-outlined icon-gradient-text" style={{ fontSize: '32px' }}>install_mobile</span> );
         const CloseIcon = () => ( <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg> );
 
         // --- Main React Component ---
-        // Global variable to store install prompt
-        let globalDeferredPrompt = null;
-        
-        // Capture the event as early as possible
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            globalDeferredPrompt = e;
-            console.log('Install prompt captured and stored');
-        });
-
         const BnBGuestGuide = () => {
             const { useState, useEffect } = React;
             const [openDialog, setOpenDialog] = useState(null);
@@ -157,43 +147,34 @@
             const [isLoaded, setIsLoaded] = useState(false);
             const [isOffline, setIsOffline] = useState(!navigator.onLine);
             const [lastVisited, setLastVisited] = useState([]);
-            const [deferredPrompt, setDeferredPrompt] = useState(globalDeferredPrompt);
-            const [isStandalone, setIsStandalone] = useState(false);
-            const [isIOS, setIsIOS] = useState(false);
-            const [showInstallInstructions, setShowInstallInstructions] = useState(false);
+            const [deferredPrompt, setDeferredPrompt] = useState(null);
+            
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 
             useEffect(() => {
+                // --- Loading Screen ---
                 setTimeout(() => {
                     const ls = document.getElementById('loading-screen');
                     if(ls) { ls.style.opacity = '0'; setTimeout(() => { ls.style.display = 'none'; }, 500); }
                     setIsLoaded(true);
                 }, 1000);
-                const handleOnline = () => setIsOffline(false); const handleOffline = () => setIsOffline(true);
-                window.addEventListener('online', handleOnline); window.addEventListener('offline', handleOffline);
+
+                // --- Online/Offline Status ---
+                const handleOnline = () => setIsOffline(false);
+                const handleOffline = () => setIsOffline(true);
+                window.addEventListener('online', handleOnline);
+                window.addEventListener('offline', handleOffline);
+
+                // --- Recently Visited ---
                 setLastVisited(JSON.parse(sessionStorage.getItem('lastVisited') || '[]'));
                 
-                // Detect iOS
-                const userAgent = window.navigator.userAgent.toLowerCase();
-                const ios = /iphone|ipad|ipod/.test(userAgent);
-                setIsIOS(ios);
-                
-                // Check if already installed
-                const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || false;
-                setIsStandalone(standalone);
-                
-                // Check if we already have the prompt
-                if (globalDeferredPrompt) {
-                    setDeferredPrompt(globalDeferredPrompt);
-                }
-                
-                // Handle install prompt for browsers that support it
+                // --- PWA Install Prompt ---
                 const handleInstallPrompt = (e) => {
                     e.preventDefault();
-                    globalDeferredPrompt = e;
+                    console.log("beforeinstallprompt event fired!");
                     setDeferredPrompt(e);
-                    console.log('Install prompt received in component');
                 };
-                
                 window.addEventListener('beforeinstallprompt', handleInstallPrompt);
                 
                 return () => {
@@ -207,57 +188,17 @@
             const closeImage = () => setZoomedImg(null);
             
             const handleInstallClick = async () => {
-                console.log('Install button clicked');
-                console.log('User Agent:', navigator.userAgent);
-                console.log('Is Chrome/Edge:', /Chrome|Edg/.test(navigator.userAgent));
-                console.log('Deferred prompt available:', !!deferredPrompt);
-                console.log('Global deferred prompt available:', !!globalDeferredPrompt);
-                
-                // Try to use either the state or global deferred prompt
-                const promptToUse = deferredPrompt || globalDeferredPrompt;
-                
-                if (promptToUse && promptToUse.prompt) {
-                    try {
-                        // Use the native install prompt
-                        console.log('Triggering native install prompt');
-                        await promptToUse.prompt();
-                        const { outcome } = await promptToUse.userChoice;
-                        
-                        console.log('Install outcome:', outcome);
-                        if (outcome === 'accepted') {
-                            console.log('User accepted the install prompt');
-                            setIsStandalone(true);
-                        }
-                        
-                        // Clear the prompt after use
-                        globalDeferredPrompt = null;
-                        setDeferredPrompt(null);
-                    } catch (error) {
-                        console.error('Error showing install prompt:', error);
-                        // Fall back to showing instructions
-                        setShowInstallInstructions(true);
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
                     }
+                    setDeferredPrompt(null);
                 } else {
-                    console.log('No native prompt available, showing instructions');
-                    // For Android Chrome/Edge, check if it's a PWA-capable browser
-                    const isAndroidChrome = /Android/.test(navigator.userAgent) && /Chrome|Edg/.test(navigator.userAgent);
-                    
-                    if (isAndroidChrome) {
-                        console.log('Android Chrome/Edge detected but no install prompt available');
-                        console.log('This might be because:');
-                        console.log('1. The app was already installed');
-                        console.log('2. The user previously dismissed the install prompt');
-                        console.log('3. The page needs to be reloaded');
-                        console.log('4. The manifest or service worker has issues');
-                    }
-                    
-                    // Show instructions for manual installation
-                    setShowInstallInstructions(true);
+                    // Fallback to instructions if prompt not available
+                    openDialogHandler('install');
                 }
-            };
-            
-            const dismissInstructions = () => {
-                setShowInstallInstructions(false);
             };
 
             const cards = [
@@ -332,8 +273,8 @@
                                      <a href="tel:050-555-1383" className="text-blue-600 hover:underline">050-555-1383</a>
                                  </p>
                                  <div className="bg-white p-3 rounded-lg shadow-sm border">
-                                 <img src="https://imgur.com/5vg5NXj.png" alt="info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://imgur.com/5vg5NXj.png')} />
-                             </div>
+                                    <img src="https://i.imgur.com/5vg5NXj.png" alt="Spa Info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://i.imgur.com/5vg5NXj.png')} />
+                                </div>
                              </div>
                          </div>
                      </div>
@@ -350,6 +291,37 @@
                         </div>
                       </div>
                     </div>
+                )},
+                { id: 'install', title: 'Install App', icon: <InstallIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
+                    <div className="text-center p-4">
+                        <h3 className="text-xl font-bold text-gray-800 mb-3">Install GrappA Guide</h3>
+                        <p className="text-gray-600 mb-6">Add this app to your home screen for quick access and offline use.</p>
+                        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                            {isIOS ? (
+                                <ol className="text-left text-sm text-gray-700 space-y-3">
+                                    <li className="flex items-start gap-2">
+                                        <span className="font-bold text-blue-600">1.</span>
+                                        <span>Tap the <span className="inline-flex items-center justify-center w-6 h-6 bg-gray-200 rounded-md"><span className="material-symbols-outlined" style={{fontSize: '18px'}}>ios_share</span></span> share button in your browser.</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <span className="font-bold text-blue-600">2.</span>
+                                        <span>Scroll down and tap 'Add to Home Screen'.</span>
+                                    </li>
+                                </ol>
+                            ) : (
+                                <ol className="text-left text-sm text-gray-700 space-y-3">
+                                     <li className="flex items-start gap-2">
+                                        <span className="font-bold text-blue-600">1.</span>
+                                        <span>Tap the menu button (usually ⋮ or …) in your browser.</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <span className="font-bold text-blue-600">2.</span>
+                                        <span>Tap 'Install app' or 'Add to Home Screen'.</span>
+                                    </li>
+                                </ol>
+                            )}
+                        </div>
+                    </div>
                 )}
             ];
 
@@ -362,105 +334,32 @@
             };
             const closeDialog = () => { setOpenDialog(null); if (navigator.vibrate) navigator.vibrate(30); };
 
+            const mainCards = cards.filter(c => c.id !== 'install');
+            if (!isStandalone) {
+                mainCards.push(cards.find(c => c.id === 'install'));
+            }
+
+
             return (
                 <div className="min-h-screen p-4 relative overflow-hidden">
                     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {/* Warm Bubbles */}
+                        {/* Background Bubbles */}
                         <div className="absolute w-40 h-40 bg-gradient-to-br from-[#fffadc]/50 to-[#fef3c7]/40 rounded-full top-10 left-10 animate-float"></div>
                         <div className="absolute w-32 h-32 bg-gradient-to-br from-[#fef3c7]/45 to-[#ffedbc]/35 rounded-full top-60 right-16 animate-pulse"></div>
                         <div className="absolute w-28 h-28 bg-gradient-to-br from-[#fff7ed]/50 to-[#fffadc]/40 rounded-full bottom-20 left-1/3 animate-float" style={{animationDelay: '2s'}}></div>
                         <div className="absolute w-36 h-36 bg-gradient-to-br from-[#fffadc]/40 to-[#fef3c7]/30 rounded-full bottom-40 right-10 animate-pulse" style={{animationDelay: '1s'}}></div>
-                        <div className="absolute w-24 h-24 bg-gradient-to-br from-[#fff7ed]/45 to-[#fef3c7]/35 rounded-full top-1/3 left-1/2 animate-float" style={{animationDelay: '3s'}}></div>
-                        <div className="absolute w-44 h-44 bg-gradient-to-br from-[#fef3c7]/35 to-[#ffedbc]/25 rounded-full bottom-10 left-10 animate-pulse" style={{animationDelay: '2.5s'}}></div>
-                        <div className="absolute w-20 h-20 bg-gradient-to-br from-[#fffadc]/50 to-[#fff7ed]/40 rounded-full top-20 right-1/3 animate-float" style={{animationDelay: '1.5s'}}></div>
-                        <div className="absolute w-48 h-48 bg-gradient-to-br from-[#fef3c7]/30 to-[#ffedbc]/20 rounded-full top-1/2 right-1/4 animate-pulse" style={{animationDelay: '4s'}}></div>
-                        
-                        {/* Additional Small Bubbles */}
-                        <div className="absolute w-16 h-16 bg-gradient-to-br from-[#fff7ed]/55 to-[#fffadc]/45 rounded-full top-5 right-5 animate-float" style={{animationDelay: '0.5s'}}></div>
-                        <div className="absolute w-12 h-12 bg-gradient-to-br from-[#fffadc]/50 to-[#fef3c7]/40 rounded-full bottom-32 right-20 animate-pulse" style={{animationDelay: '3.5s'}}></div>
-                        <div className="absolute w-14 h-14 bg-gradient-to-br from-[#fff7ed]/52 to-[#fef3c7]/42 rounded-full top-40 left-5 animate-float" style={{animationDelay: '2.5s'}}></div>
-                        <div className="absolute w-10 h-10 bg-gradient-to-br from-[#fef3c7]/48 to-[#ffedbc]/38 rounded-full bottom-5 right-1/2 animate-pulse" style={{animationDelay: '1.8s'}}></div>
-                        <div className="absolute w-18 h-18 bg-gradient-to-br from-[#fffadc]/50 to-[#fff7ed]/40 rounded-full top-3/4 left-20 animate-float" style={{animationDelay: '4.5s'}}></div>
-                        <div className="absolute w-8 h-8 bg-gradient-to-br from-[#fef3c7]/55 to-[#ffedbc]/45 rounded-full top-2/3 right-10 animate-pulse" style={{animationDelay: '0.8s'}}></div>
-                        <div className="absolute w-15 h-15 bg-gradient-to-br from-[#fff7ed]/52 to-[#fffadc]/42 rounded-full bottom-1/4 left-1/4 animate-float" style={{animationDelay: '3.2s'}}></div>
-                        <div className="absolute w-11 h-11 bg-gradient-to-br from-[#fffadc]/50 to-[#fef3c7]/40 rounded-full top-10 left-1/3 animate-pulse" style={{animationDelay: '2.2s'}}></div>
                     </div>
 
                     {isOffline && ( <div className="fixed top-4 left-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-slideUp z-50"><span className="font-semibold">Offline Mode</span> - Some features may be limited</div> )}
                     
-                    {!isStandalone && (
+                    {!isStandalone && deferredPrompt && (
                         <button 
                             onClick={handleInstallClick}
                             className="fixed top-4 right-4 w-12 h-12 glass-enhanced rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform haptic z-40 animate-scaleIn"
                             aria-label="Install app"
                         >
-                            <span className="material-symbols-outlined text-slate-700" style={{fontSize: '24px'}}>apk_install</span>
+                            <span className="material-symbols-outlined text-slate-700" style={{fontSize: '24px'}}>download_for_offline</span>
                         </button>
-                    )}
-                    
-                    {showInstallInstructions && (
-                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={dismissInstructions}>
-                            <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-slideUp" onClick={(e) => e.stopPropagation()}>
-                                <div className="text-center">
-                                    <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <span className="material-symbols-outlined text-blue-600" style={{fontSize: '40px'}}>install_mobile</span>
-                                    </div>
-                                    <h3 className="text-xl font-bold text-gray-800 mb-3">Install GrappA Guide</h3>
-                                    <p className="text-gray-600 mb-6">Add this app to your home screen for quick access and offline use</p>
-                                    {/* Debug info for Android */}
-                                    {!isIOS && (
-                                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4 text-xs text-left">
-                                            <p className="font-semibold text-yellow-800 mb-1">Troubleshooting:</p>
-                                            <p className="text-yellow-700">If the automatic install didn't work, try:</p>
-                                            <ul className="list-disc list-inside text-yellow-700 mt-1">
-                                                <li>Refreshing the page and trying again</li>
-                                                <li>Clearing browser cache</li>
-                                                <li>Using the manual method below</li>
-                                            </ul>
-                                        </div>
-                                    )}
-                                    <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                                        {isIOS ? (
-                                            <ol className="text-left text-sm text-gray-700 space-y-2">
-                                                <li className="flex items-start gap-2">
-                                                    <span className="font-bold text-blue-600">1.</span>
-                                                    <span>Tap the <span className="inline-flex items-center"><span className="material-symbols-outlined" style={{fontSize: '16px'}}>ios_share</span></span> share button</span>
-                                                </li>
-                                                <li className="flex items-start gap-2">
-                                                    <span className="font-bold text-blue-600">2.</span>
-                                                    <span>Scroll down and tap "Add to Home Screen"</span>
-                                                </li>
-                                                <li className="flex items-start gap-2">
-                                                    <span className="font-bold text-blue-600">3.</span>
-                                                    <span>Tap "Add" to install</span>
-                                                </li>
-                                            </ol>
-                                        ) : (
-                                            <ol className="text-left text-sm text-gray-700 space-y-2">
-                                                <li className="flex items-start gap-2">
-                                                    <span className="font-bold text-blue-600">1.</span>
-                                                    <span>Open browser menu (⋮)</span>
-                                                </li>
-                                                <li className="flex items-start gap-2">
-                                                    <span className="font-bold text-blue-600">2.</span>
-                                                    <span>Look for "Install app" or "Add to Home Screen"</span>
-                                                </li>
-                                                <li className="flex items-start gap-2">
-                                                    <span className="font-bold text-blue-600">3.</span>
-                                                    <span>Follow the prompts to install</span>
-                                                </li>
-                                            </ol>
-                                        )}
-                                    </div>
-                                    <button 
-                                        onClick={dismissInstructions}
-                                        className="w-full bg-slate-800 text-white py-3 rounded-lg font-semibold hover:bg-slate-700 transition-colors haptic"
-                                    >
-                                        Got it
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
                     )}
 
                     <div className={`text-center mb-8 pt-8 transition-all duration-1000 ${isLoaded ? 'animate-fadeIn' : 'opacity-0'}`}>
@@ -481,8 +380,8 @@
                     </div>
 
                     <div className="grid grid-cols-2 gap-5 max-w-lg mx-auto">
-                        {cards.map((card, index) => (
-                            <div key={card.id} onClick={() => openDialogHandler(card.id)} className={`glass rounded-2xl p-5 cursor-pointer shadow-lg card-hover haptic ${ isLoaded ? 'animate-scaleIn' : 'opacity-0' }`} style={{animationDelay: `${index * 0.08}s`}}>
+                        {mainCards.map((card, index) => (
+                            <div key={card.id} onClick={() => card.id === 'install' ? handleInstallClick() : openDialogHandler(card.id)} className={`glass rounded-2xl p-5 cursor-pointer shadow-lg card-hover haptic ${ isLoaded ? 'animate-scaleIn' : 'opacity-0' }`} style={{animationDelay: `${index * 0.08}s`}}>
                                 <div className="flex flex-col items-center text-center space-y-3">
                                     <div className={`p-4 bg-gradient-to-br ${card.gradient} backdrop-blur-sm rounded-2xl shadow-md icon-container border border-white/40`}>{card.icon}</div>
                                     <h3 className="text-slate-800 font-bold text-base tracking-tight">{card.title}</h3>
