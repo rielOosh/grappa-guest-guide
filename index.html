@@ -8,14 +8,14 @@
     <meta name="theme-color" content="#f8fafc">
     <meta property="og:title" content="GrappA Guest Guide">
     <meta property="og:description" content="Your complete resort companion for GrappA. Access guides, links, and information, even offline.">
-    <meta property="og:image" content="https://imgur.com/FlZNEFh.png">
+    <meta property="og:image" content="https://i.imgur.com/r4z8Ibx.png">
     <meta property="og:url" content="https://grappa-guest-guide.netlify.app/">
     <meta property="og:type" content="website">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="GrappA Guest Guide">
     <meta name="twitter:description" content="Your complete resort companion for GrappA. Access guides, links, and information, even offline.">
-    <meta name="twitter:image" content="https://imgur.com/FlZNEFh.png">
+    <meta name="twitter:image" content="https://i.imgur.com/r4z8Ibx.png">
     <link rel="manifest" href="data:application/manifest+json,{
         &quot;name&quot;: &quot;GrappA Guest Guide&quot;,
         &quot;short_name&quot;: &quot;GrappA Guide&quot;,
@@ -77,7 +77,7 @@
         .animate-pulse { animation: pulse 4s ease-in-out infinite; }
         .animate-float { animation: float 8s ease-in-out infinite; }
         .glass { 
-            background: rgba(255, 255, 255, 0.65); 
+            background: rgba(255, 255, 255, 0.35); 
             backdrop-filter: blur(20px) saturate(180%); 
 
             -webkit-backdrop-filter: blur(20px) saturate(180%); 
@@ -146,6 +146,10 @@
             const [isLoaded, setIsLoaded] = useState(false);
             const [isOffline, setIsOffline] = useState(!navigator.onLine);
             const [lastVisited, setLastVisited] = useState([]);
+            const [deferredPrompt, setDeferredPrompt] = useState(null);
+            const [showInstallButton, setShowInstallButton] = useState(false);
+            const [isIOS, setIsIOS] = useState(false);
+            const [showIOSInstall, setShowIOSInstall] = useState(false);
 
             useEffect(() => {
                 setTimeout(() => {
@@ -156,11 +160,61 @@
                 const handleOnline = () => setIsOffline(false); const handleOffline = () => setIsOffline(true);
                 window.addEventListener('online', handleOnline); window.addEventListener('offline', handleOffline);
                 setLastVisited(JSON.parse(sessionStorage.getItem('lastVisited') || '[]'));
+                
+                // Detect iOS
+                const userAgent = window.navigator.userAgent.toLowerCase();
+                const ios = /iphone|ipad|ipod/.test(userAgent);
+                setIsIOS(ios);
+                
+                // Check if already installed
+                const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+                
+                if (!isStandalone) {
+                    if (ios && !sessionStorage.getItem('iosInstallDismissed')) {
+                        // Show iOS install prompt after a delay
+                        setTimeout(() => setShowIOSInstall(true), 3000);
+                    }
+                    
+                    // Handle install prompt for other browsers
+                    const handleInstallPrompt = (e) => {
+                        e.preventDefault();
+                        setDeferredPrompt(e);
+                        setShowInstallButton(true);
+                    };
+                    
+                    window.addEventListener('beforeinstallprompt', handleInstallPrompt);
+                    
+                    return () => {
+                        window.removeEventListener('online', handleOnline);
+                        window.removeEventListener('offline', handleOffline);
+                        window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
+                    };
+                }
+                
                 return () => { window.removeEventListener('online', handleOnline); window.removeEventListener('offline', handleOffline); };
             }, []);
 
             const openImage = (src) => { setZoomedImg(src); if (navigator.vibrate) navigator.vibrate(50); };
             const closeImage = () => setZoomedImg(null);
+            
+            const handleInstallClick = async () => {
+                if (!deferredPrompt) return;
+                
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                
+                if (outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                }
+                
+                setDeferredPrompt(null);
+                setShowInstallButton(false);
+            };
+            
+            const dismissIOSInstall = () => {
+                setShowIOSInstall(false);
+                sessionStorage.setItem('iosInstallDismissed', 'true');
+            };
 
             const cards = [
                 { id: 'gate', title: 'Gate Access', icon: <GateIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
@@ -289,6 +343,54 @@
                     </div>
 
                     {isOffline && ( <div className="fixed top-4 left-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-slideUp z-50"><span className="font-semibold">Offline Mode</span> - Some features may be limited</div> )}
+                    
+                    {showInstallButton && (
+                        <div className="fixed bottom-6 left-6 right-6 animate-slideUp z-40">
+                            <button 
+                                onClick={handleInstallClick}
+                                className="w-full glass-enhanced p-4 rounded-2xl shadow-xl flex items-center justify-center gap-3 hover:scale-105 transition-transform haptic"
+                            >
+                                <span className="material-symbols-outlined" style={{fontSize: '28px'}}>download</span>
+                                <span className="font-bold text-lg text-slate-800">Install GrappA Guide App</span>
+                            </button>
+                        </div>
+                    )}
+                    
+                    {showIOSInstall && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={dismissIOSInstall}>
+                            <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-slideUp" onClick={(e) => e.stopPropagation()}>
+                                <div className="text-center">
+                                    <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <span className="material-symbols-outlined text-blue-600" style={{fontSize: '40px'}}>install_mobile</span>
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-800 mb-3">Install GrappA Guide</h3>
+                                    <p className="text-gray-600 mb-6">Add this app to your home screen for quick access and offline use</p>
+                                    <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                                        <ol className="text-left text-sm text-gray-700 space-y-2">
+                                            <li className="flex items-start gap-2">
+                                                <span className="font-bold text-blue-600">1.</span>
+                                                <span>Tap the <span className="inline-flex items-center"><span className="material-symbols-outlined" style={{fontSize: '16px'}}>ios_share</span></span> share button</span>
+                                            </li>
+                                            <li className="flex items-start gap-2">
+                                                <span className="font-bold text-blue-600">2.</span>
+                                                <span>Scroll down and tap "Add to Home Screen"</span>
+                                            </li>
+                                            <li className="flex items-start gap-2">
+                                                <span className="font-bold text-blue-600">3.</span>
+                                                <span>Tap "Add" to install</span>
+                                            </li>
+                                        </ol>
+                                    </div>
+                                    <button 
+                                        onClick={dismissIOSInstall}
+                                        className="w-full bg-slate-800 text-white py-3 rounded-lg font-semibold hover:bg-slate-700 transition-colors haptic"
+                                    >
+                                        Got it
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <div className={`text-center mb-8 pt-8 transition-all duration-1000 ${isLoaded ? 'animate-fadeIn' : 'opacity-0'}`}>
                         <div className="glass-enhanced rounded-2xl p-6 max-w-md mx-auto shadow-xl">
