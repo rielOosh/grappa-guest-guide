@@ -39,7 +39,8 @@
     <link rel="preconnect" href="https://i.imgur.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=apk_install" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=apk_install,ios_share,install_mobile" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -70,7 +71,6 @@
         @keyframes slideUp { 0% { opacity: 0; transform: translateY(100vh) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes zoomIn { 0% { opacity: 0; transform: scale(0.3); } 100% { opacity: 1; transform: scale(1); } }
         @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-        @keyframes bounceIn { 0% { opacity: 0; transform: scale(0.3); } 50% { transform: scale(1.05); } 70% { transform: scale(0.9); } 100% { opacity: 1; transform: scale(1); } }
         .animate-fadeIn { animation: fadeIn 0.6s ease-out forwards; }
         .animate-scaleIn { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
         .animate-slideUp { animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
@@ -141,14 +141,16 @@
 
         // --- Main React Component ---
         const BnBGuestGuide = () => {
-            const { useState, useEffect, useRef } = React;
+            const { useState, useEffect } = React;
             const [openDialog, setOpenDialog] = useState(null);
             const [zoomedImg, setZoomedImg] = useState(null);
             const [isLoaded, setIsLoaded] = useState(false);
             const [isOffline, setIsOffline] = useState(!navigator.onLine);
             const [lastVisited, setLastVisited] = useState([]);
-            const [showInstallButton, setShowInstallButton] = useState(false);
-            const deferredPromptRef = useRef(null);
+            const [deferredPrompt, setDeferredPrompt] = useState(null);
+            const [isStandalone, setIsStandalone] = useState(false);
+            const [isIOS, setIsIOS] = useState(false);
+            const [showInstallInstructions, setShowInstallInstructions] = useState(false);
 
             useEffect(() => {
                 setTimeout(() => {
@@ -160,42 +162,54 @@
                 window.addEventListener('online', handleOnline); window.addEventListener('offline', handleOffline);
                 setLastVisited(JSON.parse(sessionStorage.getItem('lastVisited') || '[]'));
                 
-                // PWA Install prompt handling
-                const handleBeforeInstallPrompt = (e) => {
+                // Detect iOS
+                const userAgent = window.navigator.userAgent.toLowerCase();
+                const ios = /iphone|ipad|ipod/.test(userAgent);
+                setIsIOS(ios);
+                
+                // Check if already installed
+                const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || false;
+                setIsStandalone(standalone);
+                
+                // Handle install prompt for browsers that support it
+                const handleInstallPrompt = (e) => {
                     e.preventDefault();
-                    deferredPromptRef.current = e;
-                    setShowInstallButton(true);
+                    setDeferredPrompt(e);
                 };
                 
-                window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+                window.addEventListener('beforeinstallprompt', handleInstallPrompt);
                 
-                // Check if app is already installed
-                if (window.matchMedia('(display-mode: standalone)').matches) {
-                    setShowInstallButton(false);
-                }
-                
-                return () => { 
-                    window.removeEventListener('online', handleOnline); 
+                return () => {
+                    window.removeEventListener('online', handleOnline);
                     window.removeEventListener('offline', handleOffline);
-                    window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+                    window.removeEventListener('beforeinstallprompt', handleInstallPrompt);
                 };
             }, []);
 
-            const handleInstallClick = async () => {
-                if (!deferredPromptRef.current) return;
-                
-                deferredPromptRef.current.prompt();
-                const { outcome } = await deferredPromptRef.current.userChoice;
-                
-                if (outcome === 'accepted') {
-                    setShowInstallButton(false);
-                }
-                
-                deferredPromptRef.current = null;
-            };
-
             const openImage = (src) => { setZoomedImg(src); if (navigator.vibrate) navigator.vibrate(50); };
             const closeImage = () => setZoomedImg(null);
+            
+            const handleInstallClick = async () => {
+                if (deferredPrompt) {
+                    // Use the native install prompt if available
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    
+                    if (outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                        setIsStandalone(true);
+                    }
+                    
+                    setDeferredPrompt(null);
+                } else {
+                    // Show instructions for manual installation
+                    setShowInstallInstructions(true);
+                }
+            };
+            
+            const dismissInstructions = () => {
+                setShowInstallInstructions(false);
+            };
 
             const cards = [
                 { id: 'gate', title: 'Gate Access', icon: <GateIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
@@ -324,16 +338,68 @@
                     </div>
 
                     {isOffline && ( <div className="fixed top-4 left-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-slideUp z-50"><span className="font-semibold">Offline Mode</span> - Some features may be limited</div> )}
-
-                    {showInstallButton && (
-                        <button
+                    
+                    {!isStandalone && (
+                        <button 
                             onClick={handleInstallClick}
-                            className="fixed top-4 right-4 w-12 h-12 bg-white/80 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center text-slate-700 hover:bg-white/90 hover:scale-110 transition-all duration-300 z-40 haptic border border-white/50"
-                            aria-label="Add to Home Screen"
-                            style={{ animation: 'bounceIn 0.6s ease-out' }}
+                            className="fixed top-4 right-4 w-12 h-12 glass-enhanced rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform haptic z-40 animate-scaleIn"
+                            aria-label="Install app"
                         >
-                            <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>apk_install</span>
+                            <span className="material-symbols-outlined text-slate-700" style={{fontSize: '24px'}}>apk_install</span>
                         </button>
+                    )}
+                    
+                    {showInstallInstructions && (
+                        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={dismissInstructions}>
+                            <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-slideUp" onClick={(e) => e.stopPropagation()}>
+                                <div className="text-center">
+                                    <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <span className="material-symbols-outlined text-blue-600" style={{fontSize: '40px'}}>install_mobile</span>
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-800 mb-3">Install GrappA Guide</h3>
+                                    <p className="text-gray-600 mb-6">Add this app to your home screen for quick access and offline use</p>
+                                    <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                                        {isIOS ? (
+                                            <ol className="text-left text-sm text-gray-700 space-y-2">
+                                                <li className="flex items-start gap-2">
+                                                    <span className="font-bold text-blue-600">1.</span>
+                                                    <span>Tap the <span className="inline-flex items-center"><span className="material-symbols-outlined" style={{fontSize: '16px'}}>ios_share</span></span> share button</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="font-bold text-blue-600">2.</span>
+                                                    <span>Scroll down and tap "Add to Home Screen"</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="font-bold text-blue-600">3.</span>
+                                                    <span>Tap "Add" to install</span>
+                                                </li>
+                                            </ol>
+                                        ) : (
+                                            <ol className="text-left text-sm text-gray-700 space-y-2">
+                                                <li className="flex items-start gap-2">
+                                                    <span className="font-bold text-blue-600">1.</span>
+                                                    <span>Open browser menu (⋮)</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="font-bold text-blue-600">2.</span>
+                                                    <span>Look for "Install app" or "Add to Home Screen"</span>
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <span className="font-bold text-blue-600">3.</span>
+                                                    <span>Follow the prompts to install</span>
+                                                </li>
+                                            </ol>
+                                        )}
+                                    </div>
+                                    <button 
+                                        onClick={dismissInstructions}
+                                        className="w-full bg-slate-800 text-white py-3 rounded-lg font-semibold hover:bg-slate-700 transition-colors haptic"
+                                    >
+                                        Got it
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     )}
 
                     <div className={`text-center mb-8 pt-8 transition-all duration-1000 ${isLoaded ? 'animate-fadeIn' : 'opacity-0'}`}>
