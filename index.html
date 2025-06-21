@@ -34,13 +34,11 @@
     <meta name="apple-mobile-web-app-title" content="GrappA Guide">
     <link rel="apple-touch-icon" href="https://i.imgur.com/s6g6A4b.png">
     
-    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://i.imgur.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     
-    <!-- Google Fonts for Material Symbols -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -80,14 +78,14 @@
         .animate-float { animation: float 8s ease-in-out infinite; }
         .glass { 
             background: rgba(255, 255, 255, 0.35); 
-            backdrop-filter: blur(20px) saturate(180%); 
+            backdrop-filter: blur(20px) saturate(180%); 
 
-            -webkit-backdrop-filter: blur(20px) saturate(180%); 
-            border: 1px solid rgba(255, 255, 255, 0.5); 
+            -webkit-backdrop-filter: blur(20px) saturate(180%); 
+            border: 1px solid rgba(255, 255, 255, 0.5); 
 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.7); 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.7); 
 
-        }
+        }
         .glass-enhanced {
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(25px) saturate(200%);
@@ -179,9 +177,9 @@
                         <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><h4 className="font-bold mb-3 text-slate-800 text-lg">אפליקציית ניווט וטיולים</h4><a href="https://play.google.com/store/apps/details?id=altitude.alarm.erol.apps" target="_blank" rel="noopener noreferrer" className="block bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic">הורד אפליקציית טיולים</a></div>
                         <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><h4 className="font-bold mb-3 text-slate-800 text-lg">מיקום השער למסלולים</h4><a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" className="block bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic">פתח במפות</a></div>
                         <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><a href="./walk_to_the_bulbouse_mountain.gpx" download="Bulbous_Mountain_Trail.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול 5 ק"מ להר הלבן ולבולבוסים</a></div>
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><a href="./Zepp20230405100344.gpx" download="14km_trip_to_the_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול להר הגבוה 14 ק"מ</a></div>
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><a href="./Zepp20230118153553.gpx" download="12km_trip_to_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול אל נופי הדרום והמערב 12 ק"מ</a></div>
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><a href="./12km_walk.gpx" download="12km_trip.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול אל נופי הדרום 12 ק"מ</a></div>
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><a href="./Zepp20230405100344.gpx" download="14km_trip_to_the_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול להר הגבוה 14 ק"מ</a></div>
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><a href="./Zepp20230118153553.gpx" download="12km_trip_to_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול אל נופי הדרום והמערב 12 ק"מ</a></div>
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><a href="./12km_walk.gpx" download="12km_trip.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול אל נופי הדרום 12 ק"מ</a></div>
                     </div>
                 )},
                 { id: 'trail_services', title: 'Trail Services', icon: <TrailServicesIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
@@ -227,20 +225,20 @@
                 )},
                 { id: 'spa', title: 'Spa & Wellness', icon: <SpaIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
                      <div className="text-right" dir="rtl">
-                        <div className="bg-slate-50 p-8 rounded-xl border border-slate-200">
-                            <h4 className="font-bold text-3xl text-gray-800 mb-4 text-center">שירותי ספא</h4>
-                            <p className="text-gray-600 text-lg mb-6 text-center">להזמנת טיפולים, אנא צרו קשר עם דפנה.</p>
-                            <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4 text-center">
-                                <p className="text-slate-700 font-medium text-xl">
-                                    <span className="font-semibold">דפנה: </span>
-                                    <a href="tel:050-555-1383" className="text-blue-600 hover:underline">050-555-1383</a>
-                                </p>
-   <div className="bg-white p-3 rounded-lg shadow-sm border">
-                                <img src="https://imgur.com/5vg5NXj.png" alt="Logistics info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://imgur.com/5vg5NXj.png')} />
-                            </div>
-                            </div>
-                        </div>
-                    </div>
+                         <div className="bg-slate-50 p-8 rounded-xl border border-slate-200">
+                             <h4 className="font-bold text-3xl text-gray-800 mb-4 text-center">שירותי ספא</h4>
+                             <p className="text-gray-600 text-lg mb-6 text-center">להזמנת טיפולים, אנא צרו קשר עם דפנה.</p>
+                             <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4 text-center">
+                                 <p className="text-slate-700 font-medium text-xl">
+                                     <span className="font-semibold">דפנה: </span>
+                                     <a href="tel:050-555-1383" className="text-blue-600 hover:underline">050-555-1383</a>
+                                 </p>
+                                 <div className="bg-white p-3 rounded-lg shadow-sm border">
+                                 <img src="https://imgur.com/5vg5NXj.png" alt="info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://imgur.com/5vg5NXj.png')} />
+                             </div>
+                             </div>
+                         </div>
+                     </div>
                 )},
                 { id: 'checkout', title: 'Check-out Info', icon: <CheckoutIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
                     <div className="text-right" dir="rtl">
@@ -259,7 +257,7 @@
 
             const openDialogHandler = (id) => {
                 setOpenDialog(id);
-                if (navigator.vibrate) navigator.vibrate(50);
+                if (navigator.vibrate) navigator.vibrate(30);
                 const newVisited = [id, ...lastVisited.filter(v => v !== id)].slice(0, 3);
                 setLastVisited(newVisited);
                 sessionStorage.setItem('lastVisited', JSON.stringify(newVisited));
@@ -269,25 +267,25 @@
             return (
                 <div className="min-h-screen p-4 relative overflow-hidden">
                     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {/* Dark/Grey Bubbles */}
-                        <div className="absolute w-40 h-40 bg-gradient-to-br from-slate-700/30 to-slate-900/25 rounded-full top-10 left-10 animate-float"></div>
-                        <div className="absolute w-32 h-32 bg-gradient-to-br from-gray-800/28 to-gray-900/22 rounded-full top-60 right-16 animate-pulse"></div>
-                        <div className="absolute w-28 h-28 bg-gradient-to-br from-slate-600/30 to-slate-800/25 rounded-full bottom-20 left-1/3 animate-float" style={{animationDelay: '2s'}}></div>
-                        <div className="absolute w-36 h-36 bg-gradient-to-br from-gray-700/25 to-gray-900/20 rounded-full bottom-40 right-10 animate-pulse" style={{animationDelay: '1s'}}></div>
-                        <div className="absolute w-24 h-24 bg-gradient-to-br from-slate-800/28 to-slate-900/22 rounded-full top-1/3 left-1/2 animate-float" style={{animationDelay: '3s'}}></div>
-                        <div className="absolute w-44 h-44 bg-gradient-to-br from-gray-600/22 to-gray-800/18 rounded-full bottom-10 left-10 animate-pulse" style={{animationDelay: '2.5s'}}></div>
-                        <div className="absolute w-20 h-20 bg-gradient-to-br from-slate-700/30 to-slate-900/25 rounded-full top-20 right-1/3 animate-float" style={{animationDelay: '1.5s'}}></div>
-                        <div className="absolute w-48 h-48 bg-gradient-to-br from-gray-800/20 to-gray-900/16 rounded-full top-1/2 right-1/4 animate-pulse" style={{animationDelay: '4s'}}></div>
+                        {/* Warm Bubbles */}
+                        <div className="absolute w-40 h-40 bg-gradient-to-br from-[#fffadc]/50 to-[#fef3c7]/40 rounded-full top-10 left-10 animate-float"></div>
+                        <div className="absolute w-32 h-32 bg-gradient-to-br from-[#fef3c7]/45 to-[#ffedbc]/35 rounded-full top-60 right-16 animate-pulse"></div>
+                        <div className="absolute w-28 h-28 bg-gradient-to-br from-[#fff7ed]/50 to-[#fffadc]/40 rounded-full bottom-20 left-1/3 animate-float" style={{animationDelay: '2s'}}></div>
+                        <div className="absolute w-36 h-36 bg-gradient-to-br from-[#fffadc]/40 to-[#fef3c7]/30 rounded-full bottom-40 right-10 animate-pulse" style={{animationDelay: '1s'}}></div>
+                        <div className="absolute w-24 h-24 bg-gradient-to-br from-[#fff7ed]/45 to-[#fef3c7]/35 rounded-full top-1/3 left-1/2 animate-float" style={{animationDelay: '3s'}}></div>
+                        <div className="absolute w-44 h-44 bg-gradient-to-br from-[#fef3c7]/35 to-[#ffedbc]/25 rounded-full bottom-10 left-10 animate-pulse" style={{animationDelay: '2.5s'}}></div>
+                        <div className="absolute w-20 h-20 bg-gradient-to-br from-[#fffadc]/50 to-[#fff7ed]/40 rounded-full top-20 right-1/3 animate-float" style={{animationDelay: '1.5s'}}></div>
+                        <div className="absolute w-48 h-48 bg-gradient-to-br from-[#fef3c7]/30 to-[#ffedbc]/20 rounded-full top-1/2 right-1/4 animate-pulse" style={{animationDelay: '4s'}}></div>
                         
                         {/* Additional Small Bubbles */}
-                        <div className="absolute w-16 h-16 bg-gradient-to-br from-slate-600/35 to-slate-800/30 rounded-full top-5 right-5 animate-float" style={{animationDelay: '0.5s'}}></div>
-                        <div className="absolute w-12 h-12 bg-gradient-to-br from-gray-700/30 to-gray-900/25 rounded-full bottom-32 right-20 animate-pulse" style={{animationDelay: '3.5s'}}></div>
-                        <div className="absolute w-14 h-14 bg-gradient-to-br from-slate-800/32 to-slate-900/28 rounded-full top-40 left-5 animate-float" style={{animationDelay: '2.5s'}}></div>
-                        <div className="absolute w-10 h-10 bg-gradient-to-br from-gray-600/28 to-gray-800/24 rounded-full bottom-5 right-1/2 animate-pulse" style={{animationDelay: '1.8s'}}></div>
-                        <div className="absolute w-18 h-18 bg-gradient-to-br from-slate-700/30 to-slate-900/26 rounded-full top-3/4 left-20 animate-float" style={{animationDelay: '4.5s'}}></div>
-                        <div className="absolute w-8 h-8 bg-gradient-to-br from-gray-800/35 to-gray-900/30 rounded-full top-2/3 right-10 animate-pulse" style={{animationDelay: '0.8s'}}></div>
-                        <div className="absolute w-15 h-15 bg-gradient-to-br from-slate-600/32 to-slate-800/28 rounded-full bottom-1/4 left-1/4 animate-float" style={{animationDelay: '3.2s'}}></div>
-                        <div className="absolute w-11 h-11 bg-gradient-to-br from-gray-700/30 to-gray-900/26 rounded-full top-10 left-1/3 animate-pulse" style={{animationDelay: '2.2s'}}></div>
+                        <div className="absolute w-16 h-16 bg-gradient-to-br from-[#fff7ed]/55 to-[#fffadc]/45 rounded-full top-5 right-5 animate-float" style={{animationDelay: '0.5s'}}></div>
+                        <div className="absolute w-12 h-12 bg-gradient-to-br from-[#fffadc]/50 to-[#fef3c7]/40 rounded-full bottom-32 right-20 animate-pulse" style={{animationDelay: '3.5s'}}></div>
+                        <div className="absolute w-14 h-14 bg-gradient-to-br from-[#fff7ed]/52 to-[#fef3c7]/42 rounded-full top-40 left-5 animate-float" style={{animationDelay: '2.5s'}}></div>
+                        <div className="absolute w-10 h-10 bg-gradient-to-br from-[#fef3c7]/48 to-[#ffedbc]/38 rounded-full bottom-5 right-1/2 animate-pulse" style={{animationDelay: '1.8s'}}></div>
+                        <div className="absolute w-18 h-18 bg-gradient-to-br from-[#fffadc]/50 to-[#fff7ed]/40 rounded-full top-3/4 left-20 animate-float" style={{animationDelay: '4.5s'}}></div>
+                        <div className="absolute w-8 h-8 bg-gradient-to-br from-[#fef3c7]/55 to-[#ffedbc]/45 rounded-full top-2/3 right-10 animate-pulse" style={{animationDelay: '0.8s'}}></div>
+                        <div className="absolute w-15 h-15 bg-gradient-to-br from-[#fff7ed]/52 to-[#fffadc]/42 rounded-full bottom-1/4 left-1/4 animate-float" style={{animationDelay: '3.2s'}}></div>
+                        <div className="absolute w-11 h-11 bg-gradient-to-br from-[#fffadc]/50 to-[#fef3c7]/40 rounded-full top-10 left-1/3 animate-pulse" style={{animationDelay: '2.2s'}}></div>
                     </div>
 
                     {isOffline && ( <div className="fixed top-4 left-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-slideUp z-50"><span className="font-semibold">Offline Mode</span> - Some features may be limited</div> )}
@@ -336,11 +334,11 @@
 
                     {zoomedImg && (
                         <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={closeImage}>
-                            <div className="relative max-w-full max-h-full">
-                                <img src={zoomedImg} alt="Zoomed view" className="max-w-full max-h-[90vh] rounded-xl shadow-2xl animate-zoomIn" onClick={(e) => e.stopPropagation()} />
-                                <button onClick={closeImage} className="absolute -top-2 -right-2 text-white bg-black/30 backdrop-blur-sm p-2 rounded-full haptic" aria-label="Close image">
+                            <div className="relative max-w-full max-h-full flex flex-col items-center">
+                                <button onClick={closeImage} className="mb-3 text-white bg-black/50 backdrop-blur-sm p-2 rounded-full haptic hover:bg-black/70 transition-colors" aria-label="Close image">
                                     <CloseIcon />
                                 </button>
+                                <img src={zoomedImg} alt="Zoomed view" className="max-w-full max-h-[85vh] rounded-xl shadow-2xl animate-zoomIn" onClick={(e) => e.stopPropagation()} />
                             </div>
                         </div>
                     )}
