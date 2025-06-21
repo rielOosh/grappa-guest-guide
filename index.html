@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>GrappA Guest Guide</title>
     <meta name="description" content="Your complete resort companion for GrappA. Access guides, links, and information, even offline.">
-    <meta name="theme-color" content="#f8fafc">
-    <meta property="og:title" content="GrappA Guest Guide">
+    <meta name="theme-color" content="#475569">
+      <meta property="og:title" content="GrappA Guest Guide">
     <meta property="og:description" content="Your complete resort companion for GrappA. Access guides, links, and information, even offline.">
     <meta property="og:image" content="https://i.imgur.com/r4z8Ibx.png">
     <meta property="og:url" content="https://grappa-guest-guide.netlify.app/">
@@ -21,8 +21,8 @@
         &quot;short_name&quot;: &quot;GrappA Guide&quot;,
         &quot;start_url&quot;: &quot;.&quot;,
         &quot;display&quot;: &quot;standalone&quot;,
-        &quot;background_color&quot;: &quot;#f8fafc&quot;,
-        &quot;theme_color&quot;: &quot;#f8fafc&quot;,
+        &quot;background_color&quot;: &quot;#475569&quot;,
+        &quot;theme_color&quot;: &quot;#475569&quot;,
         &quot;description&quot;: &quot;Your resort guide for GrappA.&quot;,
         &quot;icons&quot;: [
             { &quot;src&quot;: &quot;https://i.imgur.com/s6g6A4b.png&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;sizes&quot;: &quot;192x192&quot; },
@@ -38,306 +38,949 @@
     <link rel="preconnect" href="https://cdn.tailwindcss.com">
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://i.imgur.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     
-    <!-- Google Fonts for Material Symbols -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        :root { --animation-duration: 0.3s; }
-        * { -webkit-tap-highlight-color: transparent; }
+        /* Enhanced typography and base styles */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #475569 0%, #334155 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --animation-duration: 0.3s;
+        }
+        
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
         body { 
             margin: 0; 
             min-height: 100vh; 
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif; 
-            overflow-x: hidden; 
-            -webkit-font-smoothing: antialiased; 
-            -moz-osx-font-smoothing: grayscale; 
-            background: linear-gradient(135deg, #64748b 0%, #94a3b8 25%, #cbd5e1 50%, #94a3b8 75%, #64748b 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Loading screen */
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, #475569 0%, #334155 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Enhanced animations */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.05; transform: scale(1); }
+            50% { opacity: 0.1; transform: scale(1.05); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
+            33% { transform: translateY(-20px) translateX(10px) rotate(5deg); }
+            66% { transform: translateY(10px) translateX(-10px) rotate(-5deg); }
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes scaleIn {
+            0% { opacity: 0; transform: scale(0.8) rotate(-5deg); }
+            50% { transform: scale(1.05) rotate(1deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        
+        @keyframes slideUp {
+            0% { opacity: 0; transform: translateY(100vh) scale(0.8); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        @keyframes zoomIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        
+        @keyframes ripple {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(4); opacity: 0; }
+        }
+        
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Animation classes */
+        .animate-fadeIn {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        .animate-scaleIn {
+            animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .animate-slideUp {
+            animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .animate-zoomIn {
+            animation: zoomIn 0.5s ease-out forwards;
+        }
+        .animate-pulse {
+            animation: pulse 3s ease-in-out infinite;
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* Glass morphism enhancements */
+        .glass {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        /* Card enhancements */
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-hover::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .card-hover:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .card-hover:hover {
+            transform: scale(1.05) translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Icon enhancements */
+        .icon-container {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .icon-container::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .icon-container:hover::after {
+            opacity: 1;
+            animation: shimmer 1s ease;
+        }
+        
+        .icon-container:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Enhanced button styles */
+        .btn-premium {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-premium:hover::before {
+            left: 100%;
+        }
+        
+        /* Skeleton loader */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        /* Enhanced scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Haptic feedback simulation */
+        .haptic {
+            transition: transform 0.1s ease;
+        }
+        
+        .haptic:active {
+            transform: scale(0.98);
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Animated gradient background */
+        .animated-gradient {
+            background: linear-gradient(-45deg, #475569, #334155, #1e293b, #0f172a);
             background-size: 400% 400%;
-            animation: gradientShift 20s ease infinite;
+            animation: gradientShift 15s ease infinite;
         }
-        .loading-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #94a3b8 0%, #cbd5e1 100%); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease-out; }
-        .loading-spinner { width: 60px; height: 60px; border: 4px solid rgba(0, 0, 0, 0.1); border-top-color: #475569; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { opacity: 0.8; transform: scale(1); } 50% { opacity: 1; transform: scale(1.15); } }
-        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); } 33% { transform: translateY(-30px) translateX(20px) rotate(10deg); } 66% { transform: translateY(20px) translateX(-20px) rotate(-10deg); } }
-        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
-        @keyframes scaleIn { 0% { opacity: 0; transform: scale(0.8) rotate(-5deg); } 50% { transform: scale(1.05) rotate(1deg); } 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
-        @keyframes slideUp { 0% { opacity: 0; transform: translateY(100vh) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-        @keyframes zoomIn { 0% { opacity: 0; transform: scale(0.3); } 100% { opacity: 1; transform: scale(1); } }
-        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-        .animate-fadeIn { animation: fadeIn 0.6s ease-out forwards; }
-        .animate-scaleIn { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        .animate-slideUp { animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        .animate-zoomIn { animation: zoomIn 0.5s ease-out forwards; }
-        .animate-pulse { animation: pulse 4s ease-in-out infinite; }
-        .animate-float { animation: float 8s ease-in-out infinite; }
-        .glass { 
-            background: rgba(255, 255, 255, 0.35); 
-            backdrop-filter: blur(20px) saturate(180%); 
-
-            -webkit-backdrop-filter: blur(20px) saturate(180%); 
-            border: 1px solid rgba(255, 255, 255, 0.5); 
-
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.7); 
-
-        }
-        .glass-enhanced {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(25px) saturate(200%);
-            -webkit-backdrop-filter: blur(25px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+        
+        /* Focus styles for accessibility */
+        button:focus-visible,
+        a:focus-visible {
+            outline: 2px solid white;
+            outline-offset: 4px;
         }
-        .card-hover { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; overflow: hidden; }
-        .card-hover::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-radius: 50%; background: #000; opacity: 0.2; transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s; }
-        .card-hover:active::before { width: 300px; height: 300px; }
-        .card-hover:hover { transform: scale(1.05) translateY(-4px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.7); }
-        .icon-container { transition: all 0.3s ease; position: relative; }
-        .icon-container:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); }
-        .btn-premium { position: relative; overflow: hidden; transition: all 0.3s ease; }
-        .btn-premium:hover::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transition: left 0.5s ease; left: 100%; }
-        ::-webkit-scrollbar { width: 10px; height: 10px; }
-        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.3); }
-        .haptic:active { transform: scale(0.98); }
-        .gradient-text { background: linear-gradient(135deg, #2c3e50 0%, #475569 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        button:focus-visible, a:focus-visible { outline: 2px solid #334155; outline-offset: 4px; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 }
-        .icon-gradient-text { background: linear-gradient(135deg, rgba(51, 65, 85, 0.95) 0%, rgba(71, 85, 105, 0.85) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block; }
-        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* Dark mode enhancements */
+        @media (prefers-color-scheme: dark) {
+            .glass {
+                background: rgba(255, 255, 255, 0.06);
+            }
+        }
     </style>
 </head>
 <body>
-    <div id="loading-screen" class="loading-screen"><div class="loading-spinner"></div></div>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
+    </div>
+    
     <div id="root"></div>
     
     <script type="text/babel">
-        // --- PWA Service Worker (concise version) ---
-        const serviceWorkerCode = `const CACHE_NAME='grappa-guide-cache-v16';const U=['.','https://cdn.tailwindcss.com','https://unpkg.com/react@18/umd/react.development.js','https://unpkg.com/react-dom@18/umd/react-dom.development.js','https://unpkg.com/@babel/standalone/babel.min.js','https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200','https://i.imgur.com/MBYTWps.png','https://i.imgur.com/ChMRT7d.jpg','https://i.imgur.com/2AahzMz.png'];self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(U)).then(()=>self.skipWaiting())));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok){const cRes=res.clone();caches.open(CACHE_NAME).then(c=>c.put(e.request,cRes))}return res})).catch(()=>new Response('Offline'))));self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>CACHE_NAME!==k?caches.delete(k):null))).then(()=>self.clients.claim())));`;
-        if ('serviceWorker' in navigator) window.addEventListener('load',() => navigator.serviceWorker.register(URL.createObjectURL(new Blob([serviceWorkerCode],{type:'application/javascript'}))).then(r=>console.log('SW reg')).catch(e=>console.log('SW err')));
+        // --- Enhanced PWA Service Worker ---
+        const serviceWorkerCode = `
+            const CACHE_NAME = 'grappa-guide-cache-v7';
+            const urlsToCache = [
+                '.',
+                'https://cdn.tailwindcss.com',
+                'https://unpkg.com/react@18/umd/react.development.js',
+                'https://unpkg.com/react-dom@18/umd/react-dom.development.js',
+                'https://unpkg.com/@babel/standalone/babel.min.js',
+                'https://i.imgur.com/MBYTWps.png',
+                'https://i.imgur.com/ChMRT7d.jpg',
+                'https://i.imgur.com/2AahzMz.png'
+            ];
+            
+            self.addEventListener('install', event => {
+                event.waitUntil(
+                    caches.open(CACHE_NAME)
+                        .then(cache => cache.addAll(urlsToCache))
+                        .then(() => self.skipWaiting())
+                );
+            });
+            
+            self.addEventListener('fetch', event => {
+                event.respondWith(
+                    caches.match(event.request)
+                        .then(response => {
+                            if (response) {
+                                return response;
+                            }
+                            return fetch(event.request).then(response => {
+                                if (!response || response.status !== 200 || response.type !== 'basic') {
+                                    return response;
+                                }
+                                const responseToCache = response.clone();
+                                caches.open(CACHE_NAME)
+                                    .then(cache => {
+                                        cache.put(event.request, responseToCache);
+                                    });
+                                return response;
+                            });
+                        })
+                        .catch(() => {
+                            // Offline fallback
+                            return new Response('Offline - Please check your connection', {
+                                headers: { 'Content-Type': 'text/plain' }
+                            });
+                        })
+                );
+            });
+            
+            self.addEventListener('activate', event => {
+                const cacheWhitelist = [CACHE_NAME];
+                event.waitUntil(
+                    caches.keys().then(cacheNames => {
+                        return Promise.all(
+                            cacheNames.map(cacheName => {
+                                if (cacheWhitelist.indexOf(cacheName) === -1) {
+                                    return caches.delete(cacheName);
+                                }
+                            })
+                        );
+                    }).then(() => self.clients.claim())
+                );
+            });
+        `;
+        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const blob = new Blob([serviceWorkerCode], { type: 'application/javascript' });
+                navigator.serviceWorker.register(URL.createObjectURL(blob))
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed'));
+            });
+        }
 
-        // --- Reusable Icon Gradient Definition ---
-        const IconDefs = () => (<defs><linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="rgba(51, 65, 85, 0.95)" /><stop offset="100%" stopColor="rgba(71, 85, 105, 0.85)" /></linearGradient></defs>);
+        // --- Enhanced Icon Components with better design ---
+        const GateIcon = () => (
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                <defs>
+                    <linearGradient id="gateGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
+                        <stop offset="100%" stopColor="rgba(255,255,255,0.7)" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#gateGradient)" d="M3 21v-2h2V4.835c0-.484.346-.835.83-.835h5.34c.484 0 .83.351.83.835V9h6.17c.484 0 .83.351.83.835V19h2v2H3zm14-2V11h-6v8h1v-5h4v5h1z"/>
+            </svg>
+        );
 
-        // --- Icon Components (Refactored for Light Theme) ---
-        const GateIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M3 21v-2h2V4.835c0-.484.346-.835.83-.835h5.34c.484 0 .83.351.83.835V9h6.17c.484 0 .83.351.83.835V19h2v2H3zm14-2V11h-6v8h1v-5h4v5h1z"/></svg> );
-        const MapIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg> );
-        const WifiIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg> );
-        const TvIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M21 3H3c-1.11 0-2 .89-2 2v12c0 1.1.89 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.11-.9-2-2-2zm0 14H3V5h18v12z"/><path d="M8 12h2v2H8zm4 0h8v2h-8z"/></svg> );
-        const GroceryIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> );
-        const RestaurantIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/></svg> );
-        const PoolIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M22 21c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36C18.22 20.63 17.6 21 16.5 21s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36C11.56 20.63 10.95 21 9.83 21c-1.11 0-1.73-.37-2.18-.64-.37-.23-.6-.36-1.15-.36s-.78.13-1.15.36C4.9 20.63 4.29 21 3.17 21v-2c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36v2zm0-4.5c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.23-.6-.36-1.15-.36s-.78.13-1.15.36C4.34 14.63 3.72 15 2.61 15v-2c.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36v2zM8.67 12c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.23.6.36 1.15.36s.78-.13 1.15-.36c.12-.07.26-.15.41-.23L10.48 5C8.93 3.45 7.5 2.99 5 3v2.5c1.82-.01 2.89.39 4 1.5l1 1-3.25 3.25c.31.12.56.27.77.39.37.23.59.36 1.15.36z"/><circle cx="16.5" cy="5.5" r="2.5"/></svg> );
-        const SpaIcon = () => ( <span className="material-symbols-outlined icon-gradient-text" style={{ fontSize: '32px' }}>spa</span> );
-        const TrailServicesIcon = () => ( <span className="material-symbols-outlined icon-gradient-text" style={{ fontSize: '32px' }}>contact_phone</span> );
-        const CheckoutIcon = () => ( <span className="material-symbols-outlined icon-gradient-text" style={{ fontSize: '32px' }}>logout</span> );
-        const CloseIcon = () => ( <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg> );
+        const MapIcon = () => (
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                <defs>
+                    <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
+                        <stop offset="100%" stopColor="rgba(255,255,255,0.7)" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#mapGradient)" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+        );
 
-        // --- Main React Component ---
+        const WifiIcon = () => (
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                <defs>
+                    <linearGradient id="wifiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
+                        <stop offset="100%" stopColor="rgba(255,255,255,0.7)" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#wifiGradient)" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
+            </svg>
+        );
+
+        const TvIcon = () => (
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                <defs>
+                    <linearGradient id="tvGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
+                        <stop offset="100%" stopColor="rgba(255,255,255,0.7)" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#tvGradient)" d="M21 3H3c-1.11 0-2 .89-2 2v12c0 1.1.89 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.11-.9-2-2-2zm0 14H3V5h18v12z"/>
+                <path fill="url(#tvGradient)" d="M8 12h2v2H8zm4 0h8v2h-8z"/>
+            </svg>
+        );
+
+        const GroceryIcon = () => (
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                <defs>
+                    <linearGradient id="groceryGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
+                        <stop offset="100%" stopColor="rgba(255,255,255,0.7)" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#groceryGradient)" d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+        );
+
+        const RestaurantIcon = () => (
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                <defs>
+                    <linearGradient id="restaurantGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
+                        <stop offset="100%" stopColor="rgba(255,255,255,0.7)" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#restaurantGradient)" d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/>
+            </svg>
+        );
+
+        const PoolIcon = () => (
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                <defs>
+                    <linearGradient id="poolGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
+                        <stop offset="100%" stopColor="rgba(255,255,255,0.7)" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#poolGradient)" d="M22 21c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.46.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.46.27-1.08.64-2.19.64-1.11 0-1.73-.37-2.18-.64-.37-.23-.6-.36-1.15-.36s-.78.13-1.15.36c-.46.27-1.08.64-2.19.64v-2c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36v2zm0-4.5c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.23-.6-.36-1.15-.36s-.78.13-1.15.36c-.47.27-1.09.64-2.2.64v-2c.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36v2zM8.67 12c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.23.6.36 1.15.36s.78-.13 1.15-.36c.12-.07.26-.15.41-.23L10.48 5C8.93 3.45 7.5 2.99 5 3v2.5c1.82-.01 2.89.39 4 1.5l1 1-3.25 3.25c.31.12.56.27.77.39.37.23.59.36 1.15.36z"/>
+                <circle fill="url(#poolGradient)" cx="16.5" cy="5.5" r="2.5"/>
+            </svg>
+        );
+
+        const SpaIcon = () => (
+            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                <defs>
+                    <linearGradient id="spaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
+                        <stop offset="100%" stopColor="rgba(255,255,255,0.7)" />
+                    </linearGradient>
+                </defs>
+                <path fill="url(#spaGradient)" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2-3.5l6-4.5-6-4.5z"/>
+                <path fill="url(#spaGradient)" d="M8.5 16.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S7 14.17 7 15s.67 1.5 1.5 1.5zm7-7c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S14 7.67 14 8.5s.67 1 1.5 1zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 7 8.5 7 7 7.67 7 8.5 7.67 9.5 8.5 9.5zm7 7c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5S14 14.17 14 15s.67 1.5 1.5 1.5z"/>
+            </svg>
+        );
+
+        const CloseIcon = () => (
+            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        );
+
+        // --- Main React Component with Enhancements ---
         const BnBGuestGuide = () => {
-            const { useState, useEffect } = React;
+            const { useState, useEffect, useRef } = React;
             const [openDialog, setOpenDialog] = useState(null);
             const [zoomedImg, setZoomedImg] = useState(null);
             const [isLoaded, setIsLoaded] = useState(false);
+            const [searchQuery, setSearchQuery] = useState('');
             const [isOffline, setIsOffline] = useState(!navigator.onLine);
             const [lastVisited, setLastVisited] = useState([]);
 
             useEffect(() => {
+                // Hide loading screen and show content
                 setTimeout(() => {
-                    const ls = document.getElementById('loading-screen');
-                    if(ls) { ls.style.opacity = '0'; setTimeout(() => { ls.style.display = 'none'; }, 500); }
-                    setIsLoaded(true);
+                    document.getElementById('loading-screen').style.opacity = '0';
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').style.display = 'none';
+                        setIsLoaded(true);
+                    }, 500);
                 }, 1000);
-                const handleOnline = () => setIsOffline(false); const handleOffline = () => setIsOffline(true);
-                window.addEventListener('online', handleOnline); window.addEventListener('offline', handleOffline);
-                setLastVisited(JSON.parse(sessionStorage.getItem('lastVisited') || '[]'));
-                return () => { window.removeEventListener('online', handleOnline); window.removeEventListener('offline', handleOffline); };
+
+                // Check online status
+                const handleOnline = () => setIsOffline(false);
+                const handleOffline = () => setIsOffline(true);
+                
+                window.addEventListener('online', handleOnline);
+                window.addEventListener('offline', handleOffline);
+                
+                // Load last visited from storage
+                const visited = JSON.parse(sessionStorage.getItem('lastVisited') || '[]');
+                setLastVisited(visited);
+                
+                return () => {
+                    window.removeEventListener('online', handleOnline);
+                    window.removeEventListener('offline', handleOffline);
+                };
             }, []);
 
-            const openImage = (src) => { setZoomedImg(src); if (navigator.vibrate) navigator.vibrate(50); };
+            const openImage = (src) => {
+                setZoomedImg(src);
+                // Haptic feedback if available
+                if (navigator.vibrate) navigator.vibrate(50);
+            };
+            
             const closeImage = () => setZoomedImg(null);
 
             const cards = [
-                { id: 'gate', title: 'Gate Access', icon: <GateIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="text-right" dir="rtl">
-                        <p className="mb-6 text-gray-600 leading-relaxed">זהו קישור להורדת אפליקציה לפתיחת שער הקיבוץ.<br/>יש להתקין את האפליקציה, למלא אחר ההנחיות ואז ניתן לפתוח את השער בעצמך.<br/>צריך להתקרב ממש אל השער, כמעט להצמד, ואז ללחוץ על פתיחת השער באפליקציה.</p>
-                        <div className="space-y-4">
-                            <a href="https://goo.gl/fZTz4u" target="_blank" rel="noopener noreferrer" className="block bg-slate-800 text-white px-6 py-4 rounded-lg text-center hover:bg-slate-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold btn-premium haptic"><span className="flex items-center justify-center gap-2"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>iPhone App</span></a>
-                            <a href="https://goo.gl/Giopvd" target="_blank" rel="noopener noreferrer" className="block bg-green-600 text-white px-6 py-4 rounded-lg text-center hover:bg-green-500 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold btn-premium haptic"><span className="flex items-center justify-center gap-2"><span className="material-symbols-outlined" style={{fontSize: '20px'}}>android</span>Android App</span></a>
-                        </div>
-                    </div>
-                )},
-                { id: 'trips', title: 'Local Trips', icon: <MapIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="text-right space-y-6" dir="rtl">
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><h4 className="font-bold mb-3 text-slate-800 text-lg">אפליקציית ניווט וטיולים</h4><a href="https://play.google.com/store/apps/details?id=altitude.alarm.erol.apps" target="_blank" rel="noopener noreferrer" className="block bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic">הורד אפליקציית טיולים</a></div>
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><h4 className="font-bold mb-3 text-slate-800 text-lg">מיקום השער למסלולים</h4><a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" className="block bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic">פתח במפות</a></div>
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><h4 className="font-bold mb-3 text-slate-800 text-lg">קישור למסלול GPX</h4><a href="./walk_to_the_bulbouse_mountain.gpx" download="Bulbous_Mountain_Trail.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול 5ק"מ להר הבולבוסים</a></div>
-                    </div>
-                )},
-                { id: 'trail_services', title: 'Trail Services', icon: <TrailServicesIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="text-right space-y-6" dir="rtl">
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                            <h4 className="font-bold mb-3 text-slate-800 text-lg text-center">פאבלו</h4>
-                            <div className="bg-white p-3 rounded-lg shadow-sm border">
-                                <img src="https://i.imgur.com/MBYTWps.png" alt="Logistics info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://i.imgur.com/MBYTWps.png')} />
-                            </div>
-                        </div>
-                        <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-                            <h4 className="font-bold mb-4 text-slate-800 text-lg text-center">טיולי ג'יפים עם מר מדבר</h4>
-                            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 text-center">
-                                <p className="text-slate-700 font-medium">
-                                    <span className="font-semibold">טלפון: </span>
-                                    <a href="tel:08-6616976" className="text-blue-600 hover:underline">08-6616976</a>
-                                </p>
-                                <p className="text-slate-700 font-medium">
-                                    <span className="font-semibold">אימייל: </span>
-                                    <a href="mailto:tayaroot@gmail.com" className="text-blue-600 hover:underline">tayaroot@gmail.com</a>
-                                </p>
-                                <a href="https://aravadesert.co.il/marmaidbar/" target="_blank" rel="noopener noreferrer" className="!mt-4 block bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-lg text-center transition-all duration-300 haptic font-semibold">
-                                    לאתר האינטרנט
+                {
+                    id: 'gate',
+                    title: 'Gate Access',
+                    icon: <GateIcon />,
+                    gradient: 'from-slate-600 to-slate-700',
+                    tags: ['access', 'entry', 'gate', 'app'],
+                    content: (
+                        <div className="text-right" dir="rtl">
+                            <p className="mb-6 text-gray-700 leading-relaxed">
+                                זהו קישור להורדת אפליקציה לפתיחת שער הקיבוץ.<br/>
+                                יש להתקין את האפליקציה, למלא אחר ההנחיות ואז ניתן לפתוח את השער בעצמך.<br/>
+                                צריך להתקרב ממש אל השער, כמעט להצמד, ואז ללחוץ על פתיחת השער באפליקציה.
+                            </p>
+                            <div className="space-y-4">
+                                <a href="https://goo.gl/fZTz4u" target="_blank" rel="noopener noreferrer" 
+                                   className="block bg-gradient-to-r from-slate-700 to-slate-800 text-white px-6 py-4 rounded-lg text-center hover:from-slate-600 hover:to-slate-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold btn-premium haptic">
+                                   <span className="flex items-center justify-center gap-2">
+                                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                           <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/>
+                                       </svg>
+                                       iPhone App
+                                   </span>
+                                </a>
+                                <a href="https://goo.gl/Giopvd" target="_blank" rel="noopener noreferrer" 
+                                   className="block bg-gradient-to-r from-green-700 to-green-800 text-white px-6 py-4 rounded-lg text-center hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold btn-premium haptic">
+                                   <span className="flex items-center justify-center gap-2">
+                                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                           <path d="M17.6 11.48L19.44 8.3a.63.63 0 0 0-.47-.9H16.26l-3.66-5.87a.663.663 0 0 0-1.18 0L7.74 7.4H5.08a.63.63 0 0 0-.47.9l1.84 3.18 6.72 11.35a.66.66 0 0 0 1.16 0l3.27-5.52zM6.7 8.32h5.59L9.5 13.87 6.7 8.32zm6.8 8.55L10.73 12h5.54l-2.77 4.87zm.75-8.55h5.06l-2.8 4.87-2.26-4.87z"/>
+                                       </svg>
+                                       Android App
+                                   </span>
                                 </a>
                             </div>
                         </div>
-                    </div>
-                )},
-                { id: 'wifi', title: 'WiFi Access', icon: <WifiIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="text-center"><div className="bg-slate-50 p-8 rounded-xl border border-slate-200"><div className="bg-white p-6 rounded-xl shadow-inner border border-slate-100 space-y-5"><h4 className="font-bold text-2xl mb-2 text-gray-800">WiFi Connection</h4><div className="bg-slate-100 p-4 rounded-lg border"><span className="font-semibold text-slate-600 block mb-2">Network Name:</span><p className="text-2xl font-mono text-slate-700 font-bold select-all">GrappA Fiber</p></div><div className="bg-slate-100 p-4 rounded-lg border"><span className="font-semibold text-slate-600 block mb-2">Password:</span><p className="text-2xl font-mono text-slate-700 font-bold select-all">grappA321</p></div></div></div></div>
-                )},
-                { id: 'tv', title: 'Entertainment', icon: <TvIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="space-y-6"><div className="bg-slate-50 p-6 rounded-xl border border-slate-200"><h4 className="font-bold text-2xl mb-4 text-slate-800 flex items-center justify-center gap-2"><span className="text-3xl">🏰</span> Disney+</h4><div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4"><div className="bg-slate-100 p-3 rounded-lg border"><span className="font-semibold text-slate-600">Profile:</span><span className="ml-3 font-mono text-lg font-bold text-slate-700">GrappA</span></div><div className="bg-slate-100 p-3 rounded-lg border"><span className="font-semibold text-slate-600">Password:</span><span className="ml-3 font-mono text-lg font-bold text-slate-700">4114</span></div></div></div><div className="bg-slate-50 p-6 rounded-xl border border-slate-200"><h4 className="font-bold text-2xl mb-4 text-slate-800 flex items-center justify-center gap-2"><span className="text-3xl">🎬</span> Netflix</h4><div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100"><div className="bg-slate-100 p-3 rounded-lg border"><span className="font-semibold text-slate-600">Profile:</span><span className="ml-3 font-mono text-lg font-bold text-slate-700">GrappA</span></div></div></div></div>
-                )},
-                { id: 'grocery', title: 'Grocery Store', icon: <GroceryIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="text-right" dir="rtl"><div className="bg-slate-50 p-8 rounded-xl border border-slate-200"><h4 className="font-bold mb-6 text-slate-800 text-2xl text-center">המרכולית</h4><a href="https://maps.app.goo.gl/ZQu19jrZTdUjW7pF6" target="_blank" rel="noopener noreferrer" className="block bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic"><span className="flex items-center justify-center gap-2"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>פתח במפות Google</span></a></div></div>
-                )},
-                { id: 'sushi', title: 'Sushi Restaurant', icon: <RestaurantIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="text-right" dir="rtl"><div className="bg-slate-50 p-6 rounded-xl border border-slate-200"><h4 className="font-bold mb-6 text-slate-800 text-2xl text-center flex items-center justify-center gap-2"><span className="text-3xl">🍣</span> מסעדת הסושי</h4><div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><img src="https://i.imgur.com/ChMRT7d.jpg" alt="Sushi Menu" className="w-full rounded-lg cursor-pointer shadow-md" onClick={() => openImage('https://i.imgur.com/ChMRT7d.jpg')} /><p className="text-sm text-gray-600 mt-3 text-center font-semibold">תפריט מלא עם מחירים</p></div></div></div>
-                )},
-                { id: 'pool', title: 'Swimming Pool', icon: <PoolIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="text-right space-y-6" dir="rtl"><div className="bg-slate-50 p-6 rounded-xl border border-slate-200"><h4 className="font-bold text-slate-800 text-2xl text-center mb-6 flex items-center justify-center gap-2"><span className="text-3xl">🏊‍♂️</span> הבריכה</h4><div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 mb-4"><img src="https://i.imgur.com/2AahzMz.png" alt="Pool hours" className="w-full rounded-lg cursor-pointer" onClick={() => openImage('https://i.imgur.com/2AahzMz.png')} /><p className="text-sm text-gray-600 mt-3 text-center font-semibold">שעות פתיחה מעודכנות</p></div><a href="https://maps.app.goo.gl/2DS7aXFMvxGATqcY8" target="_blank" rel="noopener noreferrer" className="block bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic"><span className="flex items-center justify-center gap-2"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>פתח במפות Google</span></a></div></div>
-                )},
-                { id: 'spa', title: 'Spa & Wellness', icon: <SpaIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                     <div className="text-right" dir="rtl">
-                        <div className="bg-slate-50 p-8 rounded-xl border border-slate-200">
-                            <h4 className="font-bold text-3xl text-gray-800 mb-4 text-center">שירותי ספא</h4>
-                            <p className="text-gray-600 text-lg mb-6 text-center">להזמנת טיפולים, אנא צרו קשר עם דנה.</p>
-                            <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4 text-center">
-                                <p className="text-slate-700 font-medium text-xl">
-                                    <span className="font-semibold">דנה: </span>
-                                    <a href="tel:052-1234567" className="text-blue-600 hover:underline">052-1234567</a>
-                                </p>
-                                <div className="flex justify-center gap-4 text-4xl pt-4">
-                                    <span className="animate-pulse" style={{animationDelay: '0s'}}>🧘‍♀️</span>
-                                    <span className="animate-pulse" style={{animationDelay: '0.2s'}}>💆‍♂️</span>
-                                    <span className="animate-pulse" style={{animationDelay: '0.4s'}}>🌸</span>
+                    )
+                },
+                {
+                    id: 'trips',
+                    title: 'Local Trips',
+                    icon: <MapIcon />,
+                    gradient: 'from-slate-700 to-slate-800',
+                    tags: ['trips', 'navigation', 'map', 'טיולים'],
+                    content: (
+                        <div className="text-right space-y-6" dir="rtl">
+                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 transform transition-all hover:shadow-md">
+                                <h4 className="font-bold mb-3 text-slate-800 text-lg">אפליקציית ניווט וטיולים</h4>
+                                <a href="https://play.google.com/store/apps/details?id=altitude.alarm.erol.apps" target="_blank" rel="noopener noreferrer" 
+                                   className="block bg-gradient-to-r from-slate-600 to-slate-700 text-white px-6 py-3 rounded-lg text-center hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105 shadow-md font-semibold btn-premium haptic">
+                                   הורד אפליקציית טיולים
+                                </a>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 transform transition-all hover:shadow-md">
+                                <h4 className="font-bold mb-3 text-slate-800 text-lg">מיקום השער למסלולים</h4>
+                                <a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" 
+                                   className="block bg-gradient-to-r from-slate-600 to-slate-700 text-white px-6 py-3 rounded-lg text-center hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105 shadow-md font-semibold btn-premium haptic">
+                                   פתח במפות
+                                </a>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 transform transition-all hover:shadow-md">
+                                <h4 className="font-bold mb-3 text-slate-800 text-lg">לוגיסטיקה וציוד</h4>
+                                <div className="bg-white p-3 rounded-lg shadow-sm border">
+                                    <img src="https://i.imgur.com/MBYTWps.png" alt="פבלו פנתנות - מידע ליצירת קשר וקיבוץ זהר" 
+                                         className="w-full rounded-lg cursor-pointer hover:scale-105 transition-transform duration-300" 
+                                         onClick={() => openImage('https://i.imgur.com/MBYTWps.png')} />
+                                    <p className="text-sm text-gray-600 mt-2 text-center font-medium">מידע ליצירת קשר עם פבלו פנתנות</p>
+                                </div>
+                            </div>
+                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 transform transition-all hover:shadow-md">
+                                <h4 className="font-bold mb-3 text-slate-800 text-lg">קישור למסלול GPX</h4>
+                              <a href="./walk_to_the_bulbouse_mountain.gpx"
+                                  download="Bulbous_Mountain_Trail.gpx" 
+                                  className="block bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-3 rounded-lg text-center hover:from-blue-500 hover:to-blue-600 transition-all duration-300 transform hover:scale-105 shadow-md font-semibold btn-premium haptic">
+                                 הורד מסלול 5ק"מ להר הבולבוסים
+                              </a>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'wifi',
+                    title: 'WiFi Access',
+                    icon: <WifiIcon />,
+                    gradient: 'from-slate-600 to-slate-700',
+                    tags: ['wifi', 'internet', 'connection', 'password'],
+                    content: (
+                        <div className="text-center">
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-8 rounded-xl border border-slate-200">
+                                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                                    <div className="w-16 h-16 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-pulse">
+                                        <WifiIcon />
+                                    </div>
+                                    <h4 className="font-bold text-2xl mb-6 text-gray-800">WiFi Connection</h4>
+                                    <div className="space-y-5">
+                                        <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-4 rounded-lg border border-slate-200">
+                                            <span className="font-semibold text-slate-600 block mb-2">Network Name:</span>
+                                            <p className="text-2xl font-mono bg-white p-3 rounded-lg border-2 border-slate-300 text-slate-700 font-bold shadow-sm select-all">GrappA Fiber</p>
+                                        </div>
+                                        <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-4 rounded-lg border border-slate-200">
+                                            <span className="font-semibold text-slate-600 block mb-2">Password:</span>
+                                            <div className="relative">
+                                                <p className="text-2xl font-mono bg-white p-3 rounded-lg border-2 border-slate-300 text-slate-700 font-bold shadow-sm select-all">grappA321</p>
+                                                <button 
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText('grappA321');
+                                                        if (navigator.vibrate) navigator.vibrate(50);
+                                                    }}
+                                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-slate-600 text-white rounded hover:bg-slate-700 transition-colors haptic">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )},
-                { id: 'checkout', title: 'Check-out Info', icon: <CheckoutIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="text-right" dir="rtl">
-                      <div className="bg-slate-50 p-8 rounded-xl border border-slate-200">
-                        <h4 className="font-bold mb-4 text-slate-800 text-2xl text-center">הוראות צ'ק-אאוט</h4>
-                        <div className="space-y-4 text-slate-700 text-lg">
-                          <p>זמן הצ'ק-אאוט הוא עד השעה <strong className="font-semibold text-slate-900">11:00</strong> בבוקר.</p>
-                          <p>אנא ודאו שכל החלונות סגורים והמזגן כבוי.</p>
-                          <p>את המפתח השאירו על השולחן וודאו שלא שכחתם שום דבר.</p>
-                          <p className="mt-6 font-semibold">תודה רבה ומקווים שנהניתם!</p>
+                    )
+                },
+                {
+                    id: 'tv',
+                    title: 'Entertainment',
+                    icon: <TvIcon />,
+                    gradient: 'from-slate-600 to-gray-700',
+                    tags: ['tv', 'disney', 'netflix', 'entertainment'],
+                    content: (
+                        <div className="space-y-6">
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-6 rounded-xl border border-slate-200">
+                                <h4 className="font-bold text-2xl mb-4 text-slate-800 flex items-center justify-center gap-2">
+                                    <span className="text-3xl">🏰</span> Disney+
+                                </h4>
+                                <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4">
+                                    <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-3 rounded-lg border border-slate-200">
+                                        <span className="font-semibold text-slate-600">Profile:</span>
+                                        <span className="ml-3 font-mono text-lg font-bold text-slate-700">GrappA</span>
+                                    </div>
+                                    <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-3 rounded-lg border border-slate-200">
+                                        <span className="font-semibold text-slate-600">Password:</span>
+                                        <span className="ml-3 font-mono text-lg font-bold text-slate-700">4114</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-6 rounded-xl border border-slate-200">
+                                <h4 className="font-bold text-2xl mb-4 text-slate-800 flex items-center justify-center gap-2">
+                                    <span className="text-3xl">🎬</span> Netflix
+                                </h4>
+                                <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100">
+                                    <div className="bg-gradient-to-r from-slate-50 to-gray-50 p-3 rounded-lg border border-slate-200">
+                                        <span className="font-semibold text-slate-600">Profile:</span>
+                                        <span className="ml-3 font-mono text-lg font-bold text-slate-700">GrappA</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                      </div>
-                    </div>
-                )}
+                    )
+                },
+                {
+                    id: 'grocery',
+                    title: 'Grocery Store',
+                    icon: <GroceryIcon />,
+                    gradient: 'from-slate-700 to-slate-800',
+                    tags: ['grocery', 'store', 'shop', 'מרכולית'],
+                    content: (
+                        <div className="text-right" dir="rtl">
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-8 rounded-xl border border-slate-200">
+                                <div className="w-20 h-20 bg-gradient-to-br from-slate-700 to-slate-800 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+                                    <GroceryIcon />
+                                </div>
+                                <h4 className="font-bold mb-6 text-slate-800 text-2xl text-center">המרכולית</h4>
+                                <a href="https://maps.app.goo.gl/ZQu19jrZTdUjW7pF6" target="_blank" rel="noopener noreferrer" 
+                                   className="block bg-gradient-to-r from-slate-600 to-slate-700 text-white px-8 py-4 rounded-xl text-center hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105 shadow-lg font-bold text-lg btn-premium haptic">
+                                   <span className="flex items-center justify-center gap-2">
+                                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                           <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                                       </svg>
+                                       פתח במפות Google
+                                   </span>
+                                </a>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'sushi',
+                    title: 'Sushi Restaurant',
+                    icon: <RestaurantIcon />,
+                    gradient: 'from-slate-700 to-gray-800',
+                    tags: ['sushi', 'restaurant', 'food', 'סושי'],
+                    content: (
+                        <div className="text-right" dir="rtl">
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-6 rounded-xl border border-slate-200">
+                                <h4 className="font-bold mb-6 text-slate-800 text-2xl text-center flex items-center justify-center gap-2">
+                                    <span className="text-3xl">🍣</span> מסעדת הסושי
+                                </h4>
+                                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+                                    <img src="https://i.imgur.com/ChMRT7d.jpg" alt="תפריט סושי" 
+                                         className="w-full rounded-lg cursor-pointer hover:scale-105 transition-transform duration-300 shadow-md" 
+                                         onClick={() => openImage('https://i.imgur.com/ChMRT7d.jpg')} />
+                                    <p className="text-sm text-gray-600 mt-3 text-center font-semibold">תפריט מלא עם מחירים</p>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'pool',
+                    title: 'Swimming Pool',
+                    icon: <PoolIcon />,
+                    gradient: 'from-slate-600 to-slate-700',
+                    tags: ['pool', 'swimming', 'swim', 'בריכה'],
+                    content: (
+                        <div className="text-right space-y-6" dir="rtl">
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-6 rounded-xl border border-slate-200">
+                                <h4 className="font-bold text-slate-800 text-2xl text-center mb-6 flex items-center justify-center gap-2">
+                                    <span className="text-3xl">🏊‍♂️</span> הבריכה
+                                </h4>
+                                <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 mb-4">
+                                    <img src="https://i.imgur.com/2AahzMz.png" alt="שעות פתיחה של הבריכה" 
+                                         className="w-full rounded-lg cursor-pointer hover:scale-105 transition-transform duration-300" 
+                                         onClick={() => openImage('https://i.imgur.com/2AahzMz.png')} />
+                                    <p className="text-sm text-gray-600 mt-3 text-center font-semibold">שעות פתיחה מעודכנות</p>
+                                </div>
+                                <a href="https://maps.app.goo.gl/2DS7aXFMvxGATqcY8" target="_blank" rel="noopener noreferrer" 
+                                   className="block bg-gradient-to-r from-slate-600 to-slate-700 text-white px-8 py-4 rounded-xl text-center hover:from-slate-500 hover:to-slate-600 transition-all duration-300 transform hover:scale-105 shadow-lg font-bold text-lg btn-premium haptic">
+                                   <span className="flex items-center justify-center gap-2">
+                                       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                           <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                                       </svg>
+                                       פתח במפות Google
+                                   </span>
+                                </a>
+                            </div>
+                        </div>
+                    )
+                },
+                {
+                    id: 'spa',
+                    title: 'Spa & Wellness',
+                    icon: <SpaIcon />,
+                    gradient: 'from-slate-500 to-slate-600',
+                    tags: ['spa', 'wellness', 'relax', 'massage'],
+                    content: (
+                        <div className="text-center">
+                            <div className="bg-gradient-to-br from-slate-50 to-gray-100 p-12 rounded-xl border border-slate-200">
+                                <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100">
+                                    <div className="w-20 h-20 bg-gradient-to-br from-slate-500 to-slate-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg animate-pulse">
+                                        <SpaIcon />
+                                    </div>
+                                    <h4 className="font-bold text-3xl text-gray-800 mb-4">Spa Services</h4>
+                                    <p className="text-gray-600 text-lg mb-6">Information coming soon...</p>
+                                    <div className="flex justify-center gap-2 text-4xl">
+                                        <span className="animate-bounce" style={{animationDelay: '0s'}}>🧘‍♀️</span>
+                                        <span className="animate-bounce" style={{animationDelay: '0.2s'}}>💆‍♂️</span>
+                                        <span className="animate-bounce" style={{animationDelay: '0.4s'}}>🌸</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
             ];
+
+            // Filter cards based on search
+            const filteredCards = cards.filter(card => 
+                card.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                card.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+            );
 
             const openDialogHandler = (id) => {
                 setOpenDialog(id);
                 if (navigator.vibrate) navigator.vibrate(50);
+                
+                // Track last visited
                 const newVisited = [id, ...lastVisited.filter(v => v !== id)].slice(0, 3);
                 setLastVisited(newVisited);
                 sessionStorage.setItem('lastVisited', JSON.stringify(newVisited));
             };
-            const closeDialog = () => { setOpenDialog(null); if (navigator.vibrate) navigator.vibrate(30); };
+            
+            const closeDialog = () => {
+                setOpenDialog(null);
+                if (navigator.vibrate) navigator.vibrate(30);
+            };
 
             return (
-                <div className="min-h-screen p-4 relative overflow-hidden">
+                <div className="min-h-screen animated-gradient p-4 relative overflow-hidden">
+                    {/* Floating Background Shapes */}
                     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {/* Dark/Grey Bubbles */}
-                        <div className="absolute w-40 h-40 bg-gradient-to-br from-slate-700/30 to-slate-900/25 rounded-full top-10 left-10 animate-float"></div>
-                        <div className="absolute w-32 h-32 bg-gradient-to-br from-gray-800/28 to-gray-900/22 rounded-full top-60 right-16 animate-pulse"></div>
-                        <div className="absolute w-28 h-28 bg-gradient-to-br from-slate-600/30 to-slate-800/25 rounded-full bottom-20 left-1/3 animate-float" style={{animationDelay: '2s'}}></div>
-                        <div className="absolute w-36 h-36 bg-gradient-to-br from-gray-700/25 to-gray-900/20 rounded-full bottom-40 right-10 animate-pulse" style={{animationDelay: '1s'}}></div>
-                        <div className="absolute w-24 h-24 bg-gradient-to-br from-slate-800/28 to-slate-900/22 rounded-full top-1/3 left-1/2 animate-float" style={{animationDelay: '3s'}}></div>
-                        <div className="absolute w-44 h-44 bg-gradient-to-br from-gray-600/22 to-gray-800/18 rounded-full bottom-10 left-10 animate-pulse" style={{animationDelay: '2.5s'}}></div>
-                        <div className="absolute w-20 h-20 bg-gradient-to-br from-slate-700/30 to-slate-900/25 rounded-full top-20 right-1/3 animate-float" style={{animationDelay: '1.5s'}}></div>
-                        <div className="absolute w-48 h-48 bg-gradient-to-br from-gray-800/20 to-gray-900/16 rounded-full top-1/2 right-1/4 animate-pulse" style={{animationDelay: '4s'}}></div>
-                        
-                        {/* Additional Small Bubbles */}
-                        <div className="absolute w-16 h-16 bg-gradient-to-br from-slate-600/35 to-slate-800/30 rounded-full top-5 right-5 animate-float" style={{animationDelay: '0.5s'}}></div>
-                        <div className="absolute w-12 h-12 bg-gradient-to-br from-gray-700/30 to-gray-900/25 rounded-full bottom-32 right-20 animate-pulse" style={{animationDelay: '3.5s'}}></div>
-                        <div className="absolute w-14 h-14 bg-gradient-to-br from-slate-800/32 to-slate-900/28 rounded-full top-40 left-5 animate-float" style={{animationDelay: '2.5s'}}></div>
-                        <div className="absolute w-10 h-10 bg-gradient-to-br from-gray-600/28 to-gray-800/24 rounded-full bottom-5 right-1/2 animate-pulse" style={{animationDelay: '1.8s'}}></div>
-                        <div className="absolute w-18 h-18 bg-gradient-to-br from-slate-700/30 to-slate-900/26 rounded-full top-3/4 left-20 animate-float" style={{animationDelay: '4.5s'}}></div>
-                        <div className="absolute w-8 h-8 bg-gradient-to-br from-gray-800/35 to-gray-900/30 rounded-full top-2/3 right-10 animate-pulse" style={{animationDelay: '0.8s'}}></div>
-                        <div className="absolute w-15 h-15 bg-gradient-to-br from-slate-600/32 to-slate-800/28 rounded-full bottom-1/4 left-1/4 animate-float" style={{animationDelay: '3.2s'}}></div>
-                        <div className="absolute w-11 h-11 bg-gradient-to-br from-gray-700/30 to-gray-900/26 rounded-full top-10 left-1/3 animate-pulse" style={{animationDelay: '2.2s'}}></div>
+                        <div className="absolute w-32 h-32 bg-gradient-to-br from-slate-400 to-slate-600 rounded-full opacity-5 top-10 left-10 animate-pulse"></div>
+                        <div className="absolute w-24 h-24 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full opacity-5 top-60 right-16 animate-float"></div>
+                        <div className="absolute w-28 h-28 bg-gradient-to-br from-slate-500 to-gray-700 rounded-full opacity-5 bottom-20 left-20 animate-pulse"></div>
+                        <div className="absolute w-40 h-40 bg-gradient-to-br from-slate-600 to-gray-800 rounded-full opacity-3 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-float" style={{animationDelay: '3s'}}></div>
                     </div>
 
-                    {isOffline && ( <div className="fixed top-4 left-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-slideUp z-50"><span className="font-semibold">Offline Mode</span> - Some features may be limited</div> )}
-
-                    <div className={`text-center mb-8 pt-8 transition-all duration-1000 ${isLoaded ? 'animate-fadeIn' : 'opacity-0'}`}>
-                        <div className="glass-enhanced rounded-2xl p-6 max-w-md mx-auto shadow-xl">
-                            <h1 className="text-4xl font-black mb-2 gradient-text">GrappA Guest Guide</h1>
-                            <p className="text-lg text-slate-600 font-medium">Resort Information & Services</p>
+                    {/* Offline Indicator */}
+                    {isOffline && (
+                        <div className="fixed top-4 left-4 right-4 bg-orange-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-slideUp z-50">
+                            <span className="font-semibold">Offline Mode</span> - Some features may be limited
                         </div>
-                        {lastVisited.length > 0 && (
-                            <div className="mt-6 max-w-md mx-auto"><p className="text-slate-500 text-sm mb-2">Recently viewed:</p>
-                                <div className="flex gap-2 justify-center flex-wrap">
+                    )}
+
+                    {/* Header */}
+                    <div className={`text-center mb-8 pt-8 transition-all duration-1000 ${isLoaded ? 'animate-fadeIn' : 'opacity-0'}`}>
+                        <div className="glass rounded-2xl p-6 max-w-md mx-auto shadow-2xl">
+                            <h1 className="text-4xl font-bold text-white mb-3 drop-shadow-lg gradient-text">
+                                GrappA Guest Guide
+                            </h1>
+                            <p className="text-lg text-white/80 drop-shadow font-medium">
+                                Resort Information & Services
+                            </p>
+                            
+                            {/* Search Bar */}
+                            <div className="mt-6 relative">
+                                <input 
+                                    type="text"
+                                    placeholder="Search services..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full px-4 py-3 pl-10 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:border-white/40 transition-all"
+                                />
+                                <svg className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        
+                        {/* Quick Access */}
+                        {lastVisited.length > 0 && searchQuery === '' && (
+                            <div className="mt-4 max-w-md mx-auto">
+                                <p className="text-white/60 text-sm mb-2">Recently viewed:</p>
+                                <div className="flex gap-2 justify-center">
                                     {lastVisited.map(id => {
                                         const card = cards.find(c => c.id === id);
-                                        return card ? ( <button key={id} onClick={() => openDialogHandler(id)} className="px-3 py-1 bg-slate-100/60 backdrop-blur-sm border border-slate-200/50 rounded-full text-slate-700 text-sm hover:bg-slate-200/70 transition-all haptic">{card.title}</button> ) : null;
+                                        if (!card) return null;
+                                        return (
+                                            <button
+                                                key={id}
+                                                onClick={() => openDialogHandler(id)}
+                                                className="px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white/80 text-sm hover:bg-white/20 transition-all haptic"
+                                            >
+                                                {card.title}
+                                            </button>
+                                        );
                                     })}
                                 </div>
                             </div>
                         )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-5 max-w-lg mx-auto">
-                        {cards.map((card, index) => (
-                            <div key={card.id} onClick={() => openDialogHandler(card.id)} className={`glass rounded-2xl p-5 cursor-pointer shadow-lg card-hover haptic ${ isLoaded ? 'animate-scaleIn' : 'opacity-0' }`} style={{animationDelay: `${index * 0.08}s`}}>
-                                <div className="flex flex-col items-center text-center space-y-3">
-                                    <div className={`p-4 bg-gradient-to-br ${card.gradient} backdrop-blur-sm rounded-2xl shadow-md icon-container border border-white/40`}>{card.icon}</div>
-                                    <h3 className="text-slate-800 font-bold text-base tracking-tight">{card.title}</h3>
+                    {/* Cards Grid */}
+                    <div className="grid grid-cols-2 gap-6 max-w-lg mx-auto">
+                        {filteredCards.map((card, index) => (
+                            <div 
+                                key={card.id} 
+                                onClick={() => openDialogHandler(card.id)} 
+                                className={`glass rounded-xl p-6 cursor-pointer shadow-xl card-hover haptic ${
+                                    isLoaded ? 'animate-scaleIn' : 'opacity-0'
+                                }`}
+                                style={{animationDelay: `${index * 0.1}s`}}
+                            >
+                                <div className="flex flex-col items-center text-center space-y-4">
+                                    <div className={`p-4 bg-gradient-to-br ${card.gradient} rounded-2xl shadow-xl text-white icon-container`}>
+                                        {card.icon}
+                                    </div>
+                                    <h3 className="text-white font-bold text-lg drop-shadow-lg tracking-wide">
+                                        {card.title}
+                                    </h3>
                                 </div>
                             </div>
                         ))}
                     </div>
                     
+                    {/* No results message */}
+                    {searchQuery && filteredCards.length === 0 && (
+                        <div className="text-center mt-12">
+                            <p className="text-white/60">No services found for "{searchQuery}"</p>
+                        </div>
+                    )}
+
+                    {/* Dialog Modal */}
                     {openDialog && (
-                        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={closeDialog} role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
-                            <div className="bg-slate-50/95 backdrop-blur-sm rounded-2xl max-w-md w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slideUp border border-white/30" onClick={(e) => e.stopPropagation()}>
-                                <div className="bg-white/80 backdrop-blur-sm border-b border-slate-200/50 p-5 flex justify-between items-center">
-                                    <h2 id="dialogTitle" className="text-2xl font-black text-slate-800">{cards.find(c => c.id === openDialog)?.title}</h2>
-                                    <button onClick={closeDialog} className="p-2 text-slate-500 hover:bg-slate-100/70 rounded-full haptic transition-colors" aria-label="Close dialog">
-                                      <CloseIcon />
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-lg flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={closeDialog}>
+                            <div 
+                                className="bg-white rounded-2xl max-w-md w-full max-h-[85vh] overflow-hidden shadow-2xl border border-gray-200 animate-slideUp"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <div className="sticky top-0 bg-gradient-to-r from-slate-50 to-gray-50 border-b border-gray-200 p-6 flex justify-between items-center rounded-t-2xl">
+                                    <div>
+                                        <h2 className="text-2xl font-black text-gray-800">
+                                            {cards.find(c => c.id === openDialog)?.title}
+                                        </h2>
+                                        <div className="w-12 h-1 bg-gradient-to-r from-slate-600 to-slate-700 rounded-full mt-2"></div>
+                                    </div>
+                                    <button 
+                                        onClick={closeDialog} 
+                                        className="p-3 hover:bg-white/80 rounded-lg transition-all duration-300 transform hover:scale-110 shadow-sm border border-gray-200 haptic"
+                                        aria-label="Close dialog"
+                                    >
+                                        <CloseIcon />
                                     </button>
                                 </div>
-                                <div className="p-6 overflow-y-auto max-h-[calc(85vh-74px)]"><div className="space-y-4">{cards.find(c => c.id === openDialog)?.content}</div></div>
+                                <div className="p-6 overflow-y-auto max-h-[calc(85vh-120px)] bg-gradient-to-b from-white to-slate-50">
+                                    <div className="space-y-1">
+                                        {cards.find(c => c.id === openDialog)?.content}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}
 
+                    {/* Image Zoom Modal */}
                     {zoomedImg && (
-                        <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={closeImage}>
+                        <div className="fixed inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={closeImage}>
                             <div className="relative max-w-full max-h-full">
-                                <img src={zoomedImg} alt="Zoomed view" className="max-w-full max-h-[90vh] rounded-xl shadow-2xl animate-zoomIn" onClick={(e) => e.stopPropagation()} />
-                                <button onClick={closeImage} className="absolute -top-2 -right-2 text-white bg-black/30 backdrop-blur-sm p-2 rounded-full haptic" aria-label="Close image">
+                                <img 
+                                    src={zoomedImg} 
+                                    alt="Zoomed view" 
+                                    className="max-w-full max-h-full rounded-xl shadow-2xl border border-white/20 animate-zoomIn" 
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                                <button 
+                                    onClick={closeImage}
+                                    className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm p-3 rounded-lg hover:bg-white/30 transition-all duration-300 border border-white/30 shadow-lg haptic"
+                                    aria-label="Close image"
+                                >
                                     <CloseIcon />
                                 </button>
                             </div>
