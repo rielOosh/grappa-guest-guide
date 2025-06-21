@@ -39,7 +39,7 @@
     <link rel="preconnect" href="https://i.imgur.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=apk_install" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
@@ -360,7 +360,7 @@
     
     <script type="text/babel">
         // --- PWA Service Worker (concise version) ---
-        const serviceWorkerCode = `const CACHE_NAME='grappa-guide-cache-v16';const U=['.','https://cdn.tailwindcss.com','https://unpkg.com/react@18/umd/react.development.js','https://unpkg.com/react-dom@18/umd/react-dom.development.js','https://unpkg.com/@babel/standalone/babel.min.js','https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=apk_install','https://i.imgur.com/MBYTWps.png','https://i.imgur.com/ChMRT7d.jpg','https://i.imgur.com/2AahzMz.png'];self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(U)).then(()=>self.skipWaiting())));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok){const cRes=res.clone();caches.open(CACHE_NAME).then(c=>c.put(e.request,cRes))}return res})).catch(()=>new Response('Offline'))));self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>CACHE_NAME!==k?caches.delete(k):null))).then(()=>self.clients.claim())));`;
+        const serviceWorkerCode = `const CACHE_NAME='grappa-guide-cache-v16';const U=['.','https://cdn.tailwindcss.com','https://unpkg.com/react@18/umd/react.development.js','https://unpkg.com/react-dom@18/umd/react-dom.development.js','https://unpkg.com/@babel/standalone/babel.min.js','https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200','https://i.imgur.com/MBYTWps.png','https://i.imgur.com/ChMRT7d.jpg','https://i.imgur.com/2AahzMz.png'];self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(U)).then(()=>self.skipWaiting())));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok){const cRes=res.clone();caches.open(CACHE_NAME).then(c=>c.put(e.request,cRes))}return res})).catch(()=>new Response('Offline'))));self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>CACHE_NAME!==k?caches.delete(k):null))).then(()=>self.clients.claim())));`;
         if ('serviceWorker' in navigator) window.addEventListener('load',() => navigator.serviceWorker.register(URL.createObjectURL(new Blob([serviceWorkerCode],{type:'application/javascript'}))).then(r=>console.log('SW reg')).catch(e=>console.log('SW err')));
 
         // --- PWA Support Detection ---
@@ -373,10 +373,11 @@
             const isIOS = /iphone|ipad|ipod/.test(ua) || isIPadOS;
             
             // Browser detection
-            const isChrome = /chrome/.test(ua) && !/edg/.test(ua);
+            const isChrome = /chrome/.test(ua) && !/edg/.test(ua) && !/samsungbrowser/.test(ua);
             const isEdge = /edg/.test(ua);
             const isSafari = /safari/.test(ua) && !/chrome|crios/.test(ua);
             const isFirefox = /firefox/.test(ua);
+            const isSamsungBrowser = /samsungbrowser/.test(ua);
             
             // Feature detection
             const hasBeforeInstallPrompt = 'BeforeInstallPromptEvent' in window;
@@ -394,7 +395,8 @@
                     isEdge,
                     isSafari,
                     isFirefox,
-                    isChromium: isChrome || isEdge || /brave|opera/.test(ua)
+                    isSamsungBrowser,
+                    isChromium: isChrome || isEdge || isSamsungBrowser || /brave|opera/.test(ua)
                 },
                 features: {
                     hasBeforeInstallPrompt,
@@ -427,67 +429,104 @@
             const [deferredPrompt, setDeferredPrompt] = useState(null);
             const [showIOSBanner, setShowIOSBanner] = useState(false);
             const [showIOSModal, setShowIOSModal] = useState(false);
-            const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+            const [showAndroidInstructions, setShowAndroidInstructions] = useState(false);
             const support = useRef(detectPWASupport()).current;
+            const promptCaptured = useRef(false);
 
             useEffect(() => {
+                console.log('PWA Support:', support);
+                
                 // Check if already installed
                 if (support.features.isInstalled) {
                     console.log('PWA is already installed');
                     return;
                 }
 
-                // For Chromium browsers
-                if (support.features.hasBeforeInstallPrompt) {
+                // Always show button on supported browsers
+                if (support.browser.isChromium || (support.platform.isIOS && support.browser.isSafari)) {
                     setShowButton(true);
-                    
+                }
+
+                // Set up beforeinstallprompt listener for Chromium browsers
+                if (support.browser.isChromium) {
                     const handleBeforeInstallPrompt = (e) => {
+                        console.log('beforeinstallprompt event fired');
                         e.preventDefault();
                         setDeferredPrompt(e);
+                        promptCaptured.current = true;
                     };
 
                     const handleAppInstalled = () => {
                         console.log('PWA installed successfully');
                         setShowButton(false);
                         setDeferredPrompt(null);
-                        setShowInstallPrompt(false);
                     };
 
                     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
                     window.addEventListener('appinstalled', handleAppInstalled);
 
-                    return () => {
+                    // Check if the event already fired before we attached the listener
+                    setTimeout(() => {
+                        if (!promptCaptured.current && support.browser.isChromium && !support.features.isInstalled) {
+                            console.log('beforeinstallprompt event may have been missed or PWA criteria not met');
+                            console.log('PWA Requirements check:');
+                            console.log('- HTTPS:', window.location.protocol === 'https:');
+                            console.log('- Current protocol:', window.location.protocol);
+                            console.log('- Service Worker:', 'serviceWorker' in navigator);
+                            console.log('- Manifest linked:', !!document.querySelector('link[rel="manifest"]'));
+                            
+                            if (window.location.protocol === 'file:') {
+                                console.warn('PWA installation requires HTTPS. File:// protocol detected.');
+                            }
+                        }
+                    }, 2000);
+
+                    const hideIOSBanner = () => {
+                setShowIOSBanner(false);
+                localStorage.setItem('ios-install-guide-shown', Date.now().toString());
+            };
+
+            const showIOSInstructions = () => {
+                setShowIOSBanner(false);
+                setShowIOSModal(true);
+            };
+
+            if (!showButton) return null;
+
+            return () => {
                         window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
                         window.removeEventListener('appinstalled', handleAppInstalled);
                     };
-                } 
-                
-                // For iOS Safari
-                else if (support.platform.isIOS && support.browser.isSafari) {
-                    setShowButton(true);
-                }
-                
-                // For other browsers
-                else {
-                    console.log('PWA installation not supported in this browser');
                 }
             }, []);
 
             const handleInstallClick = async () => {
                 if (navigator.vibrate) navigator.vibrate(30);
+                console.log('Install button clicked');
+                console.log('Browser info:', {
+                    userAgent: navigator.userAgent,
+                    platform: support.platform,
+                    browser: support.browser,
+                    deferredPrompt: !!deferredPrompt
+                });
 
                 // Chromium browsers with deferred prompt
                 if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    
-                    if (outcome === 'accepted') {
-                        console.log('User accepted installation');
-                    } else {
-                        console.log('User dismissed installation');
+                    try {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        
+                        if (outcome === 'accepted') {
+                            console.log('User accepted installation');
+                        } else {
+                            console.log('User dismissed installation');
+                            localStorage.setItem('pwa-install-dismissed', Date.now().toString());
+                        }
+                        
+                        setDeferredPrompt(null);
+                    } catch (error) {
+                        console.error('Error showing install prompt:', error);
                     }
-                    
-                    setDeferredPrompt(null);
                 } 
                 
                 // iOS Safari
@@ -495,9 +534,15 @@
                     setShowIOSBanner(true);
                 }
                 
-                // Other browsers
+                // Android browsers without prompt - show manual instructions
+                else if (support.platform.isAndroid) {
+                    console.log('Showing Android manual instructions');
+                    setShowAndroidInstructions(true);
+                }
+                
+                // Desktop or other browsers
                 else {
-                    alert('To install this app, please use Chrome, Edge, or Safari on iOS.');
+                    alert('PWA installation is not supported in this browser. Please try Chrome, Edge, or Safari on iOS.');
                 }
             };
 
@@ -524,9 +569,51 @@
                         <span className="material-symbols-outlined">apk_install</span>
                     </button>
 
+                    {/* Android Manual Instructions */}
+                    {showAndroidInstructions && (
+                        <div className="ios-install-modal active">
+                            <div className="ios-modal-overlay">
+                                <div className="ios-modal-content">
+                                    <h3>Install {appName}</h3>
+                                    <p style={{marginBottom: '16px', color: '#64748b'}}>
+                                        The automatic install prompt isn't available. This can happen if:
+                                    </p>
+                                    <ul style={{marginBottom: '16px', paddingLeft: '20px', color: '#64748b', fontSize: '14px', textAlign: 'left'}}>
+                                        <li>The site isn't served over HTTPS (required for PWA)</li>
+                                        <li>You previously dismissed the install prompt</li>
+                                        <li>The app is already installed</li>
+                                    </ul>
+                                    <p style={{marginBottom: '16px', color: '#475569', fontWeight: '500'}}>
+                                        You can still install manually:
+                                    </p>
+                                    <div className="ios-install-steps">
+                                        <div className="ios-step">
+                                            <span className="ios-step-number">1</span>
+                                            <p>Tap the menu button (⋮) in the top-right corner of your browser</p>
+                                        </div>
+                                        <div className="ios-step">
+                                            <span className="ios-step-number">2</span>
+                                            <p>Look for "Add to Home screen" or "Install app" in the menu</p>
+                                        </div>
+                                        <div className="ios-step">
+                                            <span className="ios-step-number">3</span>
+                                            <p>Tap "Add" or "Install" when prompted</p>
+                                        </div>
+                                    </div>
+                                    <p style={{marginTop: '16px', fontSize: '14px', color: '#94a3b8'}}>
+                                        Note: Make sure you're using Chrome, Edge, or Samsung Internet browser
+                                    </p>
+                                    <button className="ios-modal-close" onClick={() => setShowAndroidInstructions(false)}>
+                                        Got it!
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* iOS Install Banner */}
                     {showIOSBanner && (
-                        <div className={`ios-install-banner ${showIOSBanner ? 'visible' : ''}`}>
+                        <div className="ios-install-banner visible" onClick={showIOSInstructions}>
                             <div className="ios-banner-content">
                                 <img src={appIcon} alt={appName} className="ios-banner-icon" />
                                 <div className="ios-banner-text">
@@ -537,7 +624,7 @@
                                         </svg> then "Add to Home Screen"
                                     </div>
                                 </div>
-                                <button className="ios-banner-close" onClick={hideIOSBanner}>×</button>
+                                <button className="ios-banner-close" onClick={(e) => { e.stopPropagation(); hideIOSBanner(); }}>×</button>
                             </div>
                         </div>
                     )}
