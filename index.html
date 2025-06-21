@@ -16,19 +16,7 @@
     <meta name="twitter:title" content="GrappA Guest Guide">
     <meta name="twitter:description" content="Your complete resort companion for GrappA. Access guides, links, and information, even offline.">
     <meta name="twitter:image" content="https://i.imgur.com/r4z8Ibx.png">
-    <link rel="manifest" href="data:application/manifest+json,{
-        &quot;name&quot;: &quot;GrappA Guest Guide&quot;,
-        &quot;short_name&quot;: &quot;GrappA Guide&quot;,
-        &quot;start_url&quot;: &quot;.&quot;,
-        &quot;display&quot;: &quot;standalone&quot;,
-        &quot;background_color&quot;: &quot;#f8fafc&quot;,
-        &quot;theme_color&quot;: &quot;#f8fafc&quot;,
-        &quot;description&quot;: &quot;Your resort guide for GrappA.&quot;,
-        &quot;icons&quot;: [
-            { &quot;src&quot;: &quot;https://i.imgur.com/s6g6A4b.png&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;sizes&quot;: &quot;192x192&quot; },
-            { &quot;src&quot;: &quot;https://i.imgur.com/s6g6A4b.png&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;sizes&quot;: &quot;512x512&quot; }
-        ]
-    }">
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiR3JhcHBBIEd1ZXN0IEd1aWRlIiwic2hvcnRfbmFtZSI6IkdyYXBwQSBHdWlkZSIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZjhmYWZjIiwidGhlbWVfY29sb3IiOiIjZjhmYWZjIiwiZGVzY3JpcHRpb24iOiJZb3VyIHJlc29ydCBndWlkZSBmb3IgR3JhcHBBLiIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2kuaW1ndXIuY29tL3M2ZzZBNGIucG5nIiwidHlwZSI6ImltYWdlL3BuZyIsInNpemVzIjoiMTkyeDE5MiJ9LHsic3JjIjoiaHR0cHM6Ly9pLmltZ3VyLmNvbS9zNmc2QTRiLnBuZyIsInR5cGUiOiJpbWFnZS9wbmciLCJzaXplcyI6IjUxMng1MTIifV19">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="GrappA Guide">
@@ -121,7 +109,19 @@
     <script type="text/babel">
         // --- PWA Service Worker (concise version) ---
         const serviceWorkerCode = `const CACHE_NAME='grappa-guide-cache-v16';const U=['.','https://cdn.tailwindcss.com','https://unpkg.com/react@18/umd/react.development.js','https://unpkg.com/react-dom@18/umd/react-dom.development.js','https://unpkg.com/@babel/standalone/babel.min.js','https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200','https://i.imgur.com/MBYTWps.png','https://i.imgur.com/ChMRT7d.jpg','https://i.imgur.com/2AahzMz.png'];self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(U)).then(()=>self.skipWaiting())));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok){const cRes=res.clone();caches.open(CACHE_NAME).then(c=>c.put(e.request,cRes))}return res})).catch(()=>new Response('Offline'))));self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>CACHE_NAME!==k?caches.delete(k):null))).then(()=>self.clients.claim())));`;
-        if ('serviceWorker' in navigator) window.addEventListener('load',() => navigator.serviceWorker.register(URL.createObjectURL(new Blob([serviceWorkerCode],{type:'application/javascript'}))).then(r=>console.log('SW reg')).catch(e=>console.log('SW err')));
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register(URL.createObjectURL(new Blob([serviceWorkerCode],{type:'application/javascript'})))
+                    .then(r => {
+                        console.log('Service Worker registered successfully');
+                        // Force check for install prompt after SW registration
+                        if (window.matchMedia('(display-mode: browser)').matches && !window.navigator.standalone) {
+                            console.log('App is running in browser mode, install should be available');
+                        }
+                    })
+                    .catch(e => console.error('Service Worker registration failed:', e));
+            });
+        }
 
         // --- Reusable Icon Gradient Definition ---
         const IconDefs = () => (<defs><linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="rgba(51, 65, 85, 0.95)" /><stop offset="100%" stopColor="rgba(71, 85, 105, 0.85)" /></linearGradient></defs>);
@@ -140,6 +140,16 @@
         const CloseIcon = () => ( <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg> );
 
         // --- Main React Component ---
+        // Global variable to store install prompt
+        let globalDeferredPrompt = null;
+        
+        // Capture the event as early as possible
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            globalDeferredPrompt = e;
+            console.log('Install prompt captured and stored');
+        });
+
         const BnBGuestGuide = () => {
             const { useState, useEffect } = React;
             const [openDialog, setOpenDialog] = useState(null);
@@ -147,7 +157,7 @@
             const [isLoaded, setIsLoaded] = useState(false);
             const [isOffline, setIsOffline] = useState(!navigator.onLine);
             const [lastVisited, setLastVisited] = useState([]);
-            const [deferredPrompt, setDeferredPrompt] = useState(null);
+            const [deferredPrompt, setDeferredPrompt] = useState(globalDeferredPrompt);
             const [isStandalone, setIsStandalone] = useState(false);
             const [isIOS, setIsIOS] = useState(false);
             const [showInstallInstructions, setShowInstallInstructions] = useState(false);
@@ -171,10 +181,17 @@
                 const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || false;
                 setIsStandalone(standalone);
                 
+                // Check if we already have the prompt
+                if (globalDeferredPrompt) {
+                    setDeferredPrompt(globalDeferredPrompt);
+                }
+                
                 // Handle install prompt for browsers that support it
                 const handleInstallPrompt = (e) => {
                     e.preventDefault();
+                    globalDeferredPrompt = e;
                     setDeferredPrompt(e);
+                    console.log('Install prompt received in component');
                 };
                 
                 window.addEventListener('beforeinstallprompt', handleInstallPrompt);
@@ -190,18 +207,50 @@
             const closeImage = () => setZoomedImg(null);
             
             const handleInstallClick = async () => {
-                if (deferredPrompt) {
-                    // Use the native install prompt if available
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
+                console.log('Install button clicked');
+                console.log('User Agent:', navigator.userAgent);
+                console.log('Is Chrome/Edge:', /Chrome|Edg/.test(navigator.userAgent));
+                console.log('Deferred prompt available:', !!deferredPrompt);
+                console.log('Global deferred prompt available:', !!globalDeferredPrompt);
+                
+                // Try to use either the state or global deferred prompt
+                const promptToUse = deferredPrompt || globalDeferredPrompt;
+                
+                if (promptToUse && promptToUse.prompt) {
+                    try {
+                        // Use the native install prompt
+                        console.log('Triggering native install prompt');
+                        await promptToUse.prompt();
+                        const { outcome } = await promptToUse.userChoice;
+                        
+                        console.log('Install outcome:', outcome);
+                        if (outcome === 'accepted') {
+                            console.log('User accepted the install prompt');
+                            setIsStandalone(true);
+                        }
+                        
+                        // Clear the prompt after use
+                        globalDeferredPrompt = null;
+                        setDeferredPrompt(null);
+                    } catch (error) {
+                        console.error('Error showing install prompt:', error);
+                        // Fall back to showing instructions
+                        setShowInstallInstructions(true);
+                    }
+                } else {
+                    console.log('No native prompt available, showing instructions');
+                    // For Android Chrome/Edge, check if it's a PWA-capable browser
+                    const isAndroidChrome = /Android/.test(navigator.userAgent) && /Chrome|Edg/.test(navigator.userAgent);
                     
-                    if (outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                        setIsStandalone(true);
+                    if (isAndroidChrome) {
+                        console.log('Android Chrome/Edge detected but no install prompt available');
+                        console.log('This might be because:');
+                        console.log('1. The app was already installed');
+                        console.log('2. The user previously dismissed the install prompt');
+                        console.log('3. The page needs to be reloaded');
+                        console.log('4. The manifest or service worker has issues');
                     }
                     
-                    setDeferredPrompt(null);
-                } else {
                     // Show instructions for manual installation
                     setShowInstallInstructions(true);
                 }
@@ -358,6 +407,18 @@
                                     </div>
                                     <h3 className="text-xl font-bold text-gray-800 mb-3">Install GrappA Guide</h3>
                                     <p className="text-gray-600 mb-6">Add this app to your home screen for quick access and offline use</p>
+                                    {/* Debug info for Android */}
+                                    {!isIOS && (
+                                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4 text-xs text-left">
+                                            <p className="font-semibold text-yellow-800 mb-1">Troubleshooting:</p>
+                                            <p className="text-yellow-700">If the automatic install didn't work, try:</p>
+                                            <ul className="list-disc list-inside text-yellow-700 mt-1">
+                                                <li>Refreshing the page and trying again</li>
+                                                <li>Clearing browser cache</li>
+                                                <li>Using the manual method below</li>
+                                            </ul>
+                                        </div>
+                                    )}
                                     <div className="bg-gray-50 rounded-lg p-4 mb-6">
                                         {isIOS ? (
                                             <ol className="text-left text-sm text-gray-700 space-y-2">
