@@ -1,6 +1,6 @@
 // A descriptive cache name helps in managing updates.
 // Incrementing the version (e.g., to 'v2') will trigger the 'activate' event for cleanup.
-const CACHE_NAME = 'grappa-guest-guide-v1';
+const CACHE_NAME = 'grappa-guest-guide-v2';
 
 // A comprehensive list of assets to cache for a full offline experience.
 const URLS_TO_CACHE = [
@@ -15,6 +15,10 @@ const URLS_TO_CACHE = [
   
   // Fonts - Caching fonts prevents layout shifts and ensures consistent typography.
   'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
+  
+  // App Icons
+  './grappa_icon_192px.png',
+  './grappa_icon_512px.png',
   
   // Key Images - All images used in the app for a complete offline UI.
   'https://i.imgur.com/s6g6A4b.png', // App Icon
