@@ -766,6 +766,32 @@
                 }
             };
             
+            const handleShare = async () => {
+                const shareData = {
+                    title: 'GrappA Guest Guide',
+                    text: 'Check out the GrappA Guest Guide - Your complete resort companion!',
+                    url: window.location.href
+                };
+                
+                try {
+                    if (navigator.share) {
+                        // Use native share if available (mobile)
+                        await navigator.share(shareData);
+                        console.log('Shared successfully');
+                    } else {
+                        // Fallback: copy to clipboard
+                        await navigator.clipboard.writeText(window.location.href);
+                        // Show a temporary notification
+                        const notification = document.createElement('div');
+                        notification.className = 'fixed top-20 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg animate-slideUp z-50';
+                        notification.textContent = 'Link copied to clipboard!';
+                        document.body.appendChild(notification);
+                        setTimeout(() => notification.remove(), 3000);
+                    }
+                } catch (err) {
+                    console.log('Error sharing:', err);
+                }
+            };
 
             return (
                 <div className="min-h-screen p-4 relative overflow-hidden">
@@ -792,20 +818,24 @@
                     </div>
 
                     {isOffline && ( <div className="fixed top-4 left-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-slideUp z-50"><span className="font-semibold">Offline Mode</span> - Some features may be limited</div> )}
+                    
+                    {/* Share button in top right corner */}
+                    <button
+                        onClick={handleShare}
+                        className={`fixed top-4 right-4 p-3 rounded-xl transition-all haptic shadow-lg z-40 ${
+                            currentTheme === 'day' 
+                                ? 'bg-slate-600 hover:bg-slate-700 text-white' 
+                                : 'bg-slate-700 hover:bg-slate-800 text-white'
+                        }`}
+                        aria-label="Share GrappA Guest Guide"
+                    >
+                        <span className="material-symbols-outlined" style={{fontSize: '24px'}}>
+                            share
+                        </span>
+                    </button>
 
                     <div className={`text-center mb-8 pt-8 transition-all duration-1000 ${isLoaded ? 'animate-fadeIn' : 'opacity-0'}`}>
-                        <div className="glass-enhanced rounded-2xl p-6 max-w-md mx-auto shadow-xl relative">
-                            {/* Share button in top right corner */}
-                            <button
-                                onClick={handleShare}
-                                className="absolute top-4 right-4 p-2 rounded-lg transition-all haptic hover:bg-slate-100/50"
-                                aria-label="Share"
-                            >
-                                <span className="material-symbols-outlined" style={{fontSize: '24px', color: currentTheme === 'day' ? '#64748b' : 'rgba(255,255,255,0.8)'}}>
-                                    forward
-                                </span>
-                            </button>
-                            
+                        <div className="glass-enhanced rounded-2xl p-6 max-w-md mx-auto shadow-xl">
                             <h1 className="text-4xl font-black mb-2 gradient-text">GrappA Guest Guide</h1>
                             <p className="text-lg text-slate-600 font-medium">Resort Information & Services</p>
                             {/* Manual Install Button for Testing */}
