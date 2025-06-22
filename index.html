@@ -414,6 +414,40 @@
                     setTimeout(() => setShowInstallPrompt(true), 3000); // Show after 3 seconds
                 }
                 
+                // Enhanced fallback for browsers and aggressive prompt display
+                // Check multiple times to ensure prompt is shown
+                const checkInstallPrompt = () => {
+                    const hasPWASupport = 'serviceWorker' in navigator;
+                    const isNotInstalled = !isInstalled && !localStorage.getItem('pwa-installed');
+                    const canShowPrompt = shouldShowPrompt && isNotInstalled;
+                    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+                    
+                    // Debug logging
+                    console.log('Install prompt check:', {
+                        hasPWASupport,
+                        isInstalled,
+                        isStandalone,
+                        shouldShowPrompt,
+                        deferredPrompt: !!deferredPrompt,
+                        isIOS: iOS,
+                        showInstallPrompt,
+                        dismissedDate,
+                        canShowPrompt
+                    });
+                    
+                    // Show prompt if conditions are met
+                    if (hasPWASupport && canShowPrompt && !isStandalone && !showInstallPrompt) {
+                        console.log('Showing install prompt');
+                        setShowInstallPrompt(true);
+                    }
+                };
+                
+                // Check immediately and then periodically
+                checkInstallPrompt();
+                setTimeout(checkInstallPrompt, 2000);
+                setTimeout(checkInstallPrompt, 5000);
+                setTimeout(checkInstallPrompt, 10000);
+                
                 // Theme update interval
                 const themeInterval = setInterval(() => {
                     const newTheme = getTheme();
@@ -646,6 +680,89 @@
                     )
                 });
             }
+            
+            // Add browser-specific install instructions to cards
+            if (openDialog === 'browser-install') {
+                const userAgent = navigator.userAgent.toLowerCase();
+                cards.push({
+                    id: 'browser-install',
+                    title: 'Install App',
+                    content: (
+                        <div className="text-center space-y-4">
+                            <div className="text-6xl mb-4">📱</div>
+                            <h3 className="font-bold text-xl mb-4" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>Add to Home Screen</h3>
+                            <div className="text-left space-y-3" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
+                                {userAgent.includes('firefox') ? (
+                                    <>
+                                        <p className="font-semibold mb-2">Firefox Browser:</p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">1.</span>
+                                            <span>Look for the install icon ⊕ in the address bar</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">2.</span>
+                                            <span>Click it and select "Install"</span>
+                                        </p>
+                                    </>
+                                ) : userAgent.includes('samsung') ? (
+                                    <>
+                                        <p className="font-semibold mb-2">Samsung Internet:</p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">1.</span>
+                                            <span>Tap the menu button (⋮) at the bottom</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">2.</span>
+                                            <span>Select "Add page to" → "Home screen"</span>
+                                        </p>
+                                    </>
+                                ) : userAgent.includes('edge') ? (
+                                    <>
+                                        <p className="font-semibold mb-2">Microsoft Edge:</p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">1.</span>
+                                            <span>Tap the menu (•••) at the bottom</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">2.</span>
+                                            <span>Select "Add to phone"</span>
+                                        </p>
+                                    </>
+                                ) : userAgent.includes('opera') ? (
+                                    <>
+                                        <p className="font-semibold mb-2">Opera Browser:</p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">1.</span>
+                                            <span>Tap the Opera menu button</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">2.</span>
+                                            <span>Select "Home screen" or "Add to Home screen"</span>
+                                        </p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p className="font-semibold mb-2">Your Browser:</p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">1.</span>
+                                            <span>Open the browser menu (⋮ or •••)</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">2.</span>
+                                            <span>Look for "Install app" or "Add to Home screen"</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">3.</span>
+                                            <span>Follow the prompts to install</span>
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+                            <p className="text-sm mt-4" style={{color: currentTheme === 'day' ? '#64748b' : 'rgba(255,255,255,0.6)'}}>This allows offline access and faster loading!</p>
+                        </div>
+                    )
+                });
+            }
 
             const openDialogHandler = (id) => {
                 setOpenDialog(id);
@@ -669,6 +786,11 @@
                         localStorage.setItem('pwa-installed', 'true');
                     }
                     setDeferredPrompt(null);
+                } else {
+                    // Enhanced fallback for browsers without install prompt support
+                    // Show browser-specific instructions dialog
+                    setOpenDialog('browser-install');
+                    console.log('No install prompt available, showing browser-specific instructions');
                 }
             };
             
@@ -743,6 +865,18 @@
                         <div className="glass-enhanced rounded-2xl p-6 max-w-md mx-auto shadow-xl">
                             <h1 className="text-4xl font-black mb-2 gradient-text">GrappA Guest Guide</h1>
                             <p className="text-lg text-slate-600 font-medium">Resort Information & Services</p>
+                            {/* Manual Install Button for Testing */}
+                            {!isInstalled && (
+                                <button
+                                    onClick={handleInstallClick}
+                                    className="mt-4 px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-medium transition-all shadow-md haptic text-sm"
+                                >
+                                    <span className="flex items-center gap-2">
+                                        <span>📲</span>
+                                        <span>Add to Home Screen</span>
+                                    </span>
+                                </button>
+                            )}
                         </div>
                         {lastVisited.length > 0 && (
                             <div className="mt-6 max-w-md mx-auto"><p className="text-sm mb-2" style={{color: currentTheme === 'day' ? '#64748b' : 'rgba(255,255,255,0.6)'}}>Recently viewed:</p>
