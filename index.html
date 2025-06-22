@@ -312,6 +312,7 @@
             const [isLoaded, setIsLoaded] = useState(false);
             const [isOffline, setIsOffline] = useState(!navigator.onLine);
             const [lastVisited, setLastVisited] = useState([]);
+            const [currentTheme, setCurrentTheme] = useState(getTheme());
 
             useEffect(() => {
                 setTimeout(() => {
