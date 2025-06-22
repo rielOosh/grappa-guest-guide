@@ -586,12 +586,12 @@
 
             const openDialogHandler = (id) => {
                 setOpenDialog(id);
-                if (navigator.vibrate) navigator.vibrate(30);
+                if (navigator.vibrate) navigator.vibrate(50); // Only vibrate when opening dialog
                 const newVisited = [id, ...lastVisited.filter(v => v !== id)].slice(0, 3);
                 setLastVisited(newVisited);
                 sessionStorage.setItem('lastVisited', JSON.stringify(newVisited));
             };
-            const closeDialog = () => { setOpenDialog(null); if (navigator.vibrate) navigator.vibrate(30); };
+            const closeDialog = () => { setOpenDialog(null); };
 
             return (
                 <div className="min-h-screen p-4 relative overflow-hidden">
