@@ -8,32 +8,16 @@
   "description": "Your resort guide for GrappA.",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192x192/64748b/ffffff?text=GrappA",
-      "type": "image/png",
+      "src": "./icon-192.svg",
+      "type": "image/svg+xml",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "https://via.placeholder.com/512x512/64748b/ffffff?text=GrappA+Guide",
-      "type": "image/png",
+      "src": "./icon-512.svg",
+      "type": "image/svg+xml",
       "sizes": "512x512",
       "purpose": "any maskable"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "https://via.placeholder.com/540x1170/f8fafc/64748b?text=GrappA+Guest+Guide+Mobile",
-      "type": "image/png",
-      "sizes": "540x1170",
-      "form_factor": "narrow",
-      "label": "GrappA Guest Guide on mobile"
-    },
-    {
-      "src": "https://via.placeholder.com/1280x720/f8fafc/64748b?text=GrappA+Guest+Guide+Desktop",
-      "type": "image/png",
-      "sizes": "1280x720",
-      "form_factor": "wide",
-      "label": "GrappA Guest Guide on desktop"
     }
   ]
 }
