@@ -722,6 +722,30 @@
             };
             const closeDialog = () => { setOpenDialog(null); };
             
+            const handleShare = async () => {
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'GrappA Guest Guide',
+                            text: 'Check out the GrappA Guest Guide - Your resort companion app!',
+                            url: window.location.href
+                        });
+                    } catch (err) {
+                        if (err.name !== 'AbortError') {
+                            console.log('Error sharing:', err);
+                        }
+                    }
+                } else {
+                    // Fallback: copy to clipboard
+                    try {
+                        await navigator.clipboard.writeText(window.location.href);
+                        alert('Link copied to clipboard!');
+                    } catch (err) {
+                        console.log('Failed to copy:', err);
+                    }
+                }
+            };
+            
             const handleInstallClick = async () => {
                 if (isIOS) {
                     // Show iOS instructions
@@ -770,7 +794,18 @@
                     {isOffline && ( <div className="fixed top-4 left-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-slideUp z-50"><span className="font-semibold">Offline Mode</span> - Some features may be limited</div> )}
 
                     <div className={`text-center mb-8 pt-8 transition-all duration-1000 ${isLoaded ? 'animate-fadeIn' : 'opacity-0'}`}>
-                        <div className="glass-enhanced rounded-2xl p-6 max-w-md mx-auto shadow-xl">
+                        <div className="glass-enhanced rounded-2xl p-6 max-w-md mx-auto shadow-xl relative">
+                            {/* Share button in top right corner */}
+                            <button
+                                onClick={handleShare}
+                                className="absolute top-4 right-4 p-2 rounded-lg transition-all haptic hover:bg-slate-100/50"
+                                aria-label="Share"
+                            >
+                                <span className="material-symbols-outlined" style={{fontSize: '24px', color: currentTheme === 'day' ? '#64748b' : 'rgba(255,255,255,0.8)'}}>
+                                    forward
+                                </span>
+                            </button>
+                            
                             <h1 className="text-4xl font-black mb-2 gradient-text">GrappA Guest Guide</h1>
                             <p className="text-lg text-slate-600 font-medium">Resort Information & Services</p>
                             {/* Manual Install Button for Testing */}
