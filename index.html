@@ -322,8 +322,22 @@
                 const handleOnline = () => setIsOffline(false); const handleOffline = () => setIsOffline(true);
                 window.addEventListener('online', handleOnline); window.addEventListener('offline', handleOffline);
                 setLastVisited(JSON.parse(sessionStorage.getItem('lastVisited') || '[]'));
-                return () => { window.removeEventListener('online', handleOnline); window.removeEventListener('offline', handleOffline); };
-            }, []);
+                
+                // Theme update interval
+                const themeInterval = setInterval(() => {
+                    const newTheme = getTheme();
+                    if (newTheme !== currentTheme) {
+                        setCurrentTheme(newTheme);
+                        applyTheme(newTheme);
+                    }
+                }, 60000);
+                
+                return () => { 
+                    window.removeEventListener('online', handleOnline); 
+                    window.removeEventListener('offline', handleOffline);
+                    clearInterval(themeInterval);
+                };
+            }, [currentTheme]);
 
             const openImage = (src) => { setZoomedImg(src); if (navigator.vibrate) navigator.vibrate(50); };
             const closeImage = () => setZoomedImg(null);
