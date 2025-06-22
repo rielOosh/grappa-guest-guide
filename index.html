@@ -445,42 +445,6 @@
                         </div>
                     </div>
                 )},
-                { id: 'trips', title: 'Local Trips', icon: <MapIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-800/70 via-gray-100/15 to-gray-900/70', content: (
-                    <div className="text-right space-y-6" dir="rtl">
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><h4 className="font-bold mb-3 text-lg" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>אפליקציית ניווט וטיולים</h4><a href="https://play.google.com/store/apps/details?id=altitude.alarm.erol.apps" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">הורד אפליקציית טיולים</a></div>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><h4 className="font-bold mb-3 text-lg" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>מיקום השער למסלולים</h4><a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">פתח במפות</a></div>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><a href="./walk_to_the_bulbouse_mountain.gpx" download="Bulbous_Mountain_Trail.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול 5 ק"מ להר הלבן ולבולבוסים</a></div>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><a href="./Zepp20230405100344.gpx" download="14km_trip_to_the_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול להר הגבוה 14 ק"מ</a></div>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><a href="./Zepp20230118153553.gpx" download="12km_trip_to_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול אל נופי הדרום והמערב 12 ק"מ</a></div>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><a href="./12km_walk.gpx" download="12km_trip.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול אל נופי הדרום 12 ק"מ</a></div>
-                    </div>
-                )},
-                { id: 'trail_services', title: 'Trail Services', icon: <TrailServicesIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-700/70 via-white/8 to-slate-800/70', content: (
-                    <div className="text-right space-y-6" dir="rtl">
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
-                            <h4 className="font-bold mb-3 text-lg text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>פאבלו</h4>
-                            <div className="bg-white rounded-lg shadow-sm border">
-                                <img src="https://i.imgur.com/MBYTWps.png" alt="Logistics info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://i.imgur.com/MBYTWps.png')} />
-                            </div>
-                        </div>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
-                            <h4 className="font-bold mb-4 text-lg text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>טיולי ג'יפים עם מר מדבר</h4>
-                            <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 text-center" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700 space-y-3 text-center"}>
-                                <p className="font-medium" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                                    <span className="font-semibold">טלפון: </span>
-                                    <a href="tel:08-6616976" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">08-6616976</a>
-                                </p>
-                                <p className="font-medium" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                                    <span className="font-semibold">אימייל: </span>
-                                    <a href="mailto:tayaroot@gmail.com" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">tayaroot@gmail.com</a>
-                                </p>
-                                <a href="https://aravadesert.co.il/marmaidbar/" target="_blank" rel="noopener noreferrer" className="!mt-4 block bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-lg text-center transition-all duration-300 haptic font-semibold shadow-md">
-                                    לאתר האינטרנט
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                )},
                 { id: 'wifi', title: 'WiFi Access', icon: <WifiIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-900/70 via-gray-200/12 to-gray-800/70', content: (
                     <div className="text-center">
                         <div className={currentTheme === 'day' ? "bg-slate-50 p-8 rounded-xl border border-slate-200" : "bg-slate-800/50 p-8 rounded-xl border border-slate-600"}>
@@ -537,19 +501,6 @@
                         </div>
                     </div>
                 )},
-                { id: 'sushi', title: 'Sushi Restaurant', icon: <RestaurantIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-800/70 via-white/15 to-gray-700/70', content: (
-                    <div className="text-right" dir="rtl">
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
-                            <h4 className="font-bold mb-6 text-2xl text-center flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                                <span className="text-3xl">🍣</span> מסעדת הסושי
-                            </h4>
-                            <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700"}>
-                                <img src="https://i.imgur.com/ChMRT7d.jpg" alt="Sushi Menu" className="w-full rounded-lg cursor-pointer shadow-md" onClick={() => openImage('https://i.imgur.com/ChMRT7d.jpg')} />
-                                <p className="text-sm mt-3 text-center font-semibold" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.8)'}}>תפריט מלא עם מחירים</p>
-                            </div>
-                        </div>
-                    </div>
-                )},
                 { id: 'pool', title: 'Swimming Pool', icon: <PoolIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-800/70 via-white/20 to-slate-900/70', content: (
                     <div className="text-right space-y-6" dir="rtl">
                         <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
@@ -585,6 +536,55 @@
                              </div>
                          </div>
                      </div>
+                )},
+                { id: 'sushi', title: 'Sushi Restaurant', icon: <RestaurantIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-800/70 via-white/15 to-gray-700/70', content: (
+                    <div className="text-right" dir="rtl">
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold mb-6 text-2xl text-center flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                <span className="text-3xl">🍣</span> מסעדת הסושי
+                            </h4>
+                            <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700"}>
+                                <img src="https://i.imgur.com/ChMRT7d.jpg" alt="Sushi Menu" className="w-full rounded-lg cursor-pointer shadow-md" onClick={() => openImage('https://i.imgur.com/ChMRT7d.jpg')} />
+                                <p className="text-sm mt-3 text-center font-semibold" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.8)'}}>תפריט מלא עם מחירים</p>
+                            </div>
+                        </div>
+                    </div>
+                )},
+                { id: 'trips', title: 'Local Trips', icon: <MapIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-800/70 via-gray-100/15 to-gray-900/70', content: (
+                    <div className="text-right space-y-6" dir="rtl">
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><h4 className="font-bold mb-3 text-lg" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>אפליקציית ניווט וטיולים</h4><a href="https://play.google.com/store/apps/details?id=altitude.alarm.erol.apps" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">הורד אפליקציית טיולים</a></div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><h4 className="font-bold mb-3 text-lg" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>מיקום השער למסלולים</h4><a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">פתח במפות</a></div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><a href="./walk_to_the_bulbouse_mountain.gpx" download="Bulbous_Mountain_Trail.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול 5 ק"מ להר הלבן ולבולבוסים</a></div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><a href="./Zepp20230405100344.gpx" download="14km_trip_to_the_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול להר הגבוה 14 ק"מ</a></div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><a href="./Zepp20230118153553.gpx" download="12km_trip_to_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול אל נופי הדרום והמערב 12 ק"מ</a></div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><a href="./12km_walk.gpx" download="12km_trip.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול אל נופי הדרום 12 ק"מ</a></div>
+                    </div>
+                )},
+                { id: 'trail_services', title: 'Trail Services', icon: <TrailServicesIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-700/70 via-white/8 to-slate-800/70', content: (
+                    <div className="text-right space-y-6" dir="rtl">
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
+                            <h4 className="font-bold mb-3 text-lg text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>פאבלו</h4>
+                            <div className="bg-white rounded-lg shadow-sm border">
+                                <img src="https://i.imgur.com/MBYTWps.png" alt="Logistics info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://i.imgur.com/MBYTWps.png')} />
+                            </div>
+                        </div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold mb-4 text-lg text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>טיולי ג'יפים עם מר מדבר</h4>
+                            <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 text-center" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700 space-y-3 text-center"}>
+                                <p className="font-medium" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
+                                    <span className="font-semibold">טלפון: </span>
+                                    <a href="tel:08-6616976" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">08-6616976</a>
+                                </p>
+                                <p className="font-medium" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
+                                    <span className="font-semibold">אימייל: </span>
+                                    <a href="mailto:tayaroot@gmail.com" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">tayaroot@gmail.com</a>
+                                </p>
+                                <a href="https://aravadesert.co.il/marmaidbar/" target="_blank" rel="noopener noreferrer" className="!mt-4 block bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-lg text-center transition-all duration-300 haptic font-semibold shadow-md">
+                                    לאתר האינטרנט
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 )},
                 { id: 'checkout', title: 'Check-out Info', icon: <CheckoutIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-900/70 via-white/12 to-slate-700/70', content: (
                     <div className="text-right" dir="rtl">
