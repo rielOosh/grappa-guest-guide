@@ -16,19 +16,7 @@
     <meta name="twitter:title" content="GrappA Guest Guide">
     <meta name="twitter:description" content="Your complete resort companion for GrappA. Access guides, links, and information, even offline.">
     <meta name="twitter:image" content="https://i.imgur.com/r4z8Ibx.png">
-    <link rel="manifest" href="data:application/manifest+json,{
-        &quot;name&quot;: &quot;GrappA Guest Guide&quot;,
-        &quot;short_name&quot;: &quot;GrappA Guide&quot;,
-        &quot;start_url&quot;: &quot;.&quot;,
-        &quot;display&quot;: &quot;standalone&quot;,
-        &quot;background_color&quot;: &quot;#f8fafc&quot;,
-        &quot;theme_color&quot;: &quot;#f8fafc&quot;,
-        &quot;description&quot;: &quot;Your resort guide for GrappA.&quot;,
-        &quot;icons&quot;: [
-            { &quot;src&quot;: &quot;https://i.imgur.com/s6g6A4b.png&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;sizes&quot;: &quot;192x192&quot; },
-            { &quot;src&quot;: &quot;https://i.imgur.com/s6g6A4b.png&quot;, &quot;type&quot;: &quot;image/png&quot;, &quot;sizes&quot;: &quot;512x512&quot; }
-        ]
-    }">
+    <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="GrappA Guide">
@@ -284,9 +272,14 @@
     <div id="root"></div>
     
     <script type="text/babel">
-        // --- PWA Service Worker (concise version) ---
-        const serviceWorkerCode = `const CACHE_NAME='grappa-guide-cache-v16';const U=['.','https://cdn.tailwindcss.com','https://unpkg.com/react@18/umd/react.development.js','https://unpkg.com/react-dom@18/umd/react-dom.development.js','https://unpkg.com/@babel/standalone/babel.min.js','https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200','https://i.imgur.com/MBYTWps.png','https://i.imgur.com/ChMRT7d.jpg','https://i.imgur.com/2AahzMz.png'];self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE_NAME).then(c=>c.addAll(U)).then(()=>self.skipWaiting())));self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok){const cRes=res.clone();caches.open(CACHE_NAME).then(c=>c.put(e.request,cRes))}return res})).catch(()=>new Response('Offline'))));self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>CACHE_NAME!==k?caches.delete(k):null))).then(()=>self.clients.claim())));`;
-        if ('serviceWorker' in navigator) window.addEventListener('load',() => navigator.serviceWorker.register(URL.createObjectURL(new Blob([serviceWorkerCode],{type:'application/javascript'}))).then(r=>console.log('SW reg')).catch(e=>console.log('SW err')));
+        // --- PWA Service Worker Registration ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => console.log('ServiceWorker registration successful with scope:', registration.scope))
+                    .catch(err => console.log('ServiceWorker registration failed:', err));
+            });
+        }
 
         // --- Theme Detection and Management ---
         const getTheme = () => {

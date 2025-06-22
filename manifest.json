@@ -1,0 +1,21 @@
+{
+    "name": "GrappA Guest Guide",
+    "short_name": "GrappA Guide",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#f8fafc",
+    "theme_color": "#475569",
+    "description": "Your complete resort guide for GrappA.",
+    "icons": [
+        {
+            "src": "https://i.imgur.com/s6g6A4b.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "https://i.imgur.com/s6g6A4b.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ]
+}
