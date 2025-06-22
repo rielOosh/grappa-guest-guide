@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GrappA Guest Guide</title>
     <meta name="description" content="Your complete resort companion for GrappA. Access guides, links, and information, even offline.">
-    <meta name="theme-color" content="#f8fafc">
+    <meta name="theme-color" content="#f8fafc" id="theme-color-meta">
     <meta property="og:title" content="GrappA Guest Guide">
     <meta property="og:description" content="Your complete resort companion for GrappA. Access guides, links, and information, even offline.">
     <meta property="og:image" content="https://i.imgur.com/r4z8Ibx.png">
@@ -47,7 +47,66 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-        :root { --animation-duration: 0.3s; }
+        /* Day Theme (8 AM - 8 PM) - Current styling */
+        :root {
+            --animation-duration: 0.3s;
+            /* Day theme colors */
+            --bg-gradient-1: #64748b;
+            --bg-gradient-2: #94a3b8;
+            --bg-gradient-3: #cbd5e1;
+            --glass-bg: rgba(255, 255, 255, 0.35);
+            --glass-bg-enhanced: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --text-primary: #334155;
+            --text-secondary: #475569;
+            --text-tertiary: #64748b;
+            --text-light: #94a3b8;
+            --card-gradient-from: rgba(241, 245, 249, 0.5);
+            --card-gradient-to: rgba(226, 232, 240, 0.5);
+            --icon-gradient-from: rgba(51, 65, 85, 0.95);
+            --icon-gradient-to: rgba(71, 85, 105, 0.85);
+            --dialog-bg: rgba(241, 245, 249, 0.95);
+            --dialog-header-bg: rgba(255, 255, 255, 0.8);
+            --bubble-1: rgba(255, 250, 220, 0.5);
+            --bubble-2: rgba(254, 243, 199, 0.4);
+            --bubble-3: rgba(255, 247, 237, 0.5);
+            --bubble-4: rgba(255, 237, 188, 0.35);
+            --ripple-color: rgba(255, 250, 220, 0.4);
+            --shadow-light: rgba(0, 0, 0, 0.05);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --shadow-heavy: rgba(0, 0, 0, 0.25);
+            --shadow-xl: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Night Theme (8 PM - 8 AM) - From older version */
+        [data-theme="night"] {
+            --bg-gradient-1: #475569;
+            --bg-gradient-2: #334155;
+            --bg-gradient-3: #1e293b;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-bg-enhanced: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.9);
+            --text-tertiary: rgba(255, 255, 255, 0.8);
+            --text-light: rgba(255, 255, 255, 0.6);
+            --card-gradient-from: rgba(71, 85, 105, 0.5);
+            --card-gradient-to: rgba(51, 65, 85, 0.5);
+            --icon-gradient-from: rgba(255, 255, 255, 0.9);
+            --icon-gradient-to: rgba(255, 255, 255, 0.7);
+            --dialog-bg: rgba(30, 41, 59, 0.95);
+            --dialog-header-bg: rgba(51, 65, 85, 0.8);
+            --bubble-1: rgba(71, 85, 105, 0.3);
+            --bubble-2: rgba(51, 65, 85, 0.25);
+            --bubble-3: rgba(30, 41, 59, 0.3);
+            --bubble-4: rgba(15, 23, 42, 0.2);
+            --ripple-color: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(0, 0, 0, 0.1);
+            --shadow-medium: rgba(0, 0, 0, 0.3);
+            --shadow-heavy: rgba(0, 0, 0, 0.5);
+            --shadow-xl: rgba(0, 0, 0, 0.7);
+        }
+
         * { -webkit-tap-highlight-color: transparent; }
         body { 
             margin: 0; 
@@ -56,12 +115,13 @@
             overflow-x: hidden; 
             -webkit-font-smoothing: antialiased; 
             -moz-osx-font-smoothing: grayscale; 
-            background: linear-gradient(135deg, #64748b 0%, #94a3b8 25%, #cbd5e1 50%, #94a3b8 75%, #64748b 100%);
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 25%, var(--bg-gradient-3) 50%, var(--bg-gradient-2) 75%, var(--bg-gradient-1) 100%);
             background-size: 400% 400%;
             animation: gradientShift 20s ease infinite;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .loading-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #94a3b8 0%, #cbd5e1 100%); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease-out; }
-        .loading-spinner { width: 60px; height: 60px; border: 4px solid rgba(0, 0, 0, 0.1); border-top-color: #475569; border-radius: 50%; animation: spin 1s linear infinite; }
+        .loading-screen { position: fixed; inset: 0; background: linear-gradient(135deg, var(--bg-gradient-2) 0%, var(--bg-gradient-3) 100%); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease-out; }
+        .loading-spinner { width: 60px; height: 60px; border: 4px solid var(--shadow-light); border-top-color: var(--text-secondary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 0.8; transform: scale(1); } 50% { opacity: 1; transform: scale(1.15); } }
         @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); } 33% { transform: translateY(-30px) translateX(20px) rotate(10deg); } 66% { transform: translateY(20px) translateX(-20px) rotate(-10deg); } }
@@ -70,47 +130,153 @@
         @keyframes slideUp { 0% { opacity: 0; transform: translateY(100vh) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes zoomIn { 0% { opacity: 0; transform: scale(0.3); } 100% { opacity: 1; transform: scale(1); } }
         @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-        .animate-fadeIn { animation: fadeIn 0.6s ease-out forwards; }
+        @keyframes ripple {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(4); opacity: 0; }
+        }
+        .animate-fadeIn { animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
         .animate-scaleIn { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
         .animate-slideUp { animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        .animate-zoomIn { animation: zoomIn 0.5s ease-out forwards; }
-        .animate-pulse { animation: pulse 4s ease-in-out infinite; }
-        .animate-float { animation: float 8s ease-in-out infinite; }
+        .animate-zoomIn { animation: zoomIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .animate-pulse { animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .animate-float { animation: float 8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         .glass { 
-            background: rgba(255, 255, 255, 0.35); 
+            background: var(--glass-bg); 
             backdrop-filter: blur(20px) saturate(180%); 
-
             -webkit-backdrop-filter: blur(20px) saturate(180%); 
-            border: 1px solid rgba(255, 255, 255, 0.5); 
-
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.7); 
-
+            border: 1px solid var(--glass-border); 
+            box-shadow: 0 8px 32px var(--shadow-medium), inset 0 0 0 1px var(--glass-border); 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .glass-enhanced {
-            background: rgba(255, 255, 255, 0.75);
+            background: var(--glass-bg-enhanced);
             backdrop-filter: blur(25px) saturate(200%);
             -webkit-backdrop-filter: blur(25px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 12px 48px var(--shadow-heavy), inset 0 0 0 1px var(--glass-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .card-hover { transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; overflow: hidden; }
-        .card-hover::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-radius: 50%; background: #000; opacity: 0.2; transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s; }
-        .card-hover:active::before { width: 300px; height: 300px; }
-        .card-hover:hover { transform: scale(1.05) translateY(-4px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), inset 0 0 0 1px rgba(255, 255, 255, 0.7); }
-        .icon-container { transition: all 0.3s ease; position: relative; }
-        .icon-container:hover { transform: scale(1.1) rotate(5deg); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); }
-        .btn-premium { position: relative; overflow: hidden; transition: all 0.3s ease; }
-        .btn-premium:hover::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); transition: left 0.5s ease; left: 100%; }
+        /* 3D Depth Shadow System */
+        .card-hover { 
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            position: relative; 
+            overflow: hidden;
+            /* Base state shadow */
+            box-shadow: 0 2px 8px var(--shadow-light), 0 4px 16px var(--shadow-light);
+        }
+        /* Ripple effect container */
+        .ripple-container {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            border-radius: inherit;
+            pointer-events: none;
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--ripple-color);
+            animation: ripple 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        /* Hover state - medium elevation */
+        .card-hover:hover { 
+            transform: scale(1.03) translateY(-6px); 
+            box-shadow: 
+                0 4px 12px var(--shadow-light),
+                0 8px 24px var(--shadow-medium),
+                0 16px 48px var(--shadow-light),
+                inset 0 0 0 1px var(--glass-border);
+        }
+        /* Active state - pressed shadow */
+        .card-hover:active { 
+            transform: scale(0.98) translateY(-2px);
+            box-shadow: 
+                0 2px 4px var(--shadow-light),
+                0 4px 8px var(--shadow-light),
+                inset 0 0 0 1px var(--glass-border);
+        }
+        .icon-container { 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            position: relative;
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+        .icon-container:hover { 
+            transform: scale(1.1) rotate(5deg); 
+            box-shadow: 0 8px 16px var(--shadow-medium);
+        }
+        /* Premium button effects */
+        .btn-premium { 
+            position: relative; 
+            overflow: hidden; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+        .btn-premium::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: -100%; 
+            width: 100%; 
+            height: 100%; 
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); 
+            transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-premium:hover::before { 
+            left: 100%; 
+        }
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px var(--shadow-medium);
+        }
+        .btn-premium:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px var(--shadow-light);
+        }
         ::-webkit-scrollbar { width: 10px; height: 10px; }
-        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.3); }
+        ::-webkit-scrollbar-track { background: var(--shadow-light); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--text-light); border-radius: 10px; transition: background 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+        .haptic { transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1); }
         .haptic:active { transform: scale(0.98); }
-        .gradient-text { background: linear-gradient(135deg, #2c3e50 0%, #475569 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        button:focus-visible, a:focus-visible { outline: 2px solid #334155; outline-offset: 4px; }
+        .gradient-text { 
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-clip: text;
+            transition: all 0.3s ease;
+        }
+        button:focus-visible, a:focus-visible { outline: 2px solid var(--text-secondary); outline-offset: 4px; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 }
-        .icon-gradient-text { background: linear-gradient(135deg, rgba(51, 65, 85, 0.95) 0%, rgba(71, 85, 105, 0.85) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block; }
-        @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
+        .icon-gradient-text { 
+            background: linear-gradient(135deg, var(--icon-gradient-from) 0%, var(--icon-gradient-to) 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-clip: text; 
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        /* Modal dialog elevation */
+        .modal-dialog {
+            box-shadow: 
+                0 10px 25px var(--shadow-medium),
+                0 20px 50px var(--shadow-heavy),
+                0 40px 100px var(--shadow-xl);
+        }
+        /* Theme-specific styles */
+        [data-theme="night"] .gradient-text {
+            filter: brightness(1.2);
+        }
+        [data-theme="night"] .btn-premium::before {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        @media (prefers-reduced-motion: reduce) { 
+            *, *::before, *::after { 
+                animation-duration: 0.01ms !important; 
+                animation-iteration-count: 1 !important; 
+                transition-duration: 0.01ms !important; 
+            } 
+        }
     </style>
 </head>
 <body>
@@ -176,71 +342,144 @@
                     <div className="text-right space-y-6" dir="rtl">
                         <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><h4 className="font-bold mb-3 text-slate-800 text-lg">אפליקציית ניווט וטיולים</h4><a href="https://play.google.com/store/apps/details?id=altitude.alarm.erol.apps" target="_blank" rel="noopener noreferrer" className="block bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic">הורד אפליקציית טיולים</a></div>
                         <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><h4 className="font-bold mb-3 text-slate-800 text-lg">מיקום השער למסלולים</h4><a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" className="block bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic">פתח במפות</a></div>
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><a href="./walk_to_the_bulbouse_mountain.gpx" download="Bulbous_Mountain_Trail.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול 5 ק"מ להר הלבן ולבולבוסים</a></div>
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><a href="./Zepp20230405100344.gpx" download="14km_trip_to_the_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול להר הגבוה 14 ק"מ</a></div>
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><a href="./Zepp20230118153553.gpx" download="12km_trip_to_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול אל נופי הדרום והמערב 12 ק"מ</a></div>
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200"><a href="./12km_walk.gpx" download="12km_trip.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול אל נופי הדרום 12 ק"מ</a></div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><a href="./walk_to_the_bulbouse_mountain.gpx" download="Bulbous_Mountain_Trail.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול 5 ק"מ להר הלבן ולבולבוסים</a></div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><a href="./Zepp20230405100344.gpx" download="14km_trip_to_the_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול להר הגבוה 14 ק"מ</a></div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><a href="./Zepp20230118153553.gpx" download="12km_trip_to_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול אל נופי הדרום והמערב 12 ק"מ</a></div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><a href="./12km_walk.gpx" download="12km_trip.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">הורד מסלול אל נופי הדרום 12 ק"מ</a></div>
                     </div>
                 )},
-                { id: 'trail_services', title: 'Trail Services', icon: <TrailServicesIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
+                { id: 'trail_services', title: 'Trail Services', icon: <TrailServicesIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-600/50 to-slate-700/50', content: (
                     <div className="text-right space-y-6" dir="rtl">
-                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                            <h4 className="font-bold mb-3 text-slate-800 text-lg text-center">פאבלו</h4>
-                            <div className="bg-white p-3 rounded-lg shadow-sm border">
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
+                            <h4 className="font-bold mb-3 text-lg text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>פאבלו</h4>
+                            <div className="bg-white rounded-lg shadow-sm border">
                                 <img src="https://i.imgur.com/MBYTWps.png" alt="Logistics info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://i.imgur.com/MBYTWps.png')} />
                             </div>
                         </div>
-                        <div className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-                            <h4 className="font-bold mb-4 text-slate-800 text-lg text-center">טיולי ג'יפים עם מר מדבר</h4>
-                            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 text-center">
-                                <p className="text-slate-700 font-medium">
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold mb-4 text-lg text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>טיולי ג'יפים עם מר מדבר</h4>
+                            <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 text-center" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700 space-y-3 text-center"}>
+                                <p className="font-medium" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
                                     <span className="font-semibold">טלפון: </span>
-                                    <a href="tel:08-6616976" className="text-blue-600 hover:underline">08-6616976</a>
+                                    <a href="tel:08-6616976" className="text-blue-500 hover:underline">08-6616976</a>
                                 </p>
-                                <p className="text-slate-700 font-medium">
+                                <p className="font-medium" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
                                     <span className="font-semibold">אימייל: </span>
-                                    <a href="mailto:tayaroot@gmail.com" className="text-blue-600 hover:underline">tayaroot@gmail.com</a>
+                                    <a href="mailto:tayaroot@gmail.com" className="text-blue-500 hover:underline">tayaroot@gmail.com</a>
                                 </p>
-                                <a href="https://aravadesert.co.il/marmaidbar/" target="_blank" rel="noopener noreferrer" className="!mt-4 block bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-lg text-center transition-all duration-300 haptic font-semibold">
+                                <a href="https://aravadesert.co.il/marmaidbar/" target="_blank" rel="noopener noreferrer" className={currentTheme === 'day' ? "!mt-4 block bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-lg text-center transition-all duration-300 haptic font-semibold" : "!mt-4 block bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-lg text-center transition-all duration-300 haptic font-semibold"}>
                                     לאתר האינטרנט
                                 </a>
                             </div>
                         </div>
                     </div>
                 )},
-                { id: 'wifi', title: 'WiFi Access', icon: <WifiIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="text-center"><div className="bg-slate-50 p-8 rounded-xl border border-slate-200"><div className="bg-white p-6 rounded-xl shadow-inner border border-slate-100 space-y-5"><h4 className="font-bold text-2xl mb-2 text-gray-800">WiFi Connection</h4><div className="bg-slate-100 p-4 rounded-lg border"><span className="font-semibold text-slate-600 block mb-2">Network Name:</span><p className="text-2xl font-mono text-slate-700 font-bold select-all">GrappA Fiber</p></div><div className="bg-slate-100 p-4 rounded-lg border"><span className="font-semibold text-slate-600 block mb-2">Password:</span><p className="text-2xl font-mono text-slate-700 font-bold select-all">grappA321</p></div></div></div></div>
+                { id: 'wifi', title: 'WiFi Access', icon: <WifiIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-600/50 to-slate-700/50', content: (
+                    <div className="text-center">
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-8 rounded-xl border border-slate-200" : "bg-slate-800/50 p-8 rounded-xl border border-slate-600"}>
+                            <div className={currentTheme === 'day' ? "bg-white p-6 rounded-xl shadow-inner border border-slate-100 space-y-5" : "bg-slate-900/50 p-6 rounded-xl shadow-inner border border-slate-700 space-y-5"}>
+                                <h4 className="font-bold text-2xl mb-2" style={{color: currentTheme === 'day' ? '#1f2937' : '#fff'}}>WiFi Connection</h4>
+                                <div className={currentTheme === 'day' ? "bg-slate-100 p-4 rounded-lg border" : "bg-slate-800/50 p-4 rounded-lg border border-slate-700"}>
+                                    <span className="font-semibold block mb-2" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Network Name:</span>
+                                    <p className="text-2xl font-mono font-bold select-all" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>GrappA Fiber</p>
+                                </div>
+                                <div className={currentTheme === 'day' ? "bg-slate-100 p-4 rounded-lg border" : "bg-slate-800/50 p-4 rounded-lg border border-slate-700"}>
+                                    <span className="font-semibold block mb-2" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Password:</span>
+                                    <p className="text-2xl font-mono font-bold select-all" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>grappA321</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 )},
-                { id: 'tv', title: 'Entertainment', icon: <TvIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="space-y-6"><div className="bg-slate-50 p-6 rounded-xl border border-slate-200"><h4 className="font-bold text-2xl mb-4 text-slate-800 flex items-center justify-center gap-2"><span className="text-3xl">🏰</span> Disney+</h4><div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4"><div className="bg-slate-100 p-3 rounded-lg border"><span className="font-semibold text-slate-600">Profile:</span><span className="ml-3 font-mono text-lg font-bold text-slate-700">GrappA</span></div><div className="bg-slate-100 p-3 rounded-lg border"><span className="font-semibold text-slate-600">Password:</span><span className="ml-3 font-mono text-lg font-bold text-slate-700">4114</span></div></div></div><div className="bg-slate-50 p-6 rounded-xl border border-slate-200"><h4 className="font-bold text-2xl mb-4 text-slate-800 flex items-center justify-center gap-2"><span className="text-3xl">🎬</span> Netflix</h4><div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100"><div className="bg-slate-100 p-3 rounded-lg border"><span className="font-semibold text-slate-600">Profile:</span><span className="ml-3 font-mono text-lg font-bold text-slate-700">GrappA</span></div></div></div></div>
+                { id: 'tv', title: 'Entertainment', icon: <TvIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-600/50 to-slate-700/50', content: (
+                    <div className="space-y-6">
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold text-2xl mb-4 flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}><span className="text-3xl">🏰</span> Disney+</h4>
+                            <div className={currentTheme === 'day' ? "bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4" : "bg-slate-900/50 p-5 rounded-xl shadow-sm border border-slate-700 space-y-4"}>
+                                <div className={currentTheme === 'day' ? "bg-slate-100 p-3 rounded-lg border" : "bg-slate-800/50 p-3 rounded-lg border border-slate-700"}>
+                                    <span className="font-semibold" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Profile:</span>
+                                    <span className="ml-3 font-mono text-lg font-bold" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>GrappA</span>
+                                </div>
+                                <div className={currentTheme === 'day' ? "bg-slate-100 p-3 rounded-lg border" : "bg-slate-800/50 p-3 rounded-lg border border-slate-700"}>
+                                    <span className="font-semibold" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Password:</span>
+                                    <span className="ml-3 font-mono text-lg font-bold" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>4114</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold text-2xl mb-4 flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}><span className="text-3xl">🎬</span> Netflix</h4>
+                            <div className={currentTheme === 'day' ? "bg-white p-5 rounded-xl shadow-sm border border-slate-100" : "bg-slate-900/50 p-5 rounded-xl shadow-sm border border-slate-700"}>
+                                <div className={currentTheme === 'day' ? "bg-slate-100 p-3 rounded-lg border" : "bg-slate-800/50 p-3 rounded-lg border border-slate-700"}>
+                                    <span className="font-semibold" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Profile:</span>
+                                    <span className="ml-3 font-mono text-lg font-bold" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>GrappA</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 )},
-                { id: 'grocery', title: 'Grocery Store', icon: <GroceryIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="text-right" dir="rtl"><div className="bg-slate-50 p-8 rounded-xl border border-slate-200"><h4 className="font-bold mb-6 text-slate-800 text-2xl text-center">המרכולית</h4><a href="https://maps.app.goo.gl/ZQu19jrZTdUjW7pF6" target="_blank" rel="noopener noreferrer" className="block bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic"><span className="flex items-center justify-center gap-2"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>פתח במפות Google</span></a></div></div>
+                { id: 'grocery', title: 'Grocery Store', icon: <GroceryIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-600/50 to-slate-700/50', content: (
+                    <div className="text-right" dir="rtl">
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-8 rounded-xl border border-slate-200" : "bg-slate-800/50 p-8 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold mb-6 text-2xl text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>המרכולית</h4>
+                            <a href="https://maps.app.goo.gl/ZQu19jrZTdUjW7pF6" target="_blank" rel="noopener noreferrer" className={currentTheme === 'day' ? "block bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic" : "block bg-slate-700 hover:bg-slate-600 text-white px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic"}>
+                                <span className="flex items-center justify-center gap-2">
+                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                                    פתח במפות Google
+                                </span>
+                            </a>
+                        </div>
+                    </div>
                 )},
-                { id: 'sushi', title: 'Sushi Restaurant', icon: <RestaurantIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="text-right" dir="rtl"><div className="bg-slate-50 p-6 rounded-xl border border-slate-200"><h4 className="font-bold mb-6 text-slate-800 text-2xl text-center flex items-center justify-center gap-2"><span className="text-3xl">🍣</span> מסעדת הסושי</h4><div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100"><img src="https://i.imgur.com/ChMRT7d.jpg" alt="Sushi Menu" className="w-full rounded-lg cursor-pointer shadow-md" onClick={() => openImage('https://i.imgur.com/ChMRT7d.jpg')} /><p className="text-sm text-gray-600 mt-3 text-center font-semibold">תפריט מלא עם מחירים</p></div></div></div>
+                { id: 'sushi', title: 'Sushi Restaurant', icon: <RestaurantIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-600/50 to-slate-700/50', content: (
+                    <div className="text-right" dir="rtl">
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold mb-6 text-2xl text-center flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                <span className="text-3xl">🍣</span> מסעדת הסושי
+                            </h4>
+                            <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700"}>
+                                <img src="https://i.imgur.com/ChMRT7d.jpg" alt="Sushi Menu" className="w-full rounded-lg cursor-pointer shadow-md" onClick={() => openImage('https://i.imgur.com/ChMRT7d.jpg')} />
+                                <p className="text-sm mt-3 text-center font-semibold" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.8)'}}>תפריט מלא עם מחירים</p>
+                            </div>
+                        </div>
+                    </div>
                 )},
-                { id: 'pool', title: 'Swimming Pool', icon: <PoolIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
-                    <div className="text-right space-y-6" dir="rtl"><div className="bg-slate-50 p-6 rounded-xl border border-slate-200"><h4 className="font-bold text-slate-800 text-2xl text-center mb-6 flex items-center justify-center gap-2"><span className="text-3xl">🏊‍♂️</span> הבריכה</h4><div className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 mb-4"><img src="https://i.imgur.com/2AahzMz.png" alt="Pool hours" className="w-full rounded-lg cursor-pointer" onClick={() => openImage('https://i.imgur.com/2AahzMz.png')} /><p className="text-sm text-gray-600 mt-3 text-center font-semibold">שעות פתיחה מעודכנות</p></div><a href="https://maps.app.goo.gl/2DS7aXFMvxGATqcY8" target="_blank" rel="noopener noreferrer" className="block bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic"><span className="flex items-center justify-center gap-2"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>פתח במפות Google</span></a></div></div>
+                { id: 'pool', title: 'Swimming Pool', icon: <PoolIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-600/50 to-slate-700/50', content: (
+                    <div className="text-right space-y-6" dir="rtl">
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold text-2xl text-center mb-6 flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                <span className="text-3xl">🏊‍♂️</span> הבריכה
+                            </h4>
+                            <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100 mb-4" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700 mb-4"}>
+                                <img src="https://i.imgur.com/2AahzMz.png" alt="Pool hours" className="w-full rounded-lg cursor-pointer" onClick={() => openImage('https://i.imgur.com/2AahzMz.png')} />
+                                <p className="text-sm mt-3 text-center font-semibold" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.8)'}}>שעות פתיחה מעודכנות</p>
+                            </div>
+                            <a href="https://maps.app.goo.gl/2DS7aXFMvxGATqcY8" target="_blank" rel="noopener noreferrer" className={currentTheme === 'day' ? "block bg-slate-100 hover:bg-slate-200 text-slate-700 px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic" : "block bg-slate-700 hover:bg-slate-600 text-white px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic"}>
+                                <span className="flex items-center justify-center gap-2">
+                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                                    פתח במפות Google
+                                </span>
+                            </a>
+                        </div>
+                    </div>
                 )},
-                { id: 'spa', title: 'Spa & Wellness', icon: <SpaIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
+                { id: 'spa', title: 'Spa & Wellness', icon: <SpaIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-600/50 to-slate-700/50', content: (
                      <div className="text-right" dir="rtl">
-                         <div className="bg-slate-50 p-8 rounded-xl border border-slate-200">
-                             <h4 className="font-bold text-3xl text-gray-800 mb-4 text-center">שירותי ספא</h4>
-                             <p className="text-gray-600 text-lg mb-6 text-center">להזמנת טיפולים, אנא צרו קשר עם דפנה.</p>
-                             <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4 text-center">
-                                 <p className="text-slate-700 font-medium text-xl">
+                         <div className={currentTheme === 'day' ? "bg-slate-50 p-8 rounded-xl border border-slate-200" : "bg-slate-800/50 p-8 rounded-xl border border-slate-600"}>
+                             <h4 className="font-bold text-3xl mb-4 text-center" style={{color: currentTheme === 'day' ? '#1f2937' : '#fff'}}>שירותי ספא</h4>
+                             <p className="text-lg mb-6 text-center" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.9)'}}>להזמנת טיפולים, אנא צרו קשר עם דפנה.</p>
+                             <div className={currentTheme === 'day' ? "bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4 text-center" : "bg-slate-900/50 p-5 rounded-xl shadow-sm border border-slate-700 space-y-4 text-center"}>
+                                 <p className="font-medium text-xl" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
                                      <span className="font-semibold">דפנה: </span>
-                                     <a href="tel:050-555-1383" className="text-blue-600 hover:underline">050-555-1383</a>
+                                     <a href="tel:050-555-1383" className="text-blue-500 hover:underline">050-555-1383</a>
                                  </p>
-                                 <div className="bg-white p-3 rounded-lg shadow-sm border">
+                                 <div className={currentTheme === 'day' ? "bg-white rounded-lg shadow-sm border" : "bg-slate-800/50 rounded-lg shadow-sm border border-slate-700"}>
                                  <img src="https://imgur.com/5vg5NXj.png" alt="info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://imgur.com/5vg5NXj.png')} />
                              </div>
                              </div>
                          </div>
                      </div>
                 )},
-                { id: 'checkout', title: 'Check-out Info', icon: <CheckoutIcon />, gradient: 'from-slate-100/50 to-slate-200/50', content: (
+                { id: 'checkout', title: 'Check-out Info', icon: <CheckoutIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-600/50 to-slate-700/50', content: (
                     <div className="text-right" dir="rtl">
                       <div className="bg-slate-50 p-8 rounded-xl border border-slate-200">
                         <h4 className="font-bold mb-4 text-slate-800 text-2xl text-center">הוראות צ'ק-אאוט</h4>
@@ -296,7 +535,7 @@
                             <p className="text-lg text-slate-600 font-medium">Resort Information & Services</p>
                         </div>
                         {lastVisited.length > 0 && (
-                            <div className="mt-6 max-w-md mx-auto"><p className="text-slate-500 text-sm mb-2">Recently viewed:</p>
+                            <div className="mt-6 max-w-md mx-auto"><p className="text-sm mb-2" style={{color: currentTheme === 'day' ? '#64748b' : 'rgba(255,255,255,0.6)'}}>Recently viewed:</p>
                                 <div className="flex gap-2 justify-center flex-wrap">
                                     {lastVisited.map(id => {
                                         const card = cards.find(c => c.id === id);
@@ -335,7 +574,7 @@
                     {zoomedImg && (
                         <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={closeImage}>
                             <div className="relative max-w-full max-h-full flex flex-col items-center">
-                                <button onClick={closeImage} className="mb-3 text-white bg-black/50 backdrop-blur-sm p-2 rounded-full haptic hover:bg-black/70 transition-colors" aria-label="Close image">
+                                <button onClick={closeImage} className={`mb-3 p-2 rounded-full haptic transition-colors ${currentTheme === 'day' ? 'text-white bg-black/50 hover:bg-black/70' : 'text-white bg-white/20 hover:bg-white/30'} backdrop-blur-sm`} aria-label="Close image">
                                     <CloseIcon />
                                 </button>
                                 <img src={zoomedImg} alt="Zoomed view" className="max-w-full max-h-[85vh] rounded-xl shadow-2xl animate-zoomIn" onClick={(e) => e.stopPropagation()} />
