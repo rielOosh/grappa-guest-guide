@@ -517,14 +517,16 @@
                     </div>
                 )},
                 { id: 'pool', title: 'Swimming Pool', icon: <PoolIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-800/70 via-white/20 to-slate-900/70', content: (
-                    <div className="text-right space-y-6" dir="rtl">
+                    <div className={language === 'en' ? "text-center space-y-6" : "text-right space-y-6"} dir={language === 'en' ? "ltr" : "rtl"}>
                         <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
                             <h4 className="font-bold text-2xl text-center mb-6 flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                                <span className="text-3xl">🏊‍♂️</span> הבריכה
+                                <span className="text-3xl">🏊‍♂️</span> {language === 'en' ? 'The Pool' : 'הבריכה'}
                             </h4>
                             <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100 mb-4" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700 mb-4"}>
                                 <img src="https://i.imgur.com/2AahzMz.png" alt="Pool hours" className="w-full rounded-lg cursor-pointer" onClick={() => openImage('https://i.imgur.com/2AahzMz.png')} />
-                                <p className="text-sm mt-3 text-center font-semibold" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.8)'}}>שעות פתיחה מעודכנות</p>
+                                <p className="text-sm mt-3 text-center font-semibold" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.8)'}}>
+                                    {language === 'en' ? 'Updated Opening Hours' : 'שעות פתיחה מעודכנות'}
+                                </p>
                             </div>
                             <a href="https://maps.app.goo.gl/2DS7aXFMvxGATqcY8" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic">
                                 <span className="flex items-center justify-center gap-2">
@@ -536,13 +538,17 @@
                     </div>
                 )},
                 { id: 'spa', title: 'Spa & Wellness', icon: <SpaIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-700/70 via-gray-100/8 to-slate-900/70', content: (
-                     <div className="text-right" dir="rtl">
+                     <div className={language === 'en' ? "text-center" : "text-right"} dir={language === 'en' ? "ltr" : "rtl"}>
                          <div className={currentTheme === 'day' ? "bg-slate-50 p-8 rounded-xl border border-slate-200" : "bg-slate-800/50 p-8 rounded-xl border border-slate-600"}>
-                             <h4 className="font-bold text-3xl mb-4 text-center" style={{color: currentTheme === 'day' ? '#1f2937' : '#fff'}}>שירותי ספא</h4>
-                             <p className="text-lg mb-6 text-center" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.9)'}}>להזמנת טיפולים, אנא צרו קשר עם דפנה.</p>
+                             <h4 className="font-bold text-3xl mb-4 text-center" style={{color: currentTheme === 'day' ? '#1f2937' : '#fff'}}>
+                                 {language === 'en' ? 'Spa Services' : 'שירותי ספא'}
+                             </h4>
+                             <p className="text-lg mb-6 text-center" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.9)'}}>
+                                 {language === 'en' ? 'To book treatments, please contact Dafna.' : 'להזמנת טיפולים, אנא צרו קשר עם דפנה.'}
+                             </p>
                              <div className={currentTheme === 'day' ? "bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4 text-center" : "bg-slate-900/50 p-5 rounded-xl shadow-sm border border-slate-700 space-y-4 text-center"}>
                                  <p className="font-medium text-xl" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                                     <span className="font-semibold">דפנה: </span>
+                                     <span className="font-semibold">{language === 'en' ? 'Dafna: ' : 'דפנה: '}</span>
                                      <a href="tel:050-555-1383" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">050-555-1383</a>
                                  </p>
                                  <div className={currentTheme === 'day' ? "bg-white rounded-lg shadow-sm border" : "bg-slate-800/50 rounded-lg shadow-sm border border-slate-700"}>
@@ -553,14 +559,16 @@
                      </div>
                 )},
                 { id: 'sushi', title: 'Sushi Restaurant', icon: <RestaurantIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-800/70 via-white/15 to-gray-700/70', content: (
-                    <div className="text-right" dir="rtl">
+                    <div className={language === 'en' ? "text-center" : "text-right"} dir={language === 'en' ? "ltr" : "rtl"}>
                         <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
                             <h4 className="font-bold mb-6 text-2xl text-center flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                                <span className="text-3xl">🍣</span> מסעדת הסושי
+                                <span className="text-3xl">🍣</span> {language === 'en' ? 'The Sushi Restaurant' : 'מסעדת הסושי'}
                             </h4>
                             <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700"}>
                                 <img src="https://i.imgur.com/ChMRT7d.jpg" alt="Sushi Menu" className="w-full rounded-lg cursor-pointer shadow-md" onClick={() => openImage('https://i.imgur.com/ChMRT7d.jpg')} />
-                                <p className="text-sm mt-3 text-center font-semibold" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.8)'}}>תפריט מלא עם מחירים</p>
+                                <p className="text-sm mt-3 text-center font-semibold" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.8)'}}>
+                                    {language === 'en' ? 'Full Menu with Prices' : 'תפריט מלא עם מחירים'}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -615,42 +623,46 @@
                     </div>
                 )},
                 { id: 'trail_services', title: 'Trail Services', icon: <TrailServicesIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-700/70 via-white/8 to-slate-800/70', content: (
-                    <div className="text-right space-y-6" dir="rtl">
+                    <div className={language === 'en' ? "text-center space-y-6" : "text-right space-y-6"} dir={language === 'en' ? "ltr" : "rtl"}>
                         <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
                             <h4 className="font-bold mb-3 text-lg text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                                פאבלו - <a href="tel:053-9646316" className="text-blue-600 hover:text-blue-700 hover:underline">053-9646316</a>
+                                {language === 'en' ? 'Pablo' : 'פאבלו'} - <a href="tel:053-9646316" className="text-blue-600 hover:text-blue-700 hover:underline">053-9646316</a>
                             </h4>
                             <div className="bg-white rounded-lg shadow-sm border">
                                 <img src="https://i.imgur.com/MBYTWps.png" alt="Logistics info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://i.imgur.com/MBYTWps.png')} />
                             </div>
                         </div>
                         <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
-                            <h4 className="font-bold mb-4 text-lg text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>טיולי ג'יפים עם מר מדבר</h4>
+                            <h4 className="font-bold mb-4 text-lg text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                {language === 'en' ? 'Jeep Tours with Mr. Desert' : 'טיולי ג\'יפים עם מר מדבר'}
+                            </h4>
                             <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 text-center" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700 space-y-3 text-center"}>
                                 <p className="font-medium" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                                    <span className="font-semibold">טלפון: </span>
+                                    <span className="font-semibold">{language === 'en' ? 'Phone: ' : 'טלפון: '}</span>
                                     <a href="tel:054-4249783" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">054-4249783</a>
                                 </p>
                                 <p className="font-medium" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                                    <span className="font-semibold">אימייל: </span>
+                                    <span className="font-semibold">{language === 'en' ? 'Email: ' : 'אימייל: '}</span>
                                     <a href="mailto:marmidbar@gmail.com" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">marmidbar@gmail.com</a>
                                 </p>
                                 <a href="https://aravadesert.co.il/marmaidbar/" target="_blank" rel="noopener noreferrer" className="!mt-4 block bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-lg text-center transition-all duration-300 haptic font-semibold shadow-md">
-                                    לאתר האינטרנט
+                                    {language === 'en' ? 'Visit Website' : 'לאתר האינטרנט'}
                                 </a>
                             </div>
                         </div>
                     </div>
                 )},
                 { id: 'checkout', title: 'Check-out Info', icon: <CheckoutIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-900/70 via-white/12 to-slate-700/70', content: (
-                    <div className="text-right" dir="rtl">
+                    <div className={language === 'en' ? "text-left" : "text-right"} dir={language === 'en' ? "ltr" : "rtl"}>
                       <div className={currentTheme === 'day' ? "bg-slate-50 p-8 rounded-xl border border-slate-200" : "bg-slate-800/50 p-8 rounded-xl border border-slate-600"}>
-                        <h4 className="font-bold mb-4 text-2xl text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>הוראות צ'ק-אאוט</h4>
+                        <h4 className="font-bold mb-4 text-2xl text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                            {language === 'en' ? 'Check-out Instructions' : 'הוראות צ\'ק-אאוט'}
+                        </h4>
                         <div className="space-y-4 text-lg" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                          <p>זמן הצ'ק-אאוט הוא עד השעה <strong className="font-semibold" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>11:00</strong> בבוקר.</p>
-                          <p>אנא ודאו שכל החלונות סגורים והמזגן כבוי.</p>
-                          <p>את המפתח השאירו על השולחן וודאו שלא שכחתם דבר.</p>
-                          <p className="mt-6 font-semibold">תודה רבה ומקווים שנהניתם!</p>
+                          <p>{language === 'en' ? 'Check-out time is until' : 'זמן הצ\'ק-אאוט הוא עד השעה'} <strong className="font-semibold" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>11:00</strong> {language === 'en' ? 'AM' : 'בבוקר'}.</p>
+                          <p>{language === 'en' ? 'Please ensure all windows are closed and the air conditioner is turned off.' : 'אנא ודאו שכל החלונות סגורים והמזגן כבוי.'}</p>
+                          <p>{language === 'en' ? 'Leave the key on the table and make sure you haven\'t forgotten anything.' : 'את המפתח השאירו על השולחן וודאו שלא שכחתם דבר.'}</p>
+                          <p className="mt-6 font-semibold">{language === 'en' ? 'Thank you and we hope you enjoyed your stay!' : 'תודה רבה ומקווים שנהניתם!'}</p>
                         </div>
                       </div>
                     </div>
