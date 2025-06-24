@@ -1,6 +1,6 @@
 // A descriptive cache name helps in managing updates.
-// Incrementing the version (e.g., to 'v6') will trigger the 'activate' event for cleanup.
-const CACHE_NAME = 'grappa-guest-guide-v6';
+// Incrementing the version (e.g., to 'v7') will trigger the 'activate' event for cleanup.
+const CACHE_NAME = 'grappa-guest-guide-v7';
 
 // A comprehensive list of assets to cache for a full offline experience.
 const URLS_TO_CACHE = [
@@ -20,8 +20,8 @@ const URLS_TO_CACHE = [
   './grappa_icon_512px.png',
   
   // Key Images - All images used in the app for a complete offline UI.
+  './grappa_icon.png', // OG Image (local)
   'https://i.imgur.com/s6g6A4b.png', // App Icon
-  'https://i.imgur.com/r4z8Ibx.png', // OG Image
   'https://i.imgur.com/MBYTWps.png', // Logistics info
   'https://i.imgur.com/ChMRT7d.jpg', // Sushi menu
   'https://i.imgur.com/2AahzMz.png', // Pool hours
