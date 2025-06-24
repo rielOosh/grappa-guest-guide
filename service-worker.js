@@ -1,14 +1,14 @@
 // A descriptive cache name helps in managing updates.
-// Incrementing the version (e.g., to 'v3') will trigger the 'activate' event for cleanup.
-const CACHE_NAME = 'grappa-guest-guide-v3';
+// Incrementing the version (e.g., to 'v4') will trigger the 'activate' event for cleanup.
+const CACHE_NAME = 'grappa-guest-guide-v4';
 
 // A comprehensive list of assets to cache for a full offline experience.
 const URLS_TO_CACHE = [
-  // Core files - Caching '.' ensures the root of your site is available offline.
-  './',
+  // Core files - Add timestamp to force cache update
+  './?v=4',
+  './index.html?v=4',
   
-  // Core scripts - Essential for the app to function.
-  'https://cdn.tailwindcss.com',
+  // Core scripts - Essential for the app to function (removed Tailwind CDN due to CORS)
   'https://unpkg.com/react@18/umd/react.development.js',
   'https://unpkg.com/react-dom@18/umd/react-dom.development.js',
   'https://unpkg.com/@babel/standalone/babel.min.js',
@@ -26,7 +26,7 @@ const URLS_TO_CACHE = [
   'https://i.imgur.com/MBYTWps.png', // Logistics info
   'https://i.imgur.com/ChMRT7d.jpg', // Sushi menu
   'https://i.imgur.com/2AahzMz.png', // Pool hours
-  'https://imgur.com/5vg5NXj.png',   // Spa info
+  'https://i.imgur.com/5vg5NXj.png',  // Spa info (fixed URL)
   
   // Downloadable Trail Files - Caching these ensures guests can access them without a connection.
   './walk_to_the_bulbouse_mountain.gpx',
