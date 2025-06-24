@@ -1,6 +1,6 @@
 // A descriptive cache name helps in managing updates.
-// Incrementing the version (e.g., to 'v2') will trigger the 'activate' event for cleanup.
-const CACHE_NAME = 'grappa-guest-guide-v2';
+// Incrementing the version (e.g., to 'v3') will trigger the 'activate' event for cleanup.
+const CACHE_NAME = 'grappa-guest-guide-v3';
 
 // A comprehensive list of assets to cache for a full offline experience.
 const URLS_TO_CACHE = [
@@ -41,8 +41,15 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('Service Worker: Caching App Shell');
-        // addAll() fetches and caches all specified URLs. If any fetch fails, the entire operation fails.
-        return cache.addAll(URLS_TO_CACHE);
+        // Cache each URL individually to handle CORS issues gracefully
+        return Promise.all(
+          URLS_TO_CACHE.map(url => {
+            return cache.add(url).catch(err => {
+              console.warn('Failed to cache:', url, err);
+              // Continue with other resources even if one fails
+            });
+          })
+        );
       })
       .then(() => {
         // This forces the waiting service worker to become the active service worker.
@@ -93,6 +100,17 @@ self.addEventListener('fetch', event => {
         
         // If not in cache, fetch from the network.
         return fetch(event.request).then(networkResponse => {
+            // Check if we received a valid response
+            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'opaque') {
+              return networkResponse;
+            }
+            
+            // Don't cache responses from different origins to avoid CORS issues
+            const url = new URL(event.request.url);
+            if (url.origin !== self.location.origin && !URLS_TO_CACHE.includes(event.request.url)) {
+              return networkResponse;
+            }
+            
             // We must clone the response. A response is a stream
             // and can only be consumed once. We need one for the browser
             // and one for the cache.
@@ -109,7 +127,9 @@ self.addEventListener('fetch', event => {
         ).catch(error => {
           // If the fetch fails (e.g., user is offline), the app can still function
           // with the pre-cached assets. You could optionally return a fallback page here.
-          console.log('Service Worker: Fetch failed; user is likely offline.', error);
+          console.log('Service Worker: Fetch failed; returning cached response if available.', error);
+          // Try to return cached version even for failed requests
+          return caches.match(event.request);
         });
       })
   );
