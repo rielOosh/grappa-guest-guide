@@ -1,12 +1,12 @@
 // A descriptive cache name helps in managing updates.
-// Incrementing the version (e.g., to 'v4') will trigger the 'activate' event for cleanup.
-const CACHE_NAME = 'grappa-guest-guide-v4';
+// Incrementing the version (e.g., to 'v5') will trigger the 'activate' event for cleanup.
+const CACHE_NAME = 'grappa-guest-guide-v5';
 
 // A comprehensive list of assets to cache for a full offline experience.
 const URLS_TO_CACHE = [
   // Core files - Add timestamp to force cache update
-  './?v=4',
-  './index.html?v=4',
+  './?v=5',
+  './index.html?v=5',
   
   // Core scripts - Essential for the app to function (removed Tailwind CDN due to CORS)
   'https://unpkg.com/react@18/umd/react.development.js',
