@@ -826,13 +826,14 @@
             };
             
             const selectLanguage = (lang) => {
+                console.log('Language selected:', lang);
                 setLanguage(lang);
                 localStorage.setItem('preferredLanguage', lang);
                 setShowLanguageModal(false);
             };
 
             return (
-                <div className="min-h-screen p-4 relative overflow-hidden">
+                <div className="min-h-screen p-4 relative">
                     <div className="absolute inset-0 pointer-events-none overflow-hidden">
                         {/* Theme-aware Bubbles */}
                         <div className="absolute w-40 h-40 rounded-full top-10 left-10 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-1), var(--bubble-2))`}}></div>
@@ -858,10 +859,13 @@
                     {isOffline && ( <div className="fixed top-4 left-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-slideUp z-50"><span className="font-semibold">Offline Mode</span> - Some features may be limited</div> )}
 
                     {/* Top buttons - positioned above everything */}
-                    <div className="absolute top-0 right-0 p-2 flex gap-2">
+                    <div className="absolute top-0 right-0 p-2 flex gap-2 z-50">
                         {language && (
                             <button
-                                onClick={() => setShowLanguageModal(true)}
+                                onClick={() => {
+                                    console.log('Language button clicked');
+                                    setShowLanguageModal(true);
+                                }}
                                 className={`px-3 py-3 rounded-xl transition-all haptic shadow-lg ${
                                     currentTheme === 'day' 
                                         ? 'bg-slate-600 hover:bg-slate-700 text-white' 
