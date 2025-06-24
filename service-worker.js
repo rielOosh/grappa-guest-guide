@@ -81,6 +81,13 @@ self.addEventListener('activate', event => {
   );
 });
 
+// Listen for skip waiting message
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 // The 'fetch' event is fired for every network request.
 // We intercept this to serve cached assets when available.
 self.addEventListener('fetch', event => {
