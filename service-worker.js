@@ -1,12 +1,11 @@
 // A descriptive cache name helps in managing updates.
-// Incrementing the version (e.g., to 'v5') will trigger the 'activate' event for cleanup.
-const CACHE_NAME = 'grappa-guest-guide-v5';
+// Incrementing the version (e.g., to 'v6') will trigger the 'activate' event for cleanup.
+const CACHE_NAME = 'grappa-guest-guide-v6';
 
 // A comprehensive list of assets to cache for a full offline experience.
 const URLS_TO_CACHE = [
-  // Core files - Add timestamp to force cache update
-  './?v=5',
-  './index.html?v=5',
+  // Core files
+  './',
   
   // Core scripts - Essential for the app to function (removed Tailwind CDN due to CORS)
   'https://unpkg.com/react@18/umd/react.development.js',
@@ -81,13 +80,6 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Listen for skip waiting message
-self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-});
-
 // The 'fetch' event is fired for every network request.
 // We intercept this to serve cached assets when available.
 self.addEventListener('fetch', event => {
@@ -96,47 +88,52 @@ self.addEventListener('fetch', event => {
     return;
   }
   
-  // Use a "Cache first, then network" strategy.
+  // Use a "Network first, falling back to cache" strategy for HTML
+  // This ensures fresh content when online
+  if (event.request.mode === 'navigate' || event.request.url.endsWith('.html')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // Clone the response before using it
+          const responseToCache = response.clone();
+          
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+          
+          return response;
+        })
+        .catch(() => {
+          // If network fails, try the cache
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+  
+  // For other assets, use cache first for performance
   event.respondWith(
     caches.match(event.request)
       .then(cachedResponse => {
-        // If we have a match in the cache, return it immediately.
         if (cachedResponse) {
           return cachedResponse;
         }
         
-        // If not in cache, fetch from the network.
         return fetch(event.request).then(networkResponse => {
-            // Check if we received a valid response
-            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'opaque') {
-              return networkResponse;
-            }
-            
-            // Don't cache responses from different origins to avoid CORS issues
-            const url = new URL(event.request.url);
-            if (url.origin !== self.location.origin && !URLS_TO_CACHE.includes(event.request.url)) {
-              return networkResponse;
-            }
-            
-            // We must clone the response. A response is a stream
-            // and can only be consumed once. We need one for the browser
-            // and one for the cache.
-            const responseToCache = networkResponse.clone();
-            
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                // Put the newly fetched response in the cache for next time.
-                cache.put(event.request, responseToCache);
-              });
-            
+          // Only cache successful responses from our origin
+          if (!networkResponse || networkResponse.status !== 200) {
             return networkResponse;
           }
-        ).catch(error => {
-          // If the fetch fails (e.g., user is offline), the app can still function
-          // with the pre-cached assets. You could optionally return a fallback page here.
-          console.log('Service Worker: Fetch failed; returning cached response if available.', error);
-          // Try to return cached version even for failed requests
-          return caches.match(event.request);
+          
+          const responseToCache = networkResponse.clone();
+          
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+          
+          return networkResponse;
         });
       })
   );
