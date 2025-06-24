@@ -566,9 +566,11 @@
                     </div>
                 )},
                 { id: 'trips', title: 'Local Hikes', icon: <MapIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-800/70 via-gray-100/15 to-gray-900/70', content: (
-                    <div className="text-right space-y-6" dir="rtl">
+                    <div className={language === 'en' ? "text-left space-y-6" : "text-right space-y-6"} dir={language === 'en' ? "ltr" : "rtl"}>
                         <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
-                            <h4 className="font-bold mb-3 text-lg" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>אפליקציית ניווט </h4>
+                            <h4 className="font-bold mb-3 text-lg" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                {language === 'en' ? 'Navigation Apps' : 'אפליקציית ניווט'}
+                            </h4>
                             <div className="space-y-3">
                                 <a href="https://play.google.com/store/apps/details?id=altitude.alarm.erol.apps" target="_blank" rel="noopener noreferrer" className="block bg-green-600 hover:bg-green-500 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">
                                     <span className="flex items-center justify-center gap-2">
@@ -584,17 +586,30 @@
                                 </a>
                             </div>
                         </div>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}><h4 className="font-bold mb-3 text-lg" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>מיקום השער למסלולים</h4><a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">Google Maps</a></div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
+                            <h4 className="font-bold mb-3 text-lg" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                {language === 'en' ? 'Trail Gate Location' : 'מיקום השער למסלולים'}
+                            </h4>
+                            <a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">Google Maps</a>
+                        </div>
                         <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
                             <h4 className="font-bold mb-3 text-lg flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
                                 <span className="material-symbols-outlined" style={{fontSize: '24px'}}>download</span>
-                                מסלולים להורדה
+                                {language === 'en' ? 'Downloadable Trails' : 'מסלולים להורדה'}
                             </h4>
                             <div className="space-y-3">
-                                <a href="./walk_to_the_bulbouse_mountain.gpx" download="Bulbous_Mountain_Trail.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">מסלול 5 ק"מ להר הלבן ולבולבוסים</a>
-                                <a href="./Zepp20230405100344.gpx" download="14km_trip_to_the_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">מסלול להר הגבוה 14 ק"מ</a>
-                                <a href="./Zepp20230118153553.gpx" download="12km_trip_to_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">מסלול אל נופי הדרום והמערב 12 ק"מ</a>
-                                <a href="./12km_walk.gpx" download="12km_trip.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">מסלול אל נופי הדרום 12 ק"מ</a>
+                                <a href="./walk_to_the_bulbouse_mountain.gpx" download="Bulbous_Mountain_Trail.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">
+                                    {language === 'en' ? '5km Trail to White Mountain and Bulbous Rocks' : 'מסלול 5 ק"מ להר הלבן ולבולבוסים'}
+                                </a>
+                                <a href="./Zepp20230405100344.gpx" download="14km_trip_to_the_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">
+                                    {language === 'en' ? '14km Trail to the High Mountain' : 'מסלול להר הגבוה 14 ק"מ'}
+                                </a>
+                                <a href="./Zepp20230118153553.gpx" download="12km_trip_to_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">
+                                    {language === 'en' ? '12km Trail to Southern and Western Views' : 'מסלול אל נופי הדרום והמערב 12 ק"מ'}
+                                </a>
+                                <a href="./12km_walk.gpx" download="12km_trip.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">
+                                    {language === 'en' ? '12km Trail to Southern Views' : 'מסלול אל נופי הדרום 12 ק"מ'}
+                                </a>
                             </div>
                         </div>
                     </div>
