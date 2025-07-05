@@ -522,11 +522,8 @@
                             <h4 className="font-bold text-2xl text-center mb-6 flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
                                 <span className="text-3xl">🏊‍♂️</span> {language === 'en' ? 'The Pool' : 'הבריכה'}
                             </h4>
-                            <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100 mb-4" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700 mb-4"}>
+                            <div className={currentTheme === 'day' ? "bg-white p-2 rounded-xl shadow-sm border border-slate-100 mb-4" : "bg-slate-900/50 p-2 rounded-xl shadow-sm border border-slate-700 mb-4"}>
                                 <img src="./swiming_pool_instructions.png" alt="Pool hours" className="w-full rounded-lg cursor-pointer border-2 border-slate-300 hover:border-slate-400 transition-colors" onClick={() => openImage('./swiming_pool_instructions.png')} />
-                                <p className="text-sm mt-3 text-center font-semibold" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.8)'}}>
-                                    {language === 'en' ? 'Updated Opening Hours' : 'שעות פתיחה מעודכנות'}
-                                </p>
                             </div>
                             <a href="https://maps.app.goo.gl/2DS7aXFMvxGATqcY8" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic">
                                 <span className="flex items-center justify-center gap-2">
