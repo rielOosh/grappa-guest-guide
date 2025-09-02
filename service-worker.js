@@ -1,6 +1,6 @@
 // A descriptive cache name helps in managing updates.
-// Incrementing the version (e.g., to 'v9') will trigger the 'activate' event for cleanup.
-const CACHE_NAME = 'grappa-guest-guide-v8';
+// Incrementing the version (e.g., to 'v10') will trigger the 'activate' event for cleanup.
+const CACHE_NAME = 'grappa-guest-guide-v10';
 
 // A comprehensive list of assets to cache for a full offline experience.
 const URLS_TO_CACHE = [
