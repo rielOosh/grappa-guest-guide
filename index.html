@@ -518,7 +518,7 @@
                             </a>
                         </div>
                     </div>
-                )},
+                ))},
                 { id: 'pool', title: 'Swimming Pool', icon: <PoolIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-800/70 via-white/20 to-slate-900/70', content: (
                     <div className={language === 'en' ? "text-center space-y-6" : "text-right space-y-6"} dir={language === 'en' ? "ltr" : "rtl"}>
                         <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
@@ -526,7 +526,6 @@
                                 <span className="text-3xl">🏊‍♂️</span> {language === 'en' ? 'The Pool' : 'הבריכה'}
                             </h4>
                             <p className="text-sm text-center mb-4" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                            <p className="text-lg text-center mb-4" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
                                 {language === 'en' ? 'The bathing season begins on Passover and ends after Sukkot' : 'עונת הרחצה מתחילה בפסח ונגמרת אחרי סוכות'}
                             </p>
                             <div className={currentTheme === 'day' ? "bg-white p-2 rounded-xl shadow-sm border border-slate-100 mb-4" : "bg-slate-900/50 p-2 rounded-xl shadow-sm border border-slate-700 mb-4"}>
@@ -670,7 +669,7 @@
                         </div>
                       </div>
                     </div>
-                )}
+                )},
             ];
 
             // Add iOS install instructions to cards
