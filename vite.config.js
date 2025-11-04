@@ -12,7 +12,7 @@ export default defineConfig({
       },
       includeAssets: ['*.png', '*.jpg', '*.gpx', '*.svg'],
       manifest: {
-        version: '2.0.0',
+        version: '2.0.1',
         name: 'GrappA Guest Guide',
         short_name: 'GrappA Guide',
         description: 'Your resort guide for GrappA.',

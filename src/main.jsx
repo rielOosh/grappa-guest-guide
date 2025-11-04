@@ -9,7 +9,8 @@ import { APP_VERSION } from './version';
 applyTheme(getTheme());
 
 // Log app version
-console.log(`GrappA Guest Guide v${APP_VERSION}`);
+console.log(`[main.jsx] GrappA Guest Guide v${APP_VERSION}`);
+console.log('[main.jsx] About to apply theme and render...');
 
 // Check if version has changed and clear cache if needed
 const storedVersion = localStorage.getItem('app-version');
@@ -53,8 +54,17 @@ if ('serviceWorker' in navigator) {
 
 // Vite PWA plugin will handle service worker registration via registerSW.js
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+console.log('[main.jsx] About to create React root and render App...');
+try {
+  const root = document.getElementById('root');
+  console.log('[main.jsx] Root element found:', !!root);
+
+  ReactDOM.createRoot(root).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+  console.log('[main.jsx] React render call completed');
+} catch (error) {
+  console.error('[main.jsx] ERROR during render:', error);
+}
