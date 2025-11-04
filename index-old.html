@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrappA Guest Guide</title>
+    <meta name="description" content="Your complete resort companion for GrappA. Access guides, links, and information, even offline.">
+    <meta name="theme-color" content="#f8fafc" id="theme-color-meta">
+    <meta property="og:title" content="GrappA Guest Guide">
+    <meta property="og:description" content="Your complete resort companion for GrappA. Access guides, links, and information, even offline.">
+    <meta property="og:image" content="https://imgur.com/IHdlwgT.png">
+    <meta property="og:url" content="https://grappa-guest-guide.netlify.app/">
+    <meta property="og:type" content="website">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="GrappA Guest Guide">
+    <meta name="twitter:description" content="Your complete resort companion for GrappA. Access guides, links, and information, even offline.">
+    <meta name="twitter:image" content="./grappa_icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GrappA Guide">
+    <link rel="apple-touch-icon" href="./grappa_icon_192px.png">
+
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://i.imgur.com">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        /* Day Theme (8 AM - 8 PM) - Current styling */
+        :root {
+            --animation-duration: 0.3s;
+            /* Day theme colors */
+            --bg-gradient-1: #64748b;
+            --bg-gradient-2: #94a3b8;
+            --bg-gradient-3: #cbd5e1;
+            --glass-bg: rgba(255, 255, 255, 0.35);
+            --glass-bg-enhanced: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --text-primary: #334155;
+            --text-secondary: #475569;
+            --text-tertiary: #64748b;
+            --text-light: #94a3b8;
+            --card-gradient-from: rgba(241, 245, 249, 0.5);
+            --card-gradient-to: rgba(226, 232, 240, 0.5);
+            --icon-gradient-from: rgba(51, 65, 85, 0.95);
+            --icon-gradient-to: rgba(71, 85, 105, 0.85);
+            --dialog-bg: rgba(241, 245, 249, 0.95);
+            --dialog-header-bg: rgba(255, 255, 255, 0.8);
+            --bubble-1: rgba(255, 250, 220, 0.5);
+            --bubble-2: rgba(254, 243, 199, 0.4);
+            --bubble-3: rgba(255, 247, 237, 0.5);
+            --bubble-4: rgba(255, 237, 188, 0.35);
+            --ripple-color: rgba(255, 250, 220, 0.4);
+            --shadow-light: rgba(0, 0, 0, 0.05);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --shadow-heavy: rgba(0, 0, 0, 0.25);
+            --shadow-xl: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Night Theme (8 PM - 8 AM) - From older version */
+        [data-theme="night"] {
+            --bg-gradient-1: #475569;
+            --bg-gradient-2: #334155;
+            --bg-gradient-3: #1e293b;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-bg-enhanced: rgba(255, 255, 255, 0.12);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.9);
+            --text-tertiary: rgba(255, 255, 255, 0.8);
+            --text-light: rgba(255, 255, 255, 0.6);
+            --card-gradient-from: rgba(71, 85, 105, 0.5);
+            --card-gradient-to: rgba(51, 65, 85, 0.5);
+            --icon-gradient-from: rgba(255, 255, 255, 0.9);
+            --icon-gradient-to: rgba(255, 255, 255, 0.7);
+            --dialog-bg: rgba(30, 41, 59, 0.95);
+            --dialog-header-bg: rgba(51, 65, 85, 0.8);
+            --bubble-1: rgba(71, 85, 105, 0.4);
+            --bubble-2: rgba(51, 65, 85, 0.35);
+            --bubble-3: rgba(30, 41, 59, 0.4);
+            --bubble-4: rgba(15, 23, 42, 0.3);
+            --ripple-color: rgba(255, 255, 255, 0.2);
+            --shadow-light: rgba(0, 0, 0, 0.1);
+            --shadow-medium: rgba(0, 0, 0, 0.3);
+            --shadow-heavy: rgba(0, 0, 0, 0.5);
+            --shadow-xl: rgba(0, 0, 0, 0.7);
+        }
+
+        * { -webkit-tap-highlight-color: transparent; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 25%, var(--bg-gradient-3) 50%, var(--bg-gradient-2) 75%, var(--bg-gradient-1) 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .loading-screen { position: fixed; inset: 0; background: linear-gradient(135deg, var(--bg-gradient-2) 0%, var(--bg-gradient-3) 100%); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease-out; }
+        .loading-spinner { width: 60px; height: 60px; border: 4px solid var(--shadow-light); border-top-color: var(--text-secondary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.8; transform: scale(1); } 50% { opacity: 1; transform: scale(1.15); } }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); } 33% { transform: translateY(-30px) translateX(20px) rotate(10deg); } 66% { transform: translateY(20px) translateX(-20px) rotate(-10deg); } }
+        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleIn { 0% { opacity: 0; transform: scale(0.8) rotate(-5deg); } 50% { transform: scale(1.05) rotate(1deg); } 100% { opacity: 1; transform: scale(1) rotate(0deg); } }
+        @keyframes slideUp { 0% { opacity: 0; transform: translateY(100vh) scale(0.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes zoomIn { 0% { opacity: 0; transform: scale(0.3); } 100% { opacity: 1; transform: scale(1); } }
+        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        @keyframes ripple {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(4); opacity: 0; }
+        }
+        .animate-fadeIn { animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .animate-scaleIn { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .animate-slideUp { animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+        .animate-zoomIn { animation: zoomIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        .animate-pulse { animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .animate-float { animation: float 8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px var(--shadow-medium), inset 0 0 0 1px var(--glass-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-enhanced {
+            background: var(--glass-bg-enhanced);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 12px 48px var(--shadow-heavy), inset 0 0 0 1px var(--glass-border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* 3D Depth Shadow System */
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            /* Base state shadow */
+            box-shadow: 0 2px 8px var(--shadow-light), 0 4px 16px var(--shadow-light);
+        }
+        /* Ripple effect container */
+        .ripple-container {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            border-radius: inherit;
+            pointer-events: none;
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--ripple-color);
+            animation: ripple 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        /* Hover state - medium elevation */
+        .card-hover:hover {
+            transform: scale(1.03) translateY(-6px);
+            box-shadow:
+                0 4px 12px var(--shadow-light),
+                0 8px 24px var(--shadow-medium),
+                0 16px 48px var(--shadow-light),
+                inset 0 0 0 1px var(--glass-border);
+        }
+        /* Active state - pressed shadow */
+        .card-hover:active {
+            transform: scale(0.98) translateY(-2px);
+            box-shadow:
+                0 2px 4px var(--shadow-light),
+                0 4px 8px var(--shadow-light),
+                inset 0 0 0 1px var(--glass-border);
+        }
+        .icon-container {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+        .icon-container:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 16px var(--shadow-medium);
+        }
+        /* Premium button effects */
+        .btn-premium {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+        .btn-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-premium:hover::before {
+            left: 100%;
+        }
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px var(--shadow-medium);
+        }
+        .btn-premium:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px var(--shadow-light);
+        }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: var(--shadow-light); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--text-light); border-radius: 10px; transition: background 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+        .haptic { transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .haptic:active { transform: scale(0.98); }
+        .gradient-text {
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.3s ease;
+        }
+        button:focus-visible, a:focus-visible { outline: 2px solid var(--text-secondary); outline-offset: 4px; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 }
+        .icon-gradient-text {
+            background: linear-gradient(135deg, var(--icon-gradient-from) 0%, var(--icon-gradient-to) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        /* Modal dialog elevation */
+        .modal-dialog {
+            box-shadow:
+                0 10px 25px var(--shadow-medium),
+                0 20px 50px var(--shadow-heavy),
+                0 40px 100px var(--shadow-xl);
+        }
+        /* Theme-specific styles */
+        [data-theme="night"] .gradient-text {
+            filter: brightness(1.2);
+        }
+        [data-theme="night"] .btn-premium::before {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen" class="loading-screen"><div class="loading-spinner"></div></div>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // --- PWA Service Worker Registration ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => console.log('ServiceWorker registration successful with scope:', registration.scope))
+                    .catch(err => console.log('ServiceWorker registration failed:', err));
+            });
+        }
+
+        // --- Theme Detection and Management ---
+        const getTheme = () => {
+            const hour = new Date().getHours();
+            return (hour >= 8 && hour < 20) ? 'day' : 'night';
+        };
+
+        const applyTheme = (theme) => {
+            document.documentElement.setAttribute('data-theme', theme);
+            const metaThemeColor = document.getElementById('theme-color-meta');
+            if (metaThemeColor) {
+                metaThemeColor.content = theme === 'day' ? '#f8fafc' : '#475569';
+            }
+        };
+
+        // Apply theme on load
+        applyTheme(getTheme());
+
+        // Check and update theme every minute
+        setInterval(() => {
+            applyTheme(getTheme());
+        }, 60000);
+
+        // --- Reusable Icon Gradient Definition ---
+        const IconDefs = () => {
+            const theme = getTheme();
+            const fromColor = theme === 'day' ? 'rgba(51, 65, 85, 0.95)' : 'rgba(255, 255, 255, 0.9)';
+            const toColor = theme === 'day' ? 'rgba(71, 85, 105, 0.85)' : 'rgba(255, 255, 255, 0.7)';
+            return (
+                <defs>
+                    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor={fromColor} />
+                        <stop offset="100%" stopColor={toColor} />
+                    </linearGradient>
+                </defs>
+            );
+        };
+
+        // --- Ripple Effect Function ---
+        const createRipple = (event, element) => {
+            const rippleContainer = element.querySelector('.ripple-container');
+            if (!rippleContainer) return;
+
+            const rect = element.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = event.clientX - rect.left - size / 2;
+            const y = event.clientY - rect.top - size / 2;
+
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+
+            rippleContainer.appendChild(ripple);
+
+            setTimeout(() => {
+                ripple.remove();
+            }, 900);
+        };
+
+        // --- Icon Components (Theme-aware) ---
+        const IosIcon = () => ( <span className="material-symbols-outlined" style={{fontSize: '24px'}}>ios</span> );
+        const GateIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="url(#iconGradient)" style={{transform: "scale(1.15)", transformOrigin: "center"}}><IconDefs /><path d="M180-250v-490 490ZM434.74-80q-8.74 0-15.24-6.35Q413-92.69 413-102v-227l56-165q3-9 10.58-14.5 7.57-5.5 17.42-5.5h299q9.85 0 17.42 5.5Q821-503 824-494l56 165v227q0 9.31-6.35 15.65Q867.31-80 858-80h-22.26q-8.74 0-15.24-6.35Q814-92.69 814-102v-45H479v45q0 9.31-6.35 15.65Q466.31-80 457-80h-22.26ZM466-359h361l-38.06-115H504l-38 115Zm74 146q16.58 0 27.79-11.21Q579-235.43 579-252q0-16.58-11.21-27.79T540-291q-16.58 0-27.79 11.21T501-252q0 16.57 11.21 27.79Q523.42-213 540-213Zm213 0q16.58 0 27.79-11.21Q792-235.43 792-252q0-16.58-11.21-27.79T753-291q-16.58 0-27.79 11.21T714-252q0 16.57 11.21 27.79Q736.42-213 753-213Zm-300 26h387v-132H453v132ZM40-160v-90h80v-490q0-24.75 17.63-42.38Q155.25-800 180-800h560q24.75 0 42.38 17.62Q800-764.75 800-740v166h-60v-166H180v490h173v90H40Zm413-27v-132 132Z"/></svg> );
+        const MapIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="url(#iconGradient)" style={{transform: "scale(1.15)", transformOrigin: "center"}}><IconDefs /><path d="m282-40 121-620q5-24 23-37t38-13q20 0 37.5 9t28.5 26l39 64q19 32 52.5 57t78.5 39v-75h40v550h-40v-414q-51-11-96-39t-80-69l-29 145 85 81v296h-60v-244l-100-95-74 339h-64Zm17-403-75-14q-10-2-17.5-13t-5.5-22l30-157q5-29 29-44.5t53-10.5l36 7-50 254Zm231-311q-30 0-51.5-21.5T457-827q0-30 21.5-51.5T530-900q30 0 51.5 21.5T603-827q0 30-21.5 51.5T530-754Z"/></svg> );
+        const WifiIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg> );
+        const TvIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="url(#iconGradient)" style={{transform: "scale(1.15)", transformOrigin: "center"}}><IconDefs /><path d="M320-320h60v-250h123l97 250h60l120-310h-70l-80 209-80-209H180v60h140v250ZM180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Zm0-600v600-600Z"/></svg> );
+        const GroceryIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> );
+        const RestaurantIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/></svg> );
+        const PoolIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M22 21c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36C18.22 20.63 17.6 21 16.5 21s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36C11.56 20.63 10.95 21 9.83 21c-1.11 0-1.73-.37-2.18-.64-.37-.23-.6-.36-1.15-.36s-.78.13-1.15.36C4.9 20.63 4.29 21 3.17 21v-2c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36v2zm0-4.5c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.23-.6-.36-1.15-.36s-.78.13-1.15.36C4.34 14.63 3.72 15 2.61 15v-2c.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36v2zM8.67 12c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.23.6.36 1.15.36s.78-.13 1.15-.36c.12-.07.26-.15.41-.23L10.48 5C8.93 3.45 7.5 2.99 5 3v2.5c1.82-.01 2.89.39 4 1.5l1 1-3.25 3.25c.31.12.56.27.77.39.37.23.59.36 1.15.36z"/><circle cx="16.5" cy="5.5" r="2.5"/></svg> );
+        const SpaIcon = () => ( <span className="material-symbols-outlined icon-gradient-text" style={{ fontSize: '32px' }}>spa</span> );
+        const TrailServicesIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="url(#iconGradient)" style={{transform: "scale(1.15)", transformOrigin: "center"}}><IconDefs /><path d="M480-80q-106 0-173-31t-67-79q0-26 23-49.5t63-38.5l45 42q-20 5-39 18.5T299-190q17 20 70.5 35T480-140q57 0 111-15t71-35q-14-15-35-28t-41-18l46-42q42 15 65 38.5t23 49.5q0 48-67 79T480-80Zm1-195q109-81 164-164t55-155q0-112-71-169t-149-57q-77 0-148.5 57T260-594q0 73 55 152t166 167Zm-1 75Q340-304 270-402t-70-192q0-71 25.5-124.5t66-89.5q40.5-36 90-54t98.5-18q49 0 99 18t90 54q40 36 65.5 89.5T760-594q0 94-69.5 192T480-200Zm0-320q33 0 56.5-23.5T560-600q0-33-23.5-56.5T480-680q-33 0-56.5 23.5T400-600q0 33 23.5 56.5T480-520Zm0-80Z"/></svg> );
+        const CheckoutIcon = () => ( <span className="material-symbols-outlined icon-gradient-text" style={{ fontSize: '32px' }}>logout</span> );
+        const CloseIcon = () => ( <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg> );
+
+        // --- Main React Component ---
+        const BnBGuestGuide = () => {
+            const { useState, useEffect } = React;
+            const [openDialog, setOpenDialog] = useState(null);
+            const [zoomedImg, setZoomedImg] = useState(null);
+            const [isLoaded, setIsLoaded] = useState(false);
+            const [isOffline, setIsOffline] = useState(!navigator.onLine);
+            const [lastVisited, setLastVisited] = useState([]);
+            const [currentTheme, setCurrentTheme] = useState(getTheme());
+            const [deferredPrompt, setDeferredPrompt] = useState(null);
+            const [isIOS, setIsIOS] = useState(false);
+            const [isInstalled, setIsInstalled] = useState(false);
+            const [language, setLanguage] = useState(localStorage.getItem('preferredLanguage') || null);
+            const [showLanguageModal, setShowLanguageModal] = useState(false);
+
+            useEffect(() => {
+                setTimeout(() => {
+                    const ls = document.getElementById('loading-screen');
+                    if(ls) { ls.style.opacity = '0'; setTimeout(() => { ls.style.display = 'none'; }, 500); }
+                    setIsLoaded(true);
+                    // Show language selection if no preference is saved
+                    if (!language) {
+                        setShowLanguageModal(true);
+                    }
+                }, 1000);
+                const handleOnline = () => setIsOffline(false); const handleOffline = () => setIsOffline(true);
+                window.addEventListener('online', handleOnline); window.addEventListener('offline', handleOffline);
+                setLastVisited(JSON.parse(sessionStorage.getItem('lastVisited') || '[]'));
+
+                // Check if iOS
+                const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                setIsIOS(iOS);
+
+                // Check if already installed
+                if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+                    setIsInstalled(true);
+                }
+
+
+                // Handle install prompt
+                const handleBeforeInstallPrompt = (e) => {
+                    e.preventDefault();
+                    setDeferredPrompt(e);
+                };
+
+                window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+
+
+                // Theme update interval
+                const themeInterval = setInterval(() => {
+                    const newTheme = getTheme();
+                    if (newTheme !== currentTheme) {
+                        setCurrentTheme(newTheme);
+                        applyTheme(newTheme);
+                    }
+                }, 60000);
+
+                return () => {
+                    window.removeEventListener('online', handleOnline);
+                    window.removeEventListener('offline', handleOffline);
+                    window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+                    clearInterval(themeInterval);
+                };
+            }, [currentTheme]);
+
+            const openImage = (src) => { setZoomedImg(src); };
+            const closeImage = () => setZoomedImg(null);
+
+            // Add ripple effect to interactive elements
+            useEffect(() => {
+                const handleClick = (e) => {
+                    const rippleElement = e.target.closest('.card-hover, .btn-premium, .haptic');
+                    if (rippleElement && !rippleElement.querySelector('.ripple-container')) {
+                        const container = document.createElement('div');
+                        container.className = 'ripple-container';
+                        rippleElement.appendChild(container);
+                    }
+                    if (rippleElement) {
+                        createRipple(e, rippleElement);
+                    }
+                };
+
+                document.addEventListener('click', handleClick);
+                return () => document.removeEventListener('click', handleClick);
+            }, []);
+
+            const cards = [
+                { id: 'gate', title: 'Gate Access', icon: <GateIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-800/70 via-white/10 to-slate-900/70', content: (
+                    <div className={language === 'en' ? "text-left" : "text-right"} dir={language === 'en' ? "ltr" : "rtl"}>
+                        <p className={`mb-6 leading-relaxed ${currentTheme === 'day' ? 'text-gray-600' : 'text-white'}`}>
+                            {language === 'en' 
+                                ? "This is a link to download the kibbutz gate opening app. Install the app, follow the instructions, and you'll be able to open the gate yourself. You need to get very close to the gate, almost touching it, then press the gate opening button in the app."
+                                : "זהו קישור להורדת אפליקציה לפתיחת שער הקיבוץ. יש להתקין את האפליקציה, למלא אחר ההנחיות ואז ניתן לפתוח את השער בעצמך. צריך להתקרב ממש אל השער, כמעט להצמד, ואז ללחוץ על פתיחת השער באפליקציה."
+                            }
+                        </p>
+                        <div className="space-y-4">
+                            <a href="https://goo.gl/fZTz4u" target="_blank" rel="noopener noreferrer" className="block bg-slate-800 text-white px-6 py-4 rounded-lg text-center hover:bg-slate-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold btn-premium haptic"><span className="flex items-center justify-center gap-2"><IosIcon />iPhone App</span></a>
+                            <a href="https://goo.gl/Giopvd" target="_blank" rel="noopener noreferrer" className="block bg-green-600 text-white px-6 py-4 rounded-lg text-center hover:bg-green-500 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold btn-premium haptic"><span className="flex items-center justify-center gap-2"><span className="material-symbols-outlined" style={{fontSize: '20px'}}>android</span>Android App</span></a>
+                        </div>
+                    </div>
+                )},
+                { id: 'wifi', title: 'WiFi Access', icon: <WifiIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-900/70 via-gray-200/12 to-gray-800/70', content: (
+                    <div className="text-center">
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-8 rounded-xl border border-slate-200" : "bg-slate-800/50 p-8 rounded-xl border border-slate-600"}>
+                            <div className={currentTheme === 'day' ? "bg-white p-6 rounded-xl shadow-inner border border-slate-100 space-y-5" : "bg-slate-900/50 p-6 rounded-xl shadow-inner border border-slate-700 space-y-5"}>
+                                <h4 className="font-bold text-2xl mb-2" style={{color: currentTheme === 'day' ? '#1f2937' : '#fff'}}>WiFi Connection</h4>
+                                <div className={currentTheme === 'day' ? "bg-slate-100 p-4 rounded-lg border" : "bg-slate-800/50 p-4 rounded-lg border border-slate-700"}>
+                                    <span className="font-semibold block mb-2" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Network Name:</span>
+                                    <p className="text-2xl font-mono font-bold select-all" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>GrappA Fiber</p>
+                                </div>
+                                <div className={currentTheme === 'day' ? "bg-slate-100 p-4 rounded-lg border" : "bg-slate-800/50 p-4 rounded-lg border border-slate-700"}>
+                                    <span className="font-semibold block mb-2" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Password:</span>
+                                    <p className="text-2xl font-mono font-bold select-all" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>grappA321</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )},
+                { id: 'tv', title: 'Entertainment', icon: <TvIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-900/70 via-white/12 to-slate-700/70', content: (
+                    <div className="space-y-6">
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold text-2xl mb-4 flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}><span className="text-3xl">🏰</span> Disney+</h4>
+                            <div className={currentTheme === 'day' ? "bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4" : "bg-slate-900/50 p-5 rounded-xl shadow-sm border border-slate-700 space-y-4"}>
+                                <div className={currentTheme === 'day' ? "bg-slate-100 p-3 rounded-lg border" : "bg-slate-800/50 p-3 rounded-lg border border-slate-700"}>
+                                    <span className="font-semibold" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Profile:</span>
+                                    <span className="ml-3 font-mono text-lg font-bold" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>GrappA</span>
+                                </div>
+                                <div className={currentTheme === 'day' ? "bg-slate-100 p-3 rounded-lg border" : "bg-slate-800/50 p-3 rounded-lg border border-slate-700"}>
+                                    <span className="font-semibold" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Password:</span>
+                                    <span className="ml-3 font-mono text-lg font-bold" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>4114</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold text-2xl mb-4 flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}><span className="text-3xl">🎬</span> Netflix</h4>
+                            <div className={currentTheme === 'day' ? "bg-white p-5 rounded-xl shadow-sm border border-slate-100" : "bg-slate-900/50 p-5 rounded-xl shadow-sm border border-slate-700"}>
+                                <div className={currentTheme === 'day' ? "bg-slate-100 p-3 rounded-lg border" : "bg-slate-800/50 p-3 rounded-lg border border-slate-700"}>
+                                    <span className="font-semibold" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Profile:</span>
+                                    <span className="ml-3 font-mono text-lg font-bold" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>GrappA</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )},
+                { id: 'grocery', title: 'Grocery Store', icon: <GroceryIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-700/70 via-gray-300/10 to-gray-900/70', content: (
+                    <div className={language === 'en' ? "text-center space-y-6" : "text-right space-y-6"} dir={language === 'en' ? "ltr" : "rtl"}>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold text-2xl text-center mb-6" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                {language === 'en' ? 'The Grocery Store' : 'המרכולית'}
+                            </h4>
+                            <div className={currentTheme === 'day' ? "bg-white p-2 rounded-xl shadow-sm border border-slate-100 mb-4" : "bg-slate-900/50 p-2 rounded-xl shadow-sm border border-slate-700 mb-4"}>
+                                <img src="./Grocery_hours.jpg" alt="Grocery store hours" className="w-full rounded-lg cursor-pointer" onClick={() => openImage('./Grocery_hours.jpg')} />
+                            </div>
+                            <a href="https://maps.app.goo.gl/ZQu19jrZTdUjW7pF6" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic">
+                                <span className="flex items-center justify-center gap-2">
+                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                                    Google Maps
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                )},
+                { id: 'pool', title: 'Swimming Pool', icon: <PoolIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-800/70 via-white/20 to-slate-900/70', content: (
+                    <div className={language === 'en' ? "text-center space-y-6" : "text-right space-y-6"} dir={language === 'en' ? "ltr" : "rtl"}>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold text-2xl text-center mb-2 flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                <span className="text-3xl">🏊‍♂️</span> {language === 'en' ? 'The Pool' : 'הבריכה'}
+                            </h4>
+                            <p className="text-sm text-center mb-4" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
+                                {language === 'en' ? 'The bathing season begins on Passover and ends after Sukkot' : 'עונת הרחצה מתחילה בפסח ונגמרת אחרי סוכות'}
+                            </p>
+                            <div className={currentTheme === 'day' ? "bg-white p-2 rounded-xl shadow-sm border border-slate-100 mb-4" : "bg-slate-900/50 p-2 rounded-xl shadow-sm border border-slate-700 mb-4"}>
+                                <img src="./swiming_pool_instructions.png?v=4" alt="Pool hours" className="w-full rounded-lg cursor-pointer" onClick={() => openImage('./swiming_pool_instructions.png?v=4')} />
+                            </div>
+                            <a href="https://maps.app.goo.gl/2DS7aXFMvxGATqcY8" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic">
+                                <span className="flex items-center justify-center gap-2">
+                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                                    Google Maps
+                                </span>
+                            </a>
+                        </div>
+                    </div>
+                )},
+                { id: 'spa', title: 'Spa & Wellness', icon: <SpaIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-700/70 via-gray-100/8 to-slate-900/70', content: (
+                     <div className={language === 'en' ? "text-center" : "text-right"} dir={language === 'en' ? "ltr" : "rtl"}>
+                         <div className={currentTheme === 'day' ? "bg-slate-50 p-8 rounded-xl border border-slate-200" : "bg-slate-800/50 p-8 rounded-xl border border-slate-600"}>
+                             <h4 className="font-bold text-3xl mb-4 text-center" style={{color: currentTheme === 'day' ? '#1f2937' : '#fff'}}>
+                                 {language === 'en' ? 'Spa Services' : 'שירותי ספא'}
+                             </h4>
+                             <p className="text-lg mb-6 text-center" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.9)'}}>
+                                 {language === 'en' ? 'To book treatments, please contact Dafna.' : 'להזמנת טיפולים, אנא צרו קשר עם דפנה.'}
+                             </p>
+                             <div className={currentTheme === 'day' ? "bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4 text-center" : "bg-slate-900/50 p-5 rounded-xl shadow-sm border border-slate-700 space-y-4 text-center"}>
+                                 <p className="font-medium text-xl" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
+                                     <span className="font-semibold">{language === 'en' ? 'Dafna: ' : 'דפנה: '}</span>
+                                     <a href="tel:050-555-1383" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">050-555-1383</a>
+                                 </p>
+                                 <div className={currentTheme === 'day' ? "bg-white rounded-lg shadow-sm border" : "bg-slate-800/50 rounded-lg shadow-sm border border-slate-700"}>
+                                 <img src="https://i.imgur.com/5vg5NXj.png" alt="info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://i.imgur.com/5vg5NXj.png')} />
+                             </div>
+                             </div>
+                         </div>
+                     </div>
+                )},
+                { id: 'sushi', title: 'Sushi Restaurant', icon: <RestaurantIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-800/70 via-white/15 to-gray-700/70', content: (
+                    <div className={language === 'en' ? "text-center" : "text-right"} dir={language === 'en' ? "ltr" : "rtl"}>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold mb-6 text-2xl text-center flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                <span className="text-3xl">🍣</span> {language === 'en' ? 'The Sushi Restaurant' : 'מסעדת הסושי'}
+                            </h4>
+                            <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700"}>
+                                <img src="https://i.imgur.com/ChMRT7d.jpg" alt="Sushi Menu" className="w-full rounded-lg cursor-pointer shadow-md" onClick={() => openImage('https://i.imgur.com/ChMRT7d.jpg')} />
+                                <p className="text-sm mt-3 text-center font-semibold" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.8)'}}>
+                                    {language === 'en' ? 'Full Menu with Prices' : 'תפריט מלא עם מחירים'}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )},
+                { id: 'trips', title: 'Local Hikes', icon: <MapIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-800/70 via-gray-100/15 to-gray-900/70', content: (
+                    <div className={language === 'en' ? "text-left space-y-6" : "text-right space-y-6"} dir={language === 'en' ? "ltr" : "rtl"}>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
+                            <h4 className="font-bold mb-3 text-lg" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                {language === 'en' ? 'Navigation Apps' : 'אפליקציית ניווט'}
+                            </h4>
+                            <div className="space-y-3">
+                                <a href="https://play.google.com/store/apps/details?id=altitude.alarm.erol.apps" target="_blank" rel="noopener noreferrer" className="block bg-green-600 hover:bg-green-500 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">
+                                    <span className="flex items-center justify-center gap-2">
+                                        <span className="material-symbols-outlined" style={{fontSize: '20px'}}>android</span>
+                                        ALTLAS app
+                                    </span>
+                                </a>
+                                <a href="https://apps.apple.com/us/app/alltrails-hike-bike-run/id405075943" target="_blank" rel="noopener noreferrer" className="block bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">
+                                    <span className="flex items-center justify-center gap-2">
+                                        <IosIcon />
+                                        AllTrails app
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
+                            <h4 className="font-bold mb-3 text-lg" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                {language === 'en' ? 'Trail Gate Location' : 'מיקום השער למסלולים'}
+                            </h4>
+                            <a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">Google Maps</a>
+                        </div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
+                            <h4 className="font-bold mb-3 text-lg flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                <span className="material-symbols-outlined" style={{fontSize: '24px'}}>download</span>
+                                {language === 'en' ? 'Downloadable Trails' : 'מסלולים להורדה'}
+                            </h4>
+                            <div className="space-y-3">
+                                <a href="./walk_to_the_bulbouse_mountain.gpx" download="Bulbous_Mountain_Trail.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">
+                                    {language === 'en' ? '5km Trail to White Mountain and Bulbous Rocks' : 'מסלול 5 ק"מ להר הלבן ולבולבוסים'}
+                                </a>
+                                <a href="./Zepp20230405100344.gpx" download="14km_trip_to_the_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">
+                                    {language === 'en' ? '14km Trail to the High Mountain' : 'מסלול להר הגבוה 14 ק"מ'}
+                                </a>
+                                <a href="./Zepp20230118153553.gpx" download="12km_trip_to_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">
+                                    {language === 'en' ? '12km Trail to Southern and Western Views' : 'מסלול אל נופי הדרום והמערב 12 ק"מ'}
+                                </a>
+                                <a href="./12km_walk.gpx" download="12km_trip.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">
+                                    {language === 'en' ? '12km Trail to Southern Views' : 'מסלול אל נופי הדרום 12 ק"מ'}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                )},
+                { id: 'trail_services', title: 'Trail Services', icon: <TrailServicesIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-700/70 via-white/8 to-slate-800/70', content: (
+                    <div className={language === 'en' ? "text-center space-y-6" : "text-right space-y-6"} dir={language === 'en' ? "ltr" : "rtl"}>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
+                            <h4 className="font-bold mb-3 text-lg text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                {language === 'en' ? 'Pablo' : 'פאבלו'} - <a href="tel:053-9646316" className="text-blue-600 hover:text-blue-700 hover:underline">053-9646316</a>
+                            </h4>
+                            <div className="bg-white rounded-lg shadow-sm border">
+                                <img src="https://i.imgur.com/MBYTWps.png" alt="Logistics info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://i.imgur.com/MBYTWps.png')} />
+                            </div>
+                        </div>
+                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
+                            <h4 className="font-bold mb-4 text-lg text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                {language === 'en' ? 'Jeep Tours with Mr. Desert' : 'טיולי ג\'יפים עם מר מדבר'}
+                            </h4>
+                            <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 text-center" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700 space-y-3 text-center"}>
+                                <p className="font-medium" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
+                                    <span className="font-semibold">{language === 'en' ? 'Phone: ' : 'טלפון: '}</span>
+                                    <a href="tel:054-4249783" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">054-4249783</a>
+                                </p>
+                                <p className="font-medium" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
+                                    <span className="font-semibold">{language === 'en' ? 'Email: ' : 'אימייל: '}</span>
+                                    <a href="mailto:marmidbar@gmail.com" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">marmidbar@gmail.com</a>
+                                </p>
+                                <a href="https://aravadesert.co.il/marmaidbar/" target="_blank" rel="noopener noreferrer" className="!mt-4 block bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-lg text-center transition-all duration-300 haptic font-semibold shadow-md">
+                                    {language === 'en' ? 'Visit Website' : 'לאתר האינטרנט'}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                )},
+                { id: 'checkout', title: 'Check-out Info', icon: <CheckoutIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-900/70 via-white/12 to-slate-700/70', content: (
+                    <div className={language === 'en' ? "text-left" : "text-right"} dir={language === 'en' ? "ltr" : "rtl"}>
+                      <div className={currentTheme === 'day' ? "bg-slate-50 p-8 rounded-xl border border-slate-200" : "bg-slate-800/50 p-8 rounded-xl border border-slate-600"}>
+                        <h4 className="font-bold mb-4 text-2xl text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                            {language === 'en' ? 'Check-out Instructions' : 'הוראות צ\'ק-אאוט'}
+                        </h4>
+                        <div className="space-y-4 text-lg" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
+                          <p>{language === 'en' ? 'Check-out time is until' : 'זמן הצ\'ק-אאוט הוא עד השעה'} <strong className="font-semibold" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>11:00</strong> {language === 'en' ? 'AM' : 'בבוקר'}.</p>
+                          <p>{language === 'en' ? 'Please ensure all windows are closed and the air conditioner is turned off.' : 'אנא ודאו שכל החלונות סגורים והמזגן כבוי.'}</p>
+                          <p>{language === 'en' ? 'Leave the key on the table and make sure you haven\'t forgotten anything.' : 'את המפתח השאירו על השולחן וודאו שלא שכחתם דבר.'}</p>
+                          <p className="mt-6 font-semibold">{language === 'en' ? 'Thank you and we hope you enjoyed your stay!' : 'תודה רבה ומקווים שנהניתם!'}</p>
+                        </div>
+                      </div>
+                    </div>
+                )}
+            ];
+
+            // Add iOS install instructions to cards
+            if (openDialog === 'ios-install') {
+                cards.push({
+                    id: 'ios-install',
+                    title: 'Install App',
+                    content: (
+                        <div className="text-center space-y-4">
+                            <div className="text-6xl mb-4">📱</div>
+                            <h3 className="font-bold text-xl mb-4" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>Add to Home Screen</h3>
+                            <div className="text-left space-y-3" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
+                                <p className="flex items-start gap-2">
+                                    <span className="font-bold">1.</span>
+                                    <span>Tap the Share button <span className="inline-block align-middle">⬆️</span> at the bottom of Safari</span>
+                                </p>
+                                <p className="flex items-start gap-2">
+                                    <span className="font-bold">2.</span>
+                                    <span>Scroll down and tap "Add to Home Screen" <span className="inline-block align-middle">➕</span></span>
+                                </p>
+                                <p className="flex items-start gap-2">
+                                    <span className="font-bold">3.</span>
+                                    <span>Tap "Add" to install the app</span>
+                                </p>
+                            </div>
+                            <p className="text-sm mt-4" style={{color: currentTheme === 'day' ? '#64748b' : 'rgba(255,255,255,0.6)'}}>This allows offline access and faster loading!</p>
+                        </div>
+                    )
+                });
+            }
+
+            // Add browser-specific install instructions to cards
+            if (openDialog === 'browser-install') {
+                const userAgent = navigator.userAgent.toLowerCase();
+                cards.push({
+                    id: 'browser-install',
+                    title: 'Install App',
+                    content: (
+                        <div className="text-center space-y-4">
+                            <div className="text-6xl mb-4">📱</div>
+                            <h3 className="font-bold text-xl mb-4" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>Add to Home Screen</h3>
+                            <div className="text-left space-y-3" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
+                                {userAgent.includes('firefox') ? (
+                                    <>
+                                        <p className="font-semibold mb-2">Firefox Browser:</p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">1.</span>
+                                            <span>Look for the install icon ⊕ in the address bar</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">2.</span>
+                                            <span>Click it and select "Install"</span>
+                                        </p>
+                                    </>
+                                ) : userAgent.includes('samsung') ? (
+                                    <>
+                                        <p className="font-semibold mb-2">Samsung Internet:</p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">1.</span>
+                                            <span>Tap the menu button (⋮) at the bottom</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">2.</span>
+                                            <span>Select "Add page to" → "Home screen"</span>
+                                        </p>
+                                    </>
+                                ) : userAgent.includes('edge') ? (
+                                    <>
+                                        <p className="font-semibold mb-2">Microsoft Edge:</p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">1.</span>
+                                            <span>Tap the menu (•••) at the bottom</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">2.</span>
+                                            <span>Select "Add to phone"</span>
+                                        </p>
+                                    </>
+                                ) : userAgent.includes('opera') ? (
+                                    <>
+                                        <p className="font-semibold mb-2">Opera Browser:</p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">1.</span>
+                                            <span>Tap the Opera menu button</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">2.</span>
+                                            <span>Select "Home screen" or "Add to Home screen"</span>
+                                        </p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p className="font-semibold mb-2">Your Browser:</p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">1.</span>
+                                            <span>Open the browser menu (⋮ or •••)</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">2.</span>
+                                            <span>Look for "Install app" or "Add to Home screen"</span>
+                                        </p>
+                                        <p className="flex items-start gap-2">
+                                            <span className="font-bold">3.</span>
+                                            <span>Follow the prompts to install</span>
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+                            <p className="text-sm mt-4" style={{color: currentTheme === 'day' ? '#64748b' : 'rgba(255,255,255,0.6)'}}>This allows offline access and faster loading!</p>
+                        </div>
+                    )
+                });
+            }
+
+            const openDialogHandler = (id) => {
+                setOpenDialog(id);
+                if (navigator.vibrate) navigator.vibrate(50); // Only vibrate when opening dialog
+                const newVisited = [id, ...lastVisited.filter(v => v !== id)].slice(0, 3);
+                setLastVisited(newVisited);
+                sessionStorage.setItem('lastVisited', JSON.stringify(newVisited));
+            };
+            const closeDialog = () => { setOpenDialog(null); };
+
+            const handleInstallClick = async () => {
+                if (isIOS) {
+                    // Show iOS instructions
+                    setOpenDialog('ios-install');
+                } else if (deferredPrompt) {
+                    // Show Chrome install prompt
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        localStorage.setItem('pwa-installed', 'true');
+                    }
+                    setDeferredPrompt(null);
+                } else {
+                    // Enhanced fallback for browsers without install prompt support
+                    // Show browser-specific instructions dialog
+                    setOpenDialog('browser-install');
+                    console.log('No install prompt available, showing browser-specific instructions');
+                }
+            };
+
+            const handleShare = async () => {
+                const shareData = {
+                    title: 'GrappA Guest Guide',
+                    text: 'Check out the GrappA Guest Guide - Your complete resort companion!',
+                    url: window.location.href
+                };
+
+                try {
+                    if (navigator.share) {
+                        // Use native share if available (mobile)
+                        await navigator.share(shareData);
+                        console.log('Shared successfully');
+                    } else {
+                        // Fallback: copy to clipboard
+                        await navigator.clipboard.writeText(window.location.href);
+                        // Show a temporary notification
+                        const notification = document.createElement('div');
+                        notification.className = 'fixed top-20 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg animate-slideUp z-50';
+                        notification.textContent = 'Link copied to clipboard!';
+                        document.body.appendChild(notification);
+                        setTimeout(() => notification.remove(), 3000);
+                    }
+                } catch (err) {
+                    console.log('Error sharing:', err);
+                }
+            };
+            
+            const selectLanguage = (lang) => {
+                console.log('Language selected:', lang);
+                setLanguage(lang);
+                localStorage.setItem('preferredLanguage', lang);
+                setShowLanguageModal(false);
+            };
+
+            return (
+                <div className="min-h-screen p-4 relative">
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                        {/* Theme-aware Bubbles */}
+                        <div className="absolute w-40 h-40 rounded-full top-10 left-10 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-1), var(--bubble-2))`}}></div>
+                        <div className="absolute w-32 h-32 rounded-full top-60 right-16 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-2), var(--bubble-3))`, animationDelay: '0.5s'}}></div>
+                        <div className="absolute w-28 h-28 rounded-full bottom-20 left-1/3 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-3), var(--bubble-1))`, animationDelay: '2s'}}></div>
+                        <div className="absolute w-36 h-36 rounded-full bottom-40 right-10 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-1), var(--bubble-4))`, animationDelay: '1s'}}></div>
+                        <div className="absolute w-24 h-24 rounded-full top-1/3 left-1/2 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-3), var(--bubble-2))`, animationDelay: '3s'}}></div>
+                        <div className="absolute w-44 h-44 rounded-full bottom-10 left-10 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-2), var(--bubble-4))`, animationDelay: '2.5s'}}></div>
+                        <div className="absolute w-20 h-20 rounded-full top-20 right-1/3 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-1), var(--bubble-3))`, animationDelay: '1.5s'}}></div>
+                        <div className="absolute w-48 h-48 rounded-full top-1/2 right-1/4 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-4), var(--bubble-2))`, animationDelay: '4s'}}></div>
+
+                        {/* Additional Small Bubbles */}
+                        <div className="absolute w-16 h-16 rounded-full top-5 right-5 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-3), var(--bubble-1))`, animationDelay: '0.5s'}}></div>
+                        <div className="absolute w-12 h-12 rounded-full bottom-32 right-20 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-1), var(--bubble-2))`, animationDelay: '3.5s'}}></div>
+                        <div className="absolute w-14 h-14 rounded-full top-40 left-5 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-3), var(--bubble-2))`, animationDelay: '2.5s'}}></div>
+                        <div className="absolute w-10 h-10 rounded-full bottom-5 right-1/2 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-2), var(--bubble-4))`, animationDelay: '1.8s'}}></div>
+                        <div className="absolute w-18 h-18 rounded-full top-3/4 left-20 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-1), var(--bubble-3))`, animationDelay: '4.5s'}}></div>
+                        <div className="absolute w-8 h-8 rounded-full top-2/3 right-10 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-2), var(--bubble-1))`, animationDelay: '0.8s'}}></div>
+                        <div className="absolute w-15 h-15 rounded-full bottom-1/4 left-1/4 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-3), var(--bubble-2))`, animationDelay: '3.2s'}}></div>
+                        <div className="absolute w-11 h-11 rounded-full top-10 left-1/3 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-1), var(--bubble-2))`, animationDelay: '2.2s'}}></div>
+                    </div>
+
+                    {isOffline && ( <div className="fixed top-4 left-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-slideUp z-50"><span className="font-semibold">Offline Mode</span> - Some features may be limited</div> )}
+
+                    {/* Top buttons - positioned above everything */}
+                    <div className="absolute top-0 right-0 p-2 flex gap-2 z-50">
+                        {language && (
+                            <button
+                                onClick={() => {
+                                    console.log('Language button clicked');
+                                    setShowLanguageModal(true);
+                                }}
+                                className={`px-3 py-3 rounded-xl transition-all haptic shadow-lg ${
+                                    currentTheme === 'day' 
+                                        ? 'bg-slate-600 hover:bg-slate-700 text-white' 
+                                        : 'bg-slate-700 hover:bg-slate-800 text-white'
+                                }`}
+                                aria-label="Change Language"
+                            >
+                                <span className="text-sm font-bold">{language === 'en' ? 'EN' : 'HE'}</span>
+                            </button>
+                        )}
+                        <button
+                            onClick={handleShare}
+                            className={`px-3 py-3 rounded-xl transition-all haptic shadow-lg ${
+                                currentTheme === 'day'
+                                    ? 'bg-slate-600 hover:bg-slate-700 text-white'
+                                    : 'bg-slate-700 hover:bg-slate-800 text-white'
+                            }`}
+                            aria-label="Share GrappA Guest Guide"
+                        >
+                            <span className="material-symbols-outlined" style={{fontSize: '24px'}}>
+                                share
+                            </span>
+                        </button>
+                    </div>
+
+                    <div className={`text-center mb-8 pt-16 transition-all duration-1000 ${isLoaded ? 'animate-fadeIn' : 'opacity-0'}`}>
+                        <div className="glass-enhanced rounded-2xl p-6 max-w-md mx-auto shadow-xl">
+                            <h1 className="text-4xl font-black mb-2 gradient-text">GrappA Guest Guide</h1>
+                            <p className={`text-lg font-medium ${currentTheme === 'day' ? 'text-slate-600' : 'text-white'}`}>
+                                {language === 'en' ? 'Resort Information & Services' : 'Resort Information & Services'}
+                            </p>
+                            {/* Manual Install Button for Testing */}
+                            {!isInstalled && (
+                                <button
+                                    onClick={handleInstallClick}
+                                    className="mt-4 px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-medium transition-all shadow-md haptic text-sm"
+                                >
+                                    <span className="flex items-center gap-2">
+                                        <span>📲</span>
+                                        <span>Add to Home Screen</span>
+                                    </span>
+                                </button>
+                            )}
+                        </div>
+                        {lastVisited.length > 0 && (
+                            <div className="mt-6 max-w-md mx-auto"><p className="text-sm mb-2" style={{color: currentTheme === 'day' ? '#64748b' : 'rgba(255,255,255,0.6)'}}>Recently viewed:</p>
+                                <div className="flex gap-2 justify-center flex-wrap">
+                                    {lastVisited.map(id => {
+                                        const card = cards.find(c => c.id === id);
+                                        return card ? ( <button key={id} onClick={() => openDialogHandler(id)} className="px-3 py-1 bg-slate-100/60 backdrop-blur-sm border border-slate-200/50 rounded-full text-slate-700 text-sm hover:bg-slate-200/70 transition-all haptic">{card.title}</button> ) : null;
+                                    })}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-5 max-w-lg mx-auto">
+                        {cards.map((card, index) => (
+                            <div key={card.id} onClick={() => openDialogHandler(card.id)} className={`glass rounded-2xl p-5 cursor-pointer shadow-lg card-hover haptic ${ isLoaded ? 'animate-scaleIn' : 'opacity-0' }`} style={{animationDelay: `${index * 0.08}s`}}>
+                                <div className="flex flex-col items-center text-center space-y-3">
+                                    <div className={`p-4 bg-gradient-to-br ${card.gradient} backdrop-blur-sm rounded-2xl shadow-md icon-container border border-white/40 ${currentTheme === 'night' ? 'shadow-[0_0_20px_rgba(255,255,255,0.1)]' : ''}`}>{card.icon}</div>
+                                    <h3 className={`font-bold text-base tracking-tight ${currentTheme === 'day' ? 'text-slate-900' : 'text-white'}`}>{card.title}</h3>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {openDialog && (
+                        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={closeDialog} role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+                            <div className={`backdrop-blur-sm rounded-2xl max-w-md w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slideUp border modal-dialog ${currentTheme === 'day' ? 'bg-slate-50/95 border-white/30' : 'bg-slate-900/95 border-slate-700/30'}`} onClick={(e) => e.stopPropagation()}>
+                                <div className={`backdrop-blur-sm border-b p-5 flex justify-between items-center ${currentTheme === 'day' ? 'bg-white/80 border-slate-200/50' : 'bg-slate-800/80 border-slate-700/50'}`}>
+                                    <h2 id="dialogTitle" className="text-2xl font-black" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>{cards.find(c => c.id === openDialog)?.title}</h2>
+                                    <button onClick={closeDialog} className={`p-3 rounded-full haptic transition-colors ${currentTheme === 'day' ? 'text-slate-500 hover:bg-slate-100/70' : 'text-slate-400 hover:bg-slate-700/70'}`} aria-label="Close dialog">
+                                      <CloseIcon />
+                                    </button>
+                                </div>
+                                <div className="p-6 overflow-y-auto max-h-[calc(85vh-74px)]"><div className="space-y-4">{cards.find(c => c.id === openDialog)?.content}</div></div>
+                            </div>
+                        </div>
+                    )}
+
+                    {zoomedImg && (
+                        <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={closeImage}>
+                            <div className="relative max-w-full max-h-full flex flex-col items-center">
+                                <button onClick={closeImage} className={`mb-3 p-3 rounded-full haptic transition-colors ${currentTheme === 'day' ? 'text-white bg-black/50 hover:bg-black/70' : 'text-white bg-white/20 hover:bg-white/30'} backdrop-blur-sm`} aria-label="Close image">
+                                    <CloseIcon />
+                                </button>
+                                <img src={zoomedImg} alt="Zoomed view" className="max-w-full max-h-[85vh] rounded-xl shadow-2xl animate-zoomIn" onClick={(e) => e.stopPropagation()} />
+                            </div>
+                        </div>
+                    )}
+                    
+                    {/* Language Selection Modal */}
+                    {showLanguageModal && (
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={() => language && setShowLanguageModal(false)}>
+                            <div className={`backdrop-blur-sm rounded-2xl max-w-sm w-full p-8 shadow-2xl animate-slideUp border ${currentTheme === 'day' ? 'bg-white/95 border-slate-200' : 'bg-slate-900/95 border-slate-700'}`} onClick={(e) => e.stopPropagation()}>
+                                <h2 className="text-2xl font-bold text-center mb-6" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
+                                    Choose Language / בחר שפה
+                                </h2>
+                                <div className="space-y-4">
+                                    <button
+                                        onClick={() => selectLanguage('he')}
+                                        className="w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg haptic"
+                                    >
+                                        עברית
+                                        <span className="block text-sm font-normal mt-1">Hebrew (Current Style)</span>
+                                    </button>
+                                    <button
+                                        onClick={() => selectLanguage('en')}
+                                        className="w-full px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg haptic"
+                                    >
+                                        English
+                                        <span className="block text-sm font-normal mt-1">Full English Interface</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<BnBGuestGuide />);
+    </script>
+</body>
+</html>
