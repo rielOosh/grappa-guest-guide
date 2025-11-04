@@ -7,19 +7,32 @@ import { getTheme, applyTheme } from './utils/theme';
 // Apply initial theme
 applyTheme(getTheme());
 
-// Register service worker
+// Unregister old service worker and clear old cache
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/sw.js')
-      .then((registration) => {
-        console.log('SW registered:', registration);
-      })
-      .catch((error) => {
-        console.log('SW registration failed:', error);
-      });
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    registrations.forEach((registration) => {
+      // Check if it's the old service worker
+      if (registration.active && registration.active.scriptURL.includes('/service-worker.js')) {
+        console.log('Unregistering old service worker');
+        registration.unregister();
+
+        // Clear old cache
+        if (caches) {
+          caches.keys().then((names) => {
+            names.forEach((name) => {
+              if (name.includes('grappa-guest-guide-v0')) {
+                console.log('Deleting old cache:', name);
+                caches.delete(name);
+              }
+            });
+          });
+        }
+      }
+    });
   });
 }
+
+// Vite PWA plugin will handle service worker registration via registerSW.js
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
