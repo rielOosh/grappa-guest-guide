@@ -21,6 +21,8 @@ import { ImageZoom } from './components/ImageZoom';
 import { BackgroundBubbles } from './components/BackgroundBubbles';
 
 function App() {
+  console.log('[App] Component function called');
+
   const [openDialog, setOpenDialog] = useState(null);
   const [zoomedImg, setZoomedImg] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -32,6 +34,8 @@ function App() {
   const [isInstalled, setIsInstalled] = useState(false);
   const [language, setLanguage] = useState(localStorage.getItem('preferredLanguage') || null);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
+
+  console.log('[App] State initialized, language:', language);
 
   useEffect(() => {
     setTimeout(() => {
@@ -110,11 +114,14 @@ function App() {
     checkout: <CheckoutIcon />,
   };
 
+  console.log('[App] About to call getCardContent with theme:', currentTheme, 'language:', language);
   const cardContent = getCardContent(currentTheme, language, openImage);
+  console.log('[App] cardContent received, length:', cardContent?.length);
   const cards = cardContent.map((card) => ({
     ...card,
     icon: cardIcons[card.id],
   }));
+  console.log('[App] cards mapped, length:', cards?.length);
 
   const openDialogHandler = (id) => {
     setOpenDialog(id);
@@ -171,6 +178,8 @@ function App() {
   };
 
   const currentCard = cards.find((c) => c.id === openDialog);
+
+  console.log('[App] About to render, isLoaded:', isLoaded, 'cards.length:', cards.length);
 
   return (
     <div className="min-h-screen p-4 relative">

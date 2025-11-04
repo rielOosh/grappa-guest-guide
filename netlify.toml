@@ -1,0 +1,12 @@
+[build]
+  # Build command to run
+  command = "npm run build"
+
+  # Directory to publish (the output of the build)
+  publish = "dist"
+
+# Optional: Redirect rules for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

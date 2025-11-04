@@ -6,9 +6,13 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
+      devOptions: {
+        enabled: true
+      },
       includeAssets: ['*.png', '*.jpg', '*.gpx', '*.svg'],
       manifest: {
+        version: '2.0.1',
         name: 'GrappA Guest Guide',
         short_name: 'GrappA Guide',
         description: 'Your resort guide for GrappA.',
@@ -31,7 +35,11 @@ export default defineConfig({
         ]
       },
       workbox: {
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
         globPatterns: ['**/*.{js,css,html,png,jpg,svg,gpx}'],
+        navigateFallback: null,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
