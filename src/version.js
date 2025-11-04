@@ -1,2 +1,2 @@
 // App version - increment this to force cache updates
-export const APP_VERSION = '2.0.2';
+export const APP_VERSION = '2.0.3';
