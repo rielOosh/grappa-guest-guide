@@ -1,19 +1,17 @@
-// A descriptive cache name helps in managing updates.
-// Incrementing the version (e.g., to 'v10') will trigger the 'activate' event for cleanup.
-const CACHE_NAME = 'grappa-guest-guide-v1';
+const CACHE_NAME = 'grappa-guest-guide-v23';
 
 // A comprehensive list of assets to cache for a full offline experience.
 const URLS_TO_CACHE = [
   // Core files
   './',
+  './index.html',
   
-  // Core scripts - Essential for the app to function (removed Tailwind CDN due to CORS)
-  'https://unpkg.com/react@18/umd/react.development.js',
-  'https://unpkg.com/react-dom@18/umd/react-dom.development.js',
-  'https://unpkg.com/@babel/standalone/babel.min.js',
+  // Leaflet.js Mapping Library (loaded and cached for offline hiking map)
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
   
-  // Fonts - Caching fonts prevents layout shifts and ensures consistent typography.
   'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
+  'https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Heebo:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap',
   
   // App Icons
   './grappa_icon_192px.png',
@@ -24,10 +22,12 @@ const URLS_TO_CACHE = [
   'https://i.imgur.com/s6g6A4b.png', // App Icon
   'https://i.imgur.com/MBYTWps.png', // Logistics info
   'https://i.imgur.com/ChMRT7d.jpg', // Sushi menu
-  'https://i.imgur.com/2AahzMz.png', // Pool hours
+  './Grocery_hours.jpg',
+  './swiming_pool_instructions.png?v=4',
   'https://i.imgur.com/5vg5NXj.png',  // Spa info (fixed URL)
   
   // Downloadable Trail Files - Caching these ensures guests can access them without a connection.
+  './gpx_data.js',
   './walk_to_the_bulbouse_mountain.gpx',
   './Zepp20230405100344.gpx',
   './Zepp20230118153553.gpx',
@@ -99,14 +99,19 @@ self.addEventListener('fetch', event => {
           
           caches.open(CACHE_NAME)
             .then(cache => {
-              cache.put(event.request, responseToCache);
+              cache.put(event.request, responseToCache).catch(err => {
+                console.warn('Cache put failed for html:', err);
+              });
+            })
+            .catch(err => {
+              console.warn('Cache open failed for html:', err);
             });
           
           return response;
         })
         .catch(() => {
           // If network fails, try the cache
-          return caches.match(event.request);
+          return caches.match(event.request, { ignoreSearch: true });
         })
     );
     return;
@@ -114,27 +119,37 @@ self.addEventListener('fetch', event => {
   
   // For other assets, use cache first for performance
   event.respondWith(
-    caches.match(event.request)
+    caches.match(event.request, { ignoreSearch: true })
       .then(cachedResponse => {
         if (cachedResponse) {
           return cachedResponse;
         }
         
-        return fetch(event.request).then(networkResponse => {
-          // Only cache successful responses from our origin
-          if (!networkResponse || networkResponse.status !== 200) {
+        return fetch(event.request)
+          .then(networkResponse => {
+            // Only cache successful responses from our origin
+            if (!networkResponse || networkResponse.status !== 200) {
+              return networkResponse;
+            }
+            
+            const responseToCache = networkResponse.clone();
+            
+            caches.open(CACHE_NAME)
+              .then(cache => {
+                cache.put(event.request, responseToCache).catch(err => {
+                  console.warn('Cache put failed for asset:', err);
+                });
+              })
+              .catch(err => {
+                console.warn('Cache open failed for asset:', err);
+              });
+            
             return networkResponse;
-          }
-          
-          const responseToCache = networkResponse.clone();
-          
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            });
-          
-          return networkResponse;
-        });
+          })
+          .catch(err => {
+            console.warn('Asset fetch failed, falling back to cache if available:', err);
+            return caches.match(event.request, { ignoreSearch: true });
+          });
       })
   );
 });

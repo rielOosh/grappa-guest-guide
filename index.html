@@ -29,14 +29,23 @@
     <link rel="preconnect" href="https://i.imgur.com">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Heebo:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Leaflet.js Mapping Library (for the interactive hikes map) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="./gpx_data.js"></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
 
     <style>
-        /* Day Theme (8 AM - 8 PM) - Current styling */
+        /* Day Theme (8 AM - 8 PM) - Original colors */
         :root {
             --animation-duration: 0.3s;
             /* Day theme colors */
@@ -67,7 +76,7 @@
             --shadow-xl: rgba(0, 0, 0, 0.4);
         }
 
-        /* Night Theme (8 PM - 8 AM) - From older version */
+        /* Night Theme (8 PM - 8 AM) - Original colors */
         [data-theme="night"] {
             --bg-gradient-1: #475569;
             --bg-gradient-2: #334155;
@@ -100,7 +109,7 @@
         body {
             margin: 0;
             min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', 'Heebo', 'Assistant', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -147,11 +156,12 @@
         }
         /* 3D Depth Shadow System */
         .card-hover {
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             overflow: hidden;
             /* Base state shadow */
-            box-shadow: 0 2px 8px var(--shadow-light), 0 4px 16px var(--shadow-light);
+            box-shadow: 0 4px 20px var(--shadow-light), 0 2px 8px var(--shadow-light);
+            border: 1px solid var(--glass-border);
         }
         /* Ripple effect container */
         .ripple-container {
@@ -168,9 +178,9 @@
             animation: ripple 0.9s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
         }
-        /* Hover state - medium elevation */
+        /* Hover state - medium elevation (original colors) */
         .card-hover:hover {
-            transform: scale(1.03) translateY(-6px);
+            transform: scale(1.025) translateY(-5px);
             box-shadow:
                 0 4px 12px var(--shadow-light),
                 0 8px 24px var(--shadow-medium),
@@ -179,14 +189,13 @@
         }
         /* Active state - pressed shadow */
         .card-hover:active {
-            transform: scale(0.98) translateY(-2px);
+            transform: scale(0.98) translateY(-1px);
             box-shadow:
                 0 2px 4px var(--shadow-light),
-                0 4px 8px var(--shadow-light),
                 inset 0 0 0 1px var(--glass-border);
         }
         .icon-container {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             box-shadow: 0 2px 8px var(--shadow-light);
         }
@@ -198,7 +207,7 @@
         .btn-premium {
             position: relative;
             overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 2px 8px var(--shadow-light);
         }
         .btn-premium::before {
@@ -209,7 +218,7 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: left 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .btn-premium:hover::before {
             left: 100%;
@@ -222,11 +231,11 @@
             transform: translateY(0);
             box-shadow: 0 2px 4px var(--shadow-light);
         }
-        ::-webkit-scrollbar { width: 10px; height: 10px; }
-        ::-webkit-scrollbar-track { background: var(--shadow-light); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: var(--text-light); border-radius: 10px; transition: background 0.3s ease; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
-        .haptic { transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1); }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; transition: background 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
+        .haptic { transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1); }
         .haptic:active { transform: scale(0.98); }
         .gradient-text {
             background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
@@ -266,23 +275,249 @@
                 transition-duration: 0.01ms !important;
             }
         }
+
+        /* Review Carousel Transition */
+        #review-carousel {
+            transition: opacity 0.15s ease-in-out;
+        }
+
+        /* Leaflet custom styling to match guest guide theme */
+        .leaflet-container {
+            font-family: inherit;
+            background-color: #cbd5e1;
+        }
+        .leaflet-bar {
+            border: none !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+        .leaflet-bar a {
+            background-color: var(--glass-bg-enhanced) !important;
+            backdrop-filter: blur(10px);
+            color: var(--text-primary) !important;
+            border-bottom: 1px solid var(--glass-border) !important;
+            transition: all 0.2s ease;
+        }
+        .leaflet-bar a:hover {
+            background-color: rgba(255, 255, 255, 0.9) !important;
+            color: #000 !important;
+        }
+        .leaflet-popup-content-wrapper {
+            background: var(--dialog-bg) !important;
+            backdrop-filter: blur(15px);
+            color: var(--text-primary) !important;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+        }
+        .leaflet-popup-tip {
+            background: var(--dialog-bg) !important;
+        }
+        /* Desert background grid fallback for maps offline */
+        .offline-map-grid {
+            background-color: #f6ebd4;
+            background-image: radial-gradient(#d4b996 1px, transparent 0), radial-gradient(#d4b996 1px, transparent 0);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+        }
     </style>
 </head>
 <body>
+    <!-- Hidden static SVG defs for linear gradients used by SVG icons -->
+    <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop id="iconGradientStop1" offset="0%" stop-color="rgba(51, 65, 85, 0.95)" />
+          <stop id="iconGradientStop2" offset="100%" stop-color="rgba(71, 85, 105, 0.85)" />
+        </linearGradient>
+      </defs>
+    </svg>
+
     <div id="loading-screen" class="loading-screen"><div class="loading-spinner"></div></div>
-    <div id="root"></div>
+    
+    <div id="app-container" class="min-h-screen p-4 relative">
+        <div class="absolute inset-0 pointer-events-none overflow-hidden">
+            <!-- Ambient soft glowing auroras in the original theme colors -->
+            <div class="absolute w-[350px] h-[350px] rounded-full top-[-80px] left-[-80px] blur-[90px] animate-float" style="background: var(--bubble-1);"></div>
+            <div class="absolute w-[300px] h-[300px] rounded-full top-[25%] right-[-100px] blur-[80px] animate-pulse" style="background: var(--bubble-2); animation-delay: 1.5s;"></div>
+            <div class="absolute w-[320px] h-[320px] rounded-full bottom-[20%] left-[-80px] blur-[90px] animate-float" style="background: var(--bubble-3); animation-delay: 3s;"></div>
+            <div class="absolute w-[380px] h-[380px] rounded-full bottom-[-100px] right-[-100px] blur-[110px] animate-pulse" style="background: var(--bubble-4); animation-delay: 4.5s;"></div>
+        </div>
 
-    <script type="text/babel">
-        // --- PWA Service Worker Registration ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(registration => console.log('ServiceWorker registration successful with scope:', registration.scope))
-                    .catch(err => console.log('ServiceWorker registration failed:', err));
-            });
-        }
+        <div id="offline-banner" class="fixed top-4 left-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-slideUp z-50 hidden">
+            <span class="font-semibold" id="offline-banner-text">Offline Mode</span> - Some features may be limited
+        </div>
 
-        // --- Theme Detection and Management ---
+        <!-- Top buttons - positioned above everything -->
+        <div class="absolute top-0 right-0 p-2 flex gap-2 z-50">
+            <button id="lang-btn" class="px-3 py-3 rounded-xl transition-all haptic shadow-lg bg-slate-600 hover:bg-slate-700 text-white" aria-label="Change Language">
+                <span class="text-sm font-bold" id="lang-btn-text">EN</span>
+            </button>
+            <button id="share-btn" class="px-3 py-3 rounded-xl transition-all haptic shadow-lg bg-slate-600 hover:bg-slate-700 text-white" aria-label="Share GrappA Guest Guide">
+                <span class="material-symbols-outlined" style="font-size: 24px;">share</span>
+            </button>
+        </div>
+
+        <div class="text-center mb-8 pt-16">
+            <div class="glass-enhanced rounded-3xl p-6 max-w-md mx-auto shadow-xl">
+                <h1 class="text-3xl font-black mb-2 gradient-text">GrappA Guest Guide</h1>
+                <p class="text-base font-semibold text-slate-600 dark:text-white" id="hero-subtitle">
+                    Resort Information & Services
+                </p>
+                <button id="install-btn" class="mt-4 px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-medium transition-all shadow-md haptic text-sm hidden">
+                    <span class="flex items-center gap-2">
+                        <span>📲</span>
+                        <span id="install-btn-text">Add to Home Screen</span>
+                    </span>
+                </button>
+            </div>
+            <div id="recently-viewed-container" class="mt-6 max-w-md mx-auto hidden">
+                <p class="text-sm mb-2 text-slate-500 dark:text-slate-400" id="recently-viewed-title">Recently viewed:</p>
+                <div id="recently-viewed-list" class="flex gap-2 justify-center flex-wrap"></div>
+            </div>
+        </div>
+
+        <!-- Cards Grid -->
+        <div id="cards-grid" class="grid grid-cols-2 gap-5 max-w-lg mx-auto">
+            <!-- Cards injected dynamically by JS -->
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Content Detail Dialog Modal -->
+    <div id="dialog-modal" class="fixed inset-0 bg-black/45 backdrop-blur-sm items-end sm:items-center justify-center p-0 sm:p-4 z-50 hidden animate-fadeIn" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+        <div class="backdrop-blur-md rounded-t-3xl sm:rounded-2xl max-w-md w-full max-h-[85vh] sm:max-h-[80vh] overflow-hidden shadow-2xl animate-slideUp border border-white/20 dark:border-slate-800 bg-slate-50/95 dark:bg-slate-900/95 flex flex-col mt-auto sm:mt-0">
+            <!-- Mobile Grab Handle -->
+            <div class="flex justify-center py-2.5 sm:hidden">
+                <div class="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full"></div>
+            </div>
+            
+            <div class="border-b p-5 flex justify-between items-center bg-white/40 border-slate-200/50 dark:bg-slate-800/40 dark:border-slate-800/80">
+                <h2 id="dialogTitle" class="text-2xl font-black text-slate-800 dark:text-white"></h2>
+                <button id="dialog-close-btn" class="p-2 rounded-full haptic transition-colors text-slate-500 hover:bg-slate-250/50 dark:text-slate-400 dark:hover:bg-slate-800/50" aria-label="Close dialog">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1">
+                <div id="dialogBody" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive GPX Map Modal -->
+    <div id="map-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md items-center justify-center z-[100] hidden animate-fadeIn" role="dialog" aria-modal="true">
+        <div class="relative w-full h-full flex flex-col">
+            <!-- Map Container -->
+            <div id="map-container" class="w-full h-full"></div>
+
+            <!-- Offline Banner on Map -->
+            <div id="map-offline-notice" class="absolute top-4 left-1/2 -translate-x-1/2 bg-amber-600/90 text-white px-4 py-2 rounded-lg shadow-lg z-[1000] text-sm backdrop-blur-sm font-semibold hidden">
+                ⚠️ Working Offline - Cached Trail Path Only
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="map-spinner" class="absolute inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-[1000]">
+                <div class="bg-white/90 p-4 rounded-xl shadow-lg flex items-center gap-3 border dark:bg-slate-800 dark:border-slate-700">
+                    <div class="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <span class="text-slate-800 font-semibold dark:text-white text-sm" id="map-loading-text">Loading Trail...</span>
+                </div>
+            </div>
+
+            <!-- Floating Top Controls -->
+            <div class="absolute top-4 left-4 z-[1000] flex gap-2">
+                <button id="map-close-btn" class="p-4 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg haptic transition-all hover:scale-105 active:scale-95 flex items-center justify-center border dark:bg-slate-800/90 dark:text-white dark:border-slate-700" aria-label="Close Map">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Floating Top Right Controls (Layer Toggle) -->
+            <div class="absolute top-4 right-4 z-[1000]">
+                <button id="map-layer-btn" class="p-4 bg-white/90 hover:bg-white text-slate-800 rounded-full shadow-lg haptic transition-all hover:scale-105 active:scale-95 flex items-center justify-center border dark:bg-slate-800/90 dark:text-white dark:border-slate-700" aria-label="Toggle Satellite Map">
+                    <span class="material-symbols-outlined" style="font-size: 24px;">map</span>
+                </button>
+            </div>
+
+            <!-- Floating Right Controls (Location Selector) -->
+            <div class="absolute bottom-28 right-4 z-[1000]">
+                <button id="map-location-btn" class="p-4 bg-white hover:bg-slate-50 text-slate-800 rounded-full shadow-lg haptic transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-slate-200/50 dark:bg-slate-800 dark:text-white dark:border-slate-700" aria-label="Find My Location">
+                    <span class="material-symbols-outlined" style="font-size: 26px;">my_location</span>
+                </button>
+            </div>
+
+            <!-- Bottom Trail Info Panel (Glassmorphism) -->
+            <div id="map-bottom-panel" class="absolute bottom-4 left-4 right-4 z-[1000] glass-enhanced rounded-2xl p-3.5 shadow-2xl max-w-md mx-auto border border-white/20 transition-all duration-300">
+                <!-- Clickable header to expand/collapse elevation profile -->
+                <div id="map-panel-header" class="flex justify-between items-center gap-4 cursor-pointer select-none">
+                    <div>
+                        <h3 id="map-trail-title" class="font-black text-base text-slate-800 dark:text-white tracking-tight leading-tight"></h3>
+                        <p id="map-trail-subtitle" class="text-[9px] font-bold text-slate-400 dark:text-slate-500 mt-0.5 uppercase tracking-wider"></p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <!-- Status Badge -->
+                        <div id="map-status-badge" class="px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-full shadow-sm bg-slate-100/80 text-slate-500 border border-slate-200/50 dark:bg-slate-800/80 dark:text-slate-400 dark:border-slate-700/50 transition-colors duration-200">
+                            OFFLINE
+                        </div>
+                        <!-- Chevron toggle icon -->
+                        <span id="map-ele-toggle" class="material-symbols-outlined text-slate-400 hover:text-slate-600 transition-transform duration-300" style="font-size: 22px;">expand_more</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-2 mt-2.5 pt-2.5 border-t border-slate-200/50 dark:border-slate-700/50">
+                    <div class="text-center">
+                        <span class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide" id="map-lbl-distance">Distance</span>
+                        <span id="map-trail-distance" class="text-sm font-black text-slate-700 dark:text-slate-200">--</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide" id="map-lbl-speed">Speed</span>
+                        <span id="map-trail-speed" class="text-sm font-black text-slate-700 dark:text-slate-200">--</span>
+                    </div>
+                    <div class="text-center">
+                        <span class="block text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide" id="map-lbl-elevation">Elevation</span>
+                        <span id="map-trail-elevation" class="text-sm font-black text-slate-700 dark:text-slate-200">--</span>
+                    </div>
+                </div>
+
+                <!-- Collapsible Elevation Profile Area -->
+                <div id="map-elevation-section" class="hidden mt-2.5 pt-2.5 border-t border-slate-200/50 dark:border-slate-700/50 transition-all duration-300">
+                    <div id="map-elevation-chart" class="w-full">
+                        <!-- Chart generated dynamically by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zoomed Image Viewer Modal -->
+    <div id="image-modal" class="fixed inset-0 bg-black/80 backdrop-blur-xl flex-col items-center justify-center p-4 z-50 hidden animate-fadeIn">
+        <div class="relative max-w-full max-h-full flex flex-col items-center">
+            <button id="image-close-btn" class="mb-3 p-3 rounded-full haptic transition-colors text-white bg-black/50 hover:bg-black/70 backdrop-blur-sm border border-white/10" aria-label="Close image">
+                <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <img id="zoomed-image-el" src="" alt="Zoomed view" class="max-w-full max-h-[85vh] rounded-xl shadow-2xl animate-zoomIn" />
+        </div>
+    </div>
+
+    <!-- Language Selection Modal (Initial Load Overlay) -->
+    <div id="language-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md items-center justify-center p-4 z-50 hidden animate-fadeIn">
+        <div class="backdrop-blur-sm rounded-2xl max-w-sm w-full p-8 shadow-2xl animate-slideUp border bg-white/95 border-slate-200 dark:bg-slate-900/95 dark:border-slate-700">
+            <h2 class="text-2xl font-bold text-center mb-6 text-slate-800 dark:text-white">
+                Choose Language / בחר שפה
+            </h2>
+            <div class="space-y-4">
+                <button id="lang-opt-he" class="w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg haptic">
+                    עברית
+                    <span class="block text-sm font-normal mt-1">Hebrew (Current Style)</span>
+                </button>
+                <button id="lang-opt-en" class="w-full px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg haptic">
+                    English
+                    <span class="block text-sm font-normal mt-1">Full English Interface</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Logic Script -->
+    <script>
+        // --- Theme Setup (Executed Immediately to Prevent FOUC) ---
         const getTheme = () => {
             const hour = new Date().getHours();
             return (hour >= 8 && hour < 20) ? 'day' : 'night';
@@ -290,39 +525,1547 @@
 
         const applyTheme = (theme) => {
             document.documentElement.setAttribute('data-theme', theme);
+            if (theme === 'night') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
             const metaThemeColor = document.getElementById('theme-color-meta');
             if (metaThemeColor) {
                 metaThemeColor.content = theme === 'day' ? '#f8fafc' : '#475569';
             }
+            
+            // Update stop colors of SVG gradient
+            const stop1 = document.getElementById('iconGradientStop1');
+            const stop2 = document.getElementById('iconGradientStop2');
+            if (stop1 && stop2) {
+                if (theme === 'day') {
+                    stop1.setAttribute('stop-color', 'rgba(51, 65, 85, 0.95)');
+                    stop2.setAttribute('stop-color', 'rgba(71, 85, 105, 0.85)');
+                } else {
+                    stop1.setAttribute('stop-color', 'rgba(255, 255, 255, 0.9)');
+                    stop2.setAttribute('stop-color', 'rgba(255, 255, 255, 0.7)');
+                }
+            }
         };
 
-        // Apply theme on load
-        applyTheme(getTheme());
+        let currentTheme = getTheme();
+        applyTheme(currentTheme);
 
-        // Check and update theme every minute
+        // Check theme periodically
         setInterval(() => {
-            applyTheme(getTheme());
+            const newTheme = getTheme();
+            if (newTheme !== currentTheme) {
+                currentTheme = newTheme;
+                applyTheme(currentTheme);
+            }
         }, 60000);
 
-        // --- Reusable Icon Gradient Definition ---
-        const IconDefs = () => {
-            const theme = getTheme();
-            const fromColor = theme === 'day' ? 'rgba(51, 65, 85, 0.95)' : 'rgba(255, 255, 255, 0.9)';
-            const toColor = theme === 'day' ? 'rgba(71, 85, 105, 0.85)' : 'rgba(255, 255, 255, 0.7)';
-            return (
-                <defs>
-                    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor={fromColor} />
-                        <stop offset="100%" stopColor={toColor} />
-                    </linearGradient>
-                </defs>
+        // --- Bilingual Content Definitions & Translations ---
+        const TRANSLATIONS = {
+            en: {
+                heroSubtitle: "Resort Information & Services",
+                recentlyViewedTitle: "Recently viewed:",
+                installBtnText: "Add to Home Screen",
+                offlineBannerText: "Offline Mode",
+                closeDialog: "Close dialog",
+                closeImage: "Close image",
+                mapLoading: "Loading Trail...",
+                mapDistance: "Distance",
+                mapType: "Type",
+                mapOfflineNotice: "⚠️ Working Offline - Cached Trail Path Only",
+                mapLocationError: "Unable to retrieve your location.",
+                gpxParseError: "Could not parse trail data.",
+                gpxLoadError: "Error loading trail data. Please check your connection."
+            },
+            he: {
+                heroSubtitle: "Resort Information & Services", // Retain english branding subtitle as in original
+                recentlyViewedTitle: "Recently viewed:",
+                installBtnText: "הוסף למסך הבית",
+                offlineBannerText: "מצב לא מקוון",
+                closeDialog: "סגור חלון",
+                closeImage: "סגור תמונה",
+                mapLoading: "טוען מסלול...",
+                mapDistance: "מרחק",
+                mapType: "סוג",
+                mapOfflineNotice: "⚠️ עובד לא מקוון - מציג מסלול שמור בלבד",
+                mapLocationError: "לא ניתן לאתר את המיקום שלך.",
+                gpxParseError: "שגיאה בפענוח נתוני המסלול.",
+                gpxLoadError: "שגיאה בטעינת המסלול. אנא בדוק את החיבור."
+            }
+        };
+
+        // Real guest reviews split by original language
+        const GUEST_REVIEWS_HE = [
+            {
+                text: "“מקום מקסים, נקי ומאובזר היטב. גיא המארח היה מדהים ועזר לנו בכל דבר. המרפסת משקיפה לנוף מהמם של הרי אדום.”",
+                author: "אורית, Booking.com"
+            },
+            {
+                text: "“צימר נקי ברמות, מעוצב בטוב טעם ומפנק במיוחד. האירוח של גיא פשוט יוצא מן הכלל, תמיד זמין לעזור. נהנינו מכל רגע!”",
+                author: "דוד, Google Maps"
+            },
+            {
+                text: "“האירוח היה מושלם! גיא דאג לכל פרט ופרט, ארוחת הבוקר הייתה עשירה וטעימה מאוד. המקום שקט ומרגיע, מומלץ בחום!”",
+                author: "מיכל, Weekend.co.il"
+            }
+        ];
+
+        const GUEST_REVIEWS_EN = [
+            {
+                text: "“We had a wonderful stay at Grappa. The room is modern, clean, and has a great jacuzzi. Guy is an exceptional host, very friendly and helpful.”",
+                author: "Sarah, Booking.com"
+            },
+            {
+                text: "“Beautiful place, very quiet and clean. The private balcony with the grill and the views of the mountains is fantastic. Guy was super helpful with local tips.”",
+                author: "John, Google Maps"
+            },
+            {
+                text: "“Perfect desert getaway! Modern design, fully equipped kitchenette, and free access to the kibbutz pool. Guy went above and beyond to make us feel welcome.”",
+                author: "Emily, Booking.com"
+            }
+        ];
+
+        // --- Card Render Configuration ---
+        // SVGs matching original React components exactly
+        const getGateIcon = () => `
+            <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="url(#iconGradient)" style="transform: scale(1.15); transform-origin: center;">
+                <path d="M180-250v-490 490ZM434.74-80q-8.74 0-15.24-6.35Q413-92.69 413-102v-227l56-165q3-9 10.58-14.5 7.57-5.5 17.42-5.5h299q9.85 0 17.42 5.5Q821-503 824-494l56 165v227q0 9.31-6.35 15.65Q867.31-80 858-80h-22.26q-8.74 0-15.24-6.35Q814-92.69 814-102v-45H479v45q0 9.31-6.35 15.65Q466.31-80 457-80h-22.26ZM466-359h361l-38.06-115H504l-38 115Zm74 146q16.58 0 27.79-11.21Q579-235.43 579-252q0-16.58-11.21-27.79T540-291q-16.58 0-27.79 11.21T501-252q0 16.57 11.21 27.79Q523.42-213 540-213Zm213 0q16.58 0 27.79-11.21Q792-235.43 792-252q0-16.58-11.21-27.79T753-291q-16.58 0-27.79 11.21T714-252q0 16.57 11.21 27.79Q736.42-213 753-213Zm-300 26h387v-132H453v132ZM40-160v-90h80v-490q0-24.75 17.63-42.38Q155.25-800 180-800h560q24.75 0 42.38 17.62Q800-764.75 800-740v166h-60v-166H180v490h173v90H40Zm413-27v-132 132Z"/>
+            </svg>
+        `;
+        const getWifiIcon = () => `
+            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)">
+                <path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/>
+            </svg>
+        `;
+        const getTvIcon = () => `
+            <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="url(#iconGradient)" style="transform: scale(1.15); transform-origin: center;">
+                <path d="M320-320h60v-250h123l97 250h60l120-310h-70l-80 209-80-209H180v60h140v250ZM180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Zm0-600v600-600Z"/>
+            </svg>
+        `;
+        const getGroceryIcon = () => `
+            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)">
+                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+        `;
+        const getPoolIcon = () => `
+            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)">
+                <path d="M22 21c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36C18.22 20.63 17.6 21 16.5 21s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36C11.56 20.63 10.95 21 9.83 21c-1.11 0-1.73-.37-2.18-.64-.37-.23-.6-.36-1.15-.36s-.78.13-1.15.36C4.9 20.63 4.29 21 3.17 21v-2c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36v2zm0-4.5c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.23-.6-.36-1.15-.36s-.78.13-1.15.36C4.34 14.63 3.72 15 2.61 15v-2c.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36v2zM8.67 12c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.23.6.36 1.15.36s.78-.13 1.15-.36c.12-.07.26-.15.41-.23L10.48 5C8.93 3.45 7.5 2.99 5 3v2.5c1.82-.01 2.89.39 4 1.5l1 1-3.25 3.25c.31.12.56.27.77.39.37.23.59.36 1.15.36z"/><circle cx="16.5" cy="5.5" r="2.5"/></svg>
+        `;
+        const getSpaIcon = () => `<span class="material-symbols-outlined icon-gradient-text" style="font-size: 32px;">spa</span>`;
+        const getRestaurantIcon = () => `
+            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)">
+                <path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/>
+            </svg>
+        `;
+        const getMapIcon = () => `
+            <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="url(#iconGradient)" style="transform: scale(1.15); transform-origin: center;">
+                <path d="m282-40 121-620q5-24 23-37t38-13q20 0 37.5 9t28.5 26l39 64q19 32 52.5 57t78.5 39v-75h40v550h-40v-414q-51-11-96-39t-80-69l-29 145 85 81v296h-60v-244l-100-95-74 339h-64Zm17-403-75-14q-10-2-17.5-13t-5.5-22l30-157q5-29 29-44.5t53-10.5l36 7-50 254Zm231-311q-30 0-51.5-21.5T457-827q0-30 21.5-51.5T530-900q30 0 51.5 21.5T603-827q0 30-21.5 51.5T530-754Z"/>
+            </svg>
+        `;
+        const getTrailServicesIcon = () => `
+            <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="url(#iconGradient)" style="transform: scale(1.15); transform-origin: center;">
+                <path d="M480-80q-106 0-173-31t-67-79q0-26 23-49.5t63-38.5l45 42q-20 5-39 18.5T299-190q17 20 70.5 35T480-140q57 0 111-15t71-35q-14-15-35-28t-41-18l46-42q42 15 65 38.5t23 49.5q0 48-67 79T480-80Zm1-195q109-81 164-164t55-155q0-112-71-169t-149-57q-77 0-148.5 57T260-594q0 73 55 152t166 167Zm-1 75Q340-304 270-402t-70-192q0-71 25.5-124.5t66-89.5q40.5-36 90-54t98.5-18q49 0 99 18t90 54q40 36 65.5 89.5T760-594q0 94-69.5 192T480-200Zm0-320q33 0 56.5-23.5T560-600q0-33-23.5-56.5T480-680q-33 0-56.5 23.5T400-600q0 33 23.5 56.5T480-520Zm0-80Z"/>
+            </svg>
+        `;
+        const getCheckoutIcon = () => `<span class="material-symbols-outlined icon-gradient-text" style="font-size: 32px;">logout</span>`;
+        const getStarIcon = () => `<span class="material-symbols-outlined icon-gradient-text" style="font-variation-settings: 'FILL' 1; font-size: 32px;">star</span>`;
+
+        const CARDS_CONFIG = [
+            { id: 'gate', title: 'Gate Access', getIcon: getGateIcon, gradient: 'from-slate-100/50 to-slate-200/50', gradientNight: 'from-gray-800/70 via-white/10 to-slate-900/70' },
+            { id: 'wifi', title: 'WiFi Access', getIcon: getWifiIcon, gradient: 'from-slate-100/50 to-slate-200/50', gradientNight: 'from-slate-900/70 via-gray-200/12 to-gray-800/70' },
+            { id: 'tv', title: 'Entertainment', getIcon: getTvIcon, gradient: 'from-slate-100/50 to-slate-200/50', gradientNight: 'from-gray-900/70 via-white/12 to-slate-700/70' },
+            { id: 'grocery', title: 'Grocery Store', getIcon: getGroceryIcon, gradient: 'from-slate-100/50 to-slate-200/50', gradientNight: 'from-slate-700/70 via-gray-300/10 to-gray-900/70' },
+            { id: 'pool', title: 'Swimming Pool', getIcon: getPoolIcon, gradient: 'from-slate-100/50 to-slate-200/50', gradientNight: 'from-slate-800/70 via-white/20 to-slate-900/70' },
+            { id: 'spa', title: 'Spa & Wellness', getIcon: getSpaIcon, gradient: 'from-slate-100/50 to-slate-200/50', gradientNight: 'from-gray-700/70 via-gray-100/8 to-slate-900/70' },
+            { id: 'sushi', title: 'Sushi Restaurant', getIcon: getRestaurantIcon, gradient: 'from-slate-100/50 to-slate-200/50', gradientNight: 'from-gray-800/70 via-white/15 to-gray-700/70' },
+            { id: 'trips', title: 'Local Hikes', getIcon: getMapIcon, gradient: 'from-slate-100/50 to-slate-200/50', gradientNight: 'from-slate-800/70 via-gray-100/15 to-gray-900/70' },
+            { id: 'trail_services', title: 'Trail Services', getIcon: getTrailServicesIcon, gradient: 'from-slate-100/50 to-slate-200/50', gradientNight: 'from-gray-700/70 via-white/8 to-slate-800/70' },
+            { id: 'reviews', title: 'Rate Us & Reviews', getIcon: getStarIcon, gradient: 'from-slate-100/50 to-slate-200/50', gradientNight: 'from-slate-800/70 via-white/15 to-slate-900/70' },
+            { id: 'checkout', title: 'Check-out Info', getIcon: getCheckoutIcon, gradient: 'from-slate-100/50 to-slate-200/50', gradientNight: 'from-gray-900/70 via-white/12 to-slate-700/70' }
+        ];
+
+        // --- App State ---
+        let language = localStorage.getItem('preferredLanguage') || null;
+        let lastVisited = JSON.parse(sessionStorage.getItem('lastVisited') || '[]');
+        let deferredPrompt = null;
+        let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+        // --- Helper: Build Card Contents dynamically to preserve bilingual layouts ---
+        const getCardContent = (id, lang) => {
+            const isHe = lang === 'he';
+            const alignClass = isHe ? "text-right" : "text-left";
+            const dirAttr = isHe ? "rtl" : "ltr";
+            const containerTheme = currentTheme === 'day' ? "bg-slate-50 border-slate-200" : "bg-slate-800/50 border-slate-600";
+            const boxTheme = currentTheme === 'day' ? "bg-white border-slate-100 text-slate-800" : "bg-slate-900/50 border-slate-700 text-white";
+            const inputBgTheme = currentTheme === 'day' ? "bg-slate-100 border-slate-200" : "bg-slate-800/50 border-slate-700";
+            const textSecondaryTheme = currentTheme === 'day' ? "text-slate-600" : "text-white";
+            const labelColorTheme = currentTheme === 'day' ? "text-slate-500" : "rgba(255,255,255,0.8)";
+            const valueColorTheme = currentTheme === 'day' ? "text-slate-800" : "#ffffff";
+
+            switch(id) {
+                case 'gate':
+                    return `
+                        <div class="${alignClass}" dir="${dirAttr}">
+                            <p class="mb-6 leading-relaxed ${textSecondaryTheme}">
+                                ${isHe 
+                                    ? "זהו קישור להורדת אפליקציה לפתיחת שער הקיבוץ. יש להתקין את האפליקציה, למלא אחר ההנחיות ואז ניתן לפתוח את השער בעצמך. צריך להתקרב ממש אל השער, כמעט להצמד, ואז ללחוץ על פתיחת השער באפליקציה."
+                                    : "This is a link to download the kibbutz gate opening app. Install the app, follow the instructions, and you'll be able to open the gate yourself. You need to get very close to the gate, almost touching it, then press the gate opening button in the app."}
+                            </p>
+                            <div class="space-y-4">
+                                <a href="https://goo.gl/fZTz4u" target="_blank" rel="noopener noreferrer" class="block bg-slate-800 text-white px-6 py-4 rounded-lg text-center hover:bg-slate-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold btn-premium haptic flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">phone_iphone</span>iPhone App
+                                </a>
+                                <a href="https://goo.gl/Giopvd" target="_blank" rel="noopener noreferrer" class="block bg-green-600 text-white px-6 py-4 rounded-lg text-center hover:bg-green-500 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold btn-premium haptic flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">android</span>Android App
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                case 'wifi':
+                    return `
+                        <div class="text-center">
+                            <div class="p-8 rounded-xl border ${containerTheme}">
+                                <div class="p-6 rounded-xl shadow-inner border space-y-5 ${boxTheme}">
+                                    <h4 class="font-bold text-2xl mb-2">${isHe ? "חיבור ל-WiFi" : "WiFi Connection"}</h4>
+                                    <div class="p-4 rounded-lg border ${inputBgTheme}">
+                                        <span class="font-semibold block mb-2 text-sm ${labelColorTheme}">${isHe ? "שם הרשת:" : "Network Name:"}</span>
+                                        <p class="text-2xl font-mono font-bold select-all ${valueColorTheme}">GrappA Fiber</p>
+                                    </div>
+                                    <div class="p-4 rounded-lg border ${inputBgTheme}">
+                                        <span class="font-semibold block mb-2 text-sm ${labelColorTheme}">${isHe ? "סיסמה:" : "Password:"}</span>
+                                        <p class="text-2xl font-mono font-bold select-all ${valueColorTheme}">grappA321</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                case 'tv':
+                    return `
+                        <div class="space-y-6 ${alignClass}" dir="${dirAttr}">
+                            <div class="p-6 rounded-xl border ${containerTheme}">
+                                <h4 class="font-bold text-2xl mb-4 flex items-center justify-center gap-2 text-slate-800 dark:text-white"><span class="text-3xl">🏰</span> Disney+</h4>
+                                <div class="p-5 rounded-xl shadow-sm border space-y-4 ${boxTheme}">
+                                    <div class="p-3 rounded-lg border ${inputBgTheme} flex justify-between items-center">
+                                        <span class="font-semibold ${labelColorTheme}">Profile:</span>
+                                        <span class="font-mono text-lg font-bold ${valueColorTheme}">GrappA</span>
+                                    </div>
+                                    <div class="p-3 rounded-lg border ${inputBgTheme} flex justify-between items-center">
+                                        <span class="font-semibold ${labelColorTheme}">PIN:</span>
+                                        <span class="font-mono text-lg font-bold ${valueColorTheme}">4114</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-6 rounded-xl border ${containerTheme}">
+                                <h4 class="font-bold text-2xl mb-4 flex items-center justify-center gap-2 text-slate-800 dark:text-white"><span class="text-3xl">🎬</span> Netflix</h4>
+                                <div class="p-5 rounded-xl shadow-sm border ${boxTheme}">
+                                    <div class="p-3 rounded-lg border ${inputBgTheme} flex justify-between items-center">
+                                        <span class="font-semibold ${labelColorTheme}">Profile:</span>
+                                        <span class="font-mono text-lg font-bold ${valueColorTheme}">GrappA</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                case 'grocery':
+                    return `
+                        <div class="space-y-6 ${alignClass}" dir="${dirAttr}">
+                            <div class="p-6 rounded-xl border ${containerTheme}">
+                                <h4 class="font-bold text-2xl text-center mb-6 text-slate-800 dark:text-white">
+                                    ${isHe ? 'המרכולית' : 'The Grocery Store'}
+                                </h4>
+                                <div class="p-2 rounded-xl shadow-sm border mb-4 bg-white/70 dark:bg-slate-900/50 dark:border-slate-700">
+                                    <img src="./Grocery_hours.jpg" alt="Grocery store hours" class="w-full rounded-lg cursor-pointer" onclick="openZoomImage('./Grocery_hours.jpg')" />
+                                </div>
+                                <a href="https://maps.app.goo.gl/ZQu19jrZTdUjW7pF6" target="_blank" rel="noopener noreferrer" class="block bg-slate-600 hover:bg-slate-700 text-white px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                                    Google Maps
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                case 'pool':
+                    return `
+                        <div class="space-y-6 ${alignClass}" dir="${dirAttr}">
+                            <div class="p-6 rounded-xl border ${containerTheme}">
+                                <h4 class="font-bold text-2xl text-center mb-2 flex items-center justify-center gap-2 text-slate-800 dark:text-white">
+                                    <span class="text-3xl">🏊‍♂️</span> ${isHe ? 'הבריכה' : 'The Pool'}
+                                </h4>
+                                <p class="text-sm text-center mb-4 ${textSecondaryTheme}">
+                                    ${isHe ? 'עונת הרחצה מתחילה בפסח ונגמרת אחרי סוכות' : 'The bathing season begins on Passover and ends after Sukkot'}
+                                </p>
+                                <div class="p-2 rounded-xl shadow-sm border mb-4 bg-white/70 dark:bg-slate-900/50 dark:border-slate-700">
+                                    <img src="./swiming_pool_instructions.png?v=4" alt="Pool hours" class="w-full rounded-lg cursor-pointer" onclick="openZoomImage('./swiming_pool_instructions.png?v=4')" />
+                                </div>
+                                <a href="https://maps.app.goo.gl/2DS7aXFMvxGATqcY8" target="_blank" rel="noopener noreferrer" class="block bg-slate-600 hover:bg-slate-700 text-white px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                                    Google Maps
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                case 'spa':
+                    return `
+                        <div class="space-y-6 ${alignClass}" dir="${dirAttr}">
+                            <div class="p-8 rounded-xl border ${containerTheme}">
+                                <h4 class="font-bold text-3xl mb-4 text-center text-slate-800 dark:text-white">
+                                    ${isHe ? 'שירותי ספא' : 'Spa Services'}
+                                </h4>
+                                <p class="text-lg mb-6 text-center ${textSecondaryTheme}">
+                                    ${isHe ? 'להזמנת טיפולים, אנא צרו קשר עם דפנה.' : 'To book treatments, please contact Dafna.'}
+                                </p>
+                                <div class="p-5 rounded-xl shadow-sm border space-y-4 text-center ${boxTheme}">
+                                    <p class="font-medium text-xl">
+                                        <span class="font-semibold">${isHe ? 'דפנה: ' : 'Dafna: '}</span>
+                                        <a href="tel:050-555-1383" class="text-blue-600 hover:text-blue-700 hover:underline font-bold">050-555-1383</a>
+                                    </p>
+                                    <div class="rounded-lg shadow-sm border border-slate-200/50 bg-white/70 p-2 dark:bg-slate-900/50 dark:border-slate-700">
+                                        <img src="https://i.imgur.com/5vg5NXj.png" alt="info" class="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onclick="openZoomImage('https://i.imgur.com/5vg5NXj.png')" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                case 'sushi':
+                    return `
+                        <div class="space-y-6 ${alignClass}" dir="${dirAttr}">
+                            <div class="p-6 rounded-xl border ${containerTheme}">
+                                <h4 class="font-bold mb-6 text-2xl text-center flex items-center justify-center gap-2 text-slate-800 dark:text-white">
+                                    <span class="text-3xl">🍣</span> ${isHe ? 'מסעדת הסושי' : 'The Sushi Restaurant'}
+                                </h4>
+                                <div class="p-4 rounded-xl shadow-sm border bg-white/70 dark:bg-slate-900/50 dark:border-slate-700">
+                                    <img src="https://i.imgur.com/ChMRT7d.jpg" alt="Sushi Menu" class="w-full rounded-lg cursor-pointer shadow-md" onclick="openZoomImage('https://i.imgur.com/ChMRT7d.jpg')" />
+                                    <p class="text-sm mt-3 text-center font-semibold text-slate-500 dark:text-slate-400">
+                                        ${isHe ? 'תפריט מלא עם מחירים' : 'Full Menu with Prices'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                case 'trips':
+                    return `
+                        <div class="space-y-6 ${alignClass}" dir="${dirAttr}">
+                            <div class="p-4 rounded-lg border ${containerTheme}">
+                                <h4 class="font-bold mb-3 text-lg text-slate-800 dark:text-white">
+                                    ${isHe ? 'אפליקציית ניווט' : 'Navigation Apps'}
+                                </h4>
+                                <div class="space-y-3">
+                                    <a href="https://play.google.com/store/apps/details?id=altitude.alarm.erol.apps" target="_blank" rel="noopener noreferrer" class="block bg-green-600 hover:bg-green-500 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md flex items-center justify-center gap-2">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">android</span>
+                                        ALTLAS app
+                                    </a>
+                                    <a href="https://apps.apple.com/us/app/alltrails-hike-bike-run/id405075943" target="_blank" rel="noopener noreferrer" class="block bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md flex items-center justify-center gap-2">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">phone_iphone</span>
+                                        AllTrails app
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="p-4 rounded-lg border ${containerTheme}">
+                                <h4 class="font-bold mb-3 text-lg text-slate-800 dark:text-white">
+                                    ${isHe ? 'מיקום השער למסלולים' : 'Trail Gate Location'}
+                                </h4>
+                                <a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" class="block bg-slate-600 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">Google Maps</a>
+                            </div>
+                            <div class="p-4 rounded-lg border ${containerTheme}">
+                                <h4 class="font-bold mb-3 text-lg flex items-center justify-center gap-2 text-slate-800 dark:text-white">
+                                    <span class="material-symbols-outlined" style="font-size: 24px;">download</span>
+                                    ${isHe ? 'מסלולים להורדה וניווט' : 'Download & View Trails'}
+                                </h4>
+                                <div class="space-y-4">
+                                    <!-- Dynamic Map Buttons & Downloads -->
+                                    <div class="p-3 border rounded-xl bg-white/40 dark:bg-slate-900/30 border-slate-200/50 dark:border-slate-700/50 space-y-2">
+                                        <p class="font-bold text-sm text-slate-800 dark:text-slate-200">${isHe ? 'מסלול 5 ק"מ להר הלבן ולבולבוסים' : '5km Trail to White Mountain and Bulbous Rocks'}</p>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <button onclick="handleViewTrail('5km Bulbous Mountain Trail', './walk_to_the_bulbouse_mountain.gpx', '5.0 km')" class="bg-blue-600 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-blue-500 transition-all flex items-center justify-center gap-1 shadow-md haptic">
+                                                <span class="material-symbols-outlined" style="font-size: 14px;">map</span>${isHe ? 'מפה' : 'View Map'}
+                                            </button>
+                                            <a href="./walk_to_the_bulbouse_mountain.gpx" download="Bulbous_Mountain_Trail.gpx" class="bg-slate-700 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-slate-600 transition-all flex items-center justify-center gap-1 shadow-md haptic">
+                                                <span class="material-symbols-outlined" style="font-size: 14px;">download</span>${isHe ? 'הורד GPX' : 'GPX'}
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3 border rounded-xl bg-white/40 dark:bg-slate-900/30 border-slate-200/50 dark:border-slate-700/50 space-y-2">
+                                        <p class="font-bold text-sm text-slate-800 dark:text-slate-200">${isHe ? 'מסלול להר הגבוה 14 ק"מ' : '14km Trail to the High Mountain'}</p>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <button onclick="handleViewTrail('14km High Mountain Trail', './Zepp20230405100344.gpx', '14.0 km')" class="bg-blue-600 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-blue-500 transition-all flex items-center justify-center gap-1 shadow-md haptic">
+                                                <span class="material-symbols-outlined" style="font-size: 14px;">map</span>${isHe ? 'מפה' : 'View Map'}
+                                            </button>
+                                            <a href="./Zepp20230405100344.gpx" download="14km_trip_to_the_mountains.gpx" class="bg-slate-700 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-slate-600 transition-all flex items-center justify-center gap-1 shadow-md haptic">
+                                                <span class="material-symbols-outlined" style="font-size: 14px;">download</span>${isHe ? 'הורד GPX' : 'GPX'}
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3 border rounded-xl bg-white/40 dark:bg-slate-900/30 border-slate-200/50 dark:border-slate-700/50 space-y-2">
+                                        <p class="font-bold text-sm text-slate-800 dark:text-slate-200">${isHe ? 'מסלול אל נופי הדרום והמערב 12 ק"מ' : '12km Trail to Southern and Western Views'}</p>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <button onclick="handleViewTrail('12km South & West Trail', './Zepp20230118153553.gpx', '12.0 km')" class="bg-blue-600 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-blue-500 transition-all flex items-center justify-center gap-1 shadow-md haptic">
+                                                <span class="material-symbols-outlined" style="font-size: 14px;">map</span>${isHe ? 'מפה' : 'View Map'}
+                                            </button>
+                                            <a href="./Zepp20230118153553.gpx" download="12km_trip_to_mountains.gpx" class="bg-slate-700 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-slate-600 transition-all flex items-center justify-center gap-1 shadow-md haptic">
+                                                <span class="material-symbols-outlined" style="font-size: 14px;">download</span>${isHe ? 'הורד GPX' : 'GPX'}
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-3 border rounded-xl bg-white/40 dark:bg-slate-900/30 border-slate-200/50 dark:border-slate-700/50 space-y-2">
+                                        <p class="font-bold text-sm text-slate-800 dark:text-slate-200">${isHe ? 'מסלול אל נופי הדרום 12 ק"מ' : '12km Trail to Southern Views'}</p>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <button onclick="handleViewTrail('12km Southern Views Trail', './12km_walk.gpx', '12.0 km')" class="bg-blue-600 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-blue-500 transition-all flex items-center justify-center gap-1 shadow-md haptic">
+                                                <span class="material-symbols-outlined" style="font-size: 14px;">map</span>${isHe ? 'מפה' : 'View Map'}
+                                            </button>
+                                            <a href="./12km_walk.gpx" download="12km_trip.gpx" class="bg-slate-700 text-white text-xs font-bold py-2 px-3 rounded-lg hover:bg-slate-600 transition-all flex items-center justify-center gap-1 shadow-md haptic">
+                                                <span class="material-symbols-outlined" style="font-size: 14px;">download</span>${isHe ? 'הורד GPX' : 'GPX'}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                case 'trail_services':
+                    return `
+                        <div class="space-y-6 ${alignClass}" dir="${dirAttr}">
+                            <div class="p-6 rounded-xl border ${containerTheme}">
+                                <h4 class="font-bold mb-4 text-lg text-center text-slate-800 dark:text-white">
+                                    ${isHe ? "טיולי ג'יפים עם מר מדבר" : "Jeep Tours with Mr. Desert"}
+                                </h4>
+                                <div class="p-4 rounded-xl shadow-sm border space-y-3 text-center ${boxTheme}">
+                                    <p class="font-medium">
+                                        <span class="font-semibold">${isHe ? 'טלפון: ' : 'Phone: '}</span>
+                                        <a href="tel:054-4249783" class="text-blue-600 hover:text-blue-700 hover:underline font-bold">054-4249783</a>
+                                    </p>
+                                    <p class="font-medium">
+                                        <span class="font-semibold">${isHe ? 'אימייל: ' : 'Email: '}</span>
+                                        <a href="mailto:marmidbar@gmail.com" class="text-blue-600 hover:text-blue-700 hover:underline font-bold">marmidbar@gmail.com</a>
+                                    </p>
+                                    <a href="https://aravadesert.co.il/marmaidbar/" target="_blank" rel="noopener noreferrer" class="!mt-4 block bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-lg text-center transition-all duration-300 haptic font-semibold shadow-md">
+                                        ${isHe ? 'לאתר האינטרנט' : 'Visit Website'}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                case 'reviews':
+                    return `
+                        <div class="${alignClass} space-y-6" dir="${dirAttr}">
+                            <div class="flex flex-col items-center">
+                                <!-- Clean Golden Stars -->
+                                <div class="flex gap-1 mb-2 text-amber-500">
+                                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 28px; color: #fbbf24;">star</span>
+                                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 28px; color: #fbbf24;">star</span>
+                                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 28px; color: #fbbf24;">star</span>
+                                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 28px; color: #fbbf24;">star</span>
+                                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 28px; color: #fbbf24;">star</span>
+                                </div>
+                                <p class="text-xs font-bold tracking-wide uppercase text-slate-500 dark:text-slate-400">5 star rating</p>
+                            </div>
+                            
+                            <!-- Testimonial Slider Container -->
+                            <div class="relative overflow-hidden rounded-xl border border-slate-200/50 bg-white/40 p-6 shadow-inner min-h-[140px] flex items-center justify-center dark:bg-slate-800/40 dark:border-slate-700/50">
+                                <div id="review-carousel" class="w-full text-center">
+                                    <!-- Injected dynamically by startReviewCarousel -->
+                                </div>
+                            </div>
+                            
+                            <!-- Actions -->
+                            <div class="space-y-4">
+                                <p class="text-base leading-relaxed ${textSecondaryTheme}">
+                                    ${isHe 
+                                        ? "אנחנו מקווים שאתם נהנים מהשהות שלכם בגראפה! אם היה לכם אירוח נפלא, נהיה אסירי תודה אם תוכלו לשתף את החוויה שלכם עם אחרים."
+                                        : "We hope you are enjoying your stay at Grappa! If you had a wonderful time, we would be incredibly grateful if you could share your experience with others."}
+                                </p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <a href="https://www.google.com/travel/hotels/entity/CgkIqtO00Y_AnlgQAQ/reviews?q=grappa%20yahel%20reviews&g2lb=4965990%2C72471280%2C72560029%2C72573224%2C72647020%2C72686036%2C72803964%2C72882230%2C73059275%2C73064764%2C121608706&hl=en-IL&gl=il&cs=1&ssta=1&ts=CAEaRwopEiUyIzB4MTUwMWE5NTMxZmFlZDg4MToweGIwN2EwMGZhMmQyOWFhGgASGhIUCgcI6g8QBRgfEgcI6g8QBhgCGAIyAhAAKgQKABoA&qs=CAE4AkIJCaopLfoAerAAQgkJqikt-gB6sAA&ictx=111&utm_campaign=sharing&utm_medium=link&utm_source=htls" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 bg-slate-800 text-white font-bold px-6 py-4 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 btn-premium haptic dark:bg-slate-700 dark:hover:bg-slate-600">
+                                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 20px;">rate_review</span>
+                                        <span>${isHe ? 'כתבו ביקורת בגוגל' : 'Write a Google Review'}</span>
+                                    </a>
+                                    <a href="https://www.booking.com/hotel/il/tsymr-grph-b-rbh-grappa.html?msockid=2d157861dcf06baf09826f35dd036ab3#tab-reviews" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 bg-slate-800 text-white font-bold px-6 py-4 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 btn-premium haptic dark:bg-slate-700 dark:hover:bg-slate-600">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">menu_book</span>
+                                        <span>${isHe ? 'קראו ביקורות ב-Booking' : 'Read Booking Reviews'}</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                case 'checkout':
+                    return `
+                        <div class="${alignClass}" dir="${dirAttr}">
+                          <div class="p-8 rounded-xl border ${containerTheme}">
+                            <h4 class="font-bold mb-4 text-2xl text-center text-slate-800 dark:text-white">
+                                ${isHe ? "הוראות צ'ק-אאוט" : "Check-out Instructions"}
+                            </h4>
+                            <div class="space-y-4 text-lg ${textSecondaryTheme}">
+                              <p>${isHe ? "זמן הצ'ק-אאוט הוא עד השעה" : "Check-out time is until"} <strong class="font-semibold text-slate-800 dark:text-white">11:00</strong> ${isHe ? "בבוקר" : "AM"}.</p>
+                              <p>${isHe ? "אנא ודאו שכל החלונות סגורים והמזגן כבוי." : "Please ensure all windows are closed and the air conditioner is turned off."}</p>
+                              <p>${isHe ? "את המפתח השאירו על השולחן וודאו שלא שכחתם דבר." : "Leave the key on the table and make sure you haven't forgotten anything."}</p>
+                              <p class="mt-6 font-semibold">${isHe ? "תודה רבה ומקווים שנהניתם!" : "Thank you and we hope you enjoyed your stay!"}</p>
+                            </div>
+                          </div>
+                        </div>
+                    `;
+                default:
+                    return '';
+            }
+        };
+
+        // iOS Install card instructions
+        const getIosInstallContent = (lang) => {
+            const isHe = lang === 'he';
+            const textSecondaryTheme = currentTheme === 'day' ? "text-slate-600" : "rgba(255,255,255,0.9)";
+            const alignClass = isHe ? "text-right" : "text-left";
+            const dirAttr = isHe ? "rtl" : "ltr";
+            return `
+                <div class="text-center space-y-4 ${alignClass}" dir="${dirAttr}">
+                    <div class="text-6xl mb-4">📱</div>
+                    <h3 class="font-bold text-xl mb-4 text-slate-800 dark:text-white">${isHe ? 'הוספה למסך הבית' : 'Add to Home Screen'}</h3>
+                    <div class="space-y-3 ${textSecondaryTheme}">
+                        <p class="flex items-start gap-2">
+                            <span class="font-bold">1.</span>
+                            <span>${isHe ? 'לחץ על כפתור השיתוף <span class="inline-block align-middle">⬆️</span> בתחתית הדפדפן (Safari)' : 'Tap the Share button <span class="inline-block align-middle">⬆️</span> at the bottom of Safari'}</span>
+                        </p>
+                        <p class="flex items-start gap-2">
+                            <span class="font-bold">2.</span>
+                            <span>${isHe ? 'גלול מטה ולחץ על "הוסף למסך הבית" <span class="inline-block align-middle">➕</span>' : 'Scroll down and tap "Add to Home Screen" <span class="inline-block align-middle">➕</span>'}</span>
+                        </p>
+                        <p class="flex items-start gap-2">
+                            <span class="font-bold">3.</span>
+                            <span>${isHe ? 'לחץ על "הוסף" (Add) בפינה הימנית העליונה' : 'Tap "Add" in the top right to install'}</span>
+                        </p>
+                    </div>
+                    <p class="text-sm mt-4 text-slate-400 dark:text-slate-500">${isHe ? 'פעולה זו מאפשרת גישה לא מקוונת וטעינה מהירה יותר!' : 'This allows offline access and faster loading!'}</p>
+                </div>
+            `;
+        };
+
+        // Browser Install instructions (Fallback)
+        const getBrowserInstallContent = (lang) => {
+            const isHe = lang === 'he';
+            const textSecondaryTheme = currentTheme === 'day' ? "text-slate-600" : "rgba(255,255,255,0.9)";
+            const alignClass = isHe ? "text-right" : "text-left";
+            const dirAttr = isHe ? "rtl" : "ltr";
+            const userAgent = navigator.userAgent.toLowerCase();
+            
+            let steps = '';
+            if (userAgent.includes('firefox')) {
+                steps = `
+                    <p class="font-semibold mb-2">Firefox:</p>
+                    <p class="flex items-start gap-2"><span class="font-bold">1.</span><span>${isHe ? 'לחץ על סמל ההתקנה ⊕ בשורת הכתובת' : 'Look for the install icon ⊕ in the address bar'}</span></p>
+                    <p class="flex items-start gap-2"><span class="font-bold">2.</span><span>${isHe ? 'בחר בהתקנה' : 'Click it and select "Install"'}</span></p>
+                `;
+            } else if (userAgent.includes('samsung')) {
+                steps = `
+                    <p class="font-semibold mb-2">Samsung Internet:</p>
+                    <p class="flex items-start gap-2"><span class="font-bold">1.</span><span>${isHe ? 'לחץ על תפריט האפשרויות (⋮) בתחתית' : 'Tap the menu button (⋮) at the bottom'}</span></p>
+                    <p class="flex items-start gap-2"><span class="font-bold">2.</span><span>${isHe ? 'בחר "הוסף דף אל" ← "מסך הבית"' : 'Select "Add page to" → "Home screen"'}</span></p>
+                `;
+            } else if (userAgent.includes('edge')) {
+                steps = `
+                    <p class="font-semibold mb-2">Microsoft Edge:</p>
+                    <p class="flex items-start gap-2"><span class="font-bold">1.</span><span>${isHe ? 'לחץ על תפריט האפשרויות (•••) בתחתית' : 'Tap the menu (•••) at the bottom'}</span></p>
+                    <p class="flex items-start gap-2"><span class="font-bold">2.</span><span>${isHe ? 'בחר "הוסף לטלפון"' : 'Select "Add to phone"'}</span></p>
+                `;
+            } else {
+                steps = `
+                    <p class="font-semibold mb-2">${isHe ? 'הדפדפן שלך:' : 'Your Browser:'}</p>
+                    <p class="flex items-start gap-2"><span class="font-bold">1.</span><span>${isHe ? 'פתח את תפריט הדפדפן (⋮ או •••)' : 'Open the browser menu (⋮ or •••)'}</span></p>
+                    <p class="flex items-start gap-2"><span class="font-bold">2.</span><span>${isHe ? 'חפש "התקן אפליקציה" או "הוסף למסך הבית"' : 'Look for "Install app" or "Add to Home screen"'}</span></p>
+                    <p class="flex items-start gap-2"><span class="font-bold">3.</span><span>${isHe ? 'עקוב אחר ההוראות להתקנה' : 'Follow the prompts to install'}</span></p>
+                `;
+            }
+
+            return `
+                <div class="text-center space-y-4 ${alignClass}" dir="${dirAttr}">
+                    <div class="text-6xl mb-4">📱</div>
+                    <h3 class="font-bold text-xl mb-4 text-slate-800 dark:text-white">${isHe ? 'הוספה למסך הבית' : 'Add to Home Screen'}</h3>
+                    <div class="space-y-3 ${textSecondaryTheme}">
+                        ${steps}
+                    </div>
+                    <p class="text-sm mt-4 text-slate-400 dark:text-slate-500">${isHe ? 'פעולה זו מאפשרת גישה לא מקוונת וטעינה מהירה יותר!' : 'This allows offline access and faster loading!'}</p>
+                </div>
+            `;
+        };
+
+        const getWelcomeContent = (lang) => {
+            const isHe = lang === 'he';
+            const alignClass = isHe ? "text-right" : "text-left";
+            const dirAttr = isHe ? "rtl" : "ltr";
+            
+            if (isHe) {
+                return `
+                    <div class="${alignClass} space-y-5" dir="${dirAttr}">
+                        <div class="space-y-5 text-lg leading-relaxed text-slate-900 dark:text-white">
+                            <p class="font-bold text-slate-950 dark:text-white">
+                                השקענו את כל הלב בעיצוב המקום, ובחרנו כל פרט בקפידה כדי להעניק לכם חופשה יוקרתית ונעימה.
+                            </p>
+                            <p class="font-semibold">
+                                כדי לעזור לנו לשמור על היחידות במצב מושלם, כך שיישארו יפהפיות גם בביקור הבא שלכם, ולמען האורחים שיגיעו אחריכם, נודה לכם אם תקפידו על הדברים הבאים:
+                            </p>
+                            <ul class="space-y-3.5 pl-0 list-none">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1 select-none font-bold">✦</span>
+                                    <span>התרווחו ותיהנו מכל הפינוקים שהיחידה מציעה (אנא השאירו את מגבות החדר, האביזרים ופריטי העיצוב בתוך היחידה).</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1 select-none font-bold">✦</span>
+                                    <span>התייחסו בעדינות ובאכפתיות לריהוט ולאלמנטים העיצוביים.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1 select-none font-bold">✦</span>
+                                    <span>שמרו על ניקיון היחידה, כדי שתישאר רעננה ומזמינה.</span>
+                                </li>
+                            </ul>
+                            <p class="font-bold text-slate-950 dark:text-white pt-3 border-t border-slate-200/50 dark:border-slate-800">
+                                תודה על האכפתיות שלכם כלפי המקום ועל כך שאתם עוזרים לנו לשמור על העסק שלנו.
+                            </p>
+                            <p class="text-xl font-extrabold text-center text-slate-950 dark:text-white pt-2">
+                                שתהיה לכם חופשה נפלאה!
+                            </p>
+                        </div>
+                        <button onclick="closeDialog()" class="w-full mt-5 bg-slate-800 text-white font-extrabold py-4 px-6 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 btn-premium haptic dark:bg-slate-700 dark:hover:bg-slate-600 text-center text-lg">
+                            לאפליקציה
+                        </button>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="${alignClass} space-y-5" dir="${dirAttr}">
+                        <div class="space-y-5 text-lg leading-relaxed text-slate-900 dark:text-white">
+                            <p class="font-bold text-slate-950 dark:text-white">
+                                We have invested our hearts into designing this space, choosing every detail to offer you a premium, unforgettable getaway.
+                            </p>
+                            <p class="font-semibold">
+                                To help us keep the units in perfect condition, ensuring they remain just as beautiful when you return to visit us, and for the travelers who follow you, we kindly ask that you:
+                            </p>
+                            <ul class="space-y-3.5 pl-0 list-none">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1 select-none font-bold">✦</span>
+                                    <span>Cozy up and enjoy all room amenities inside the unit (please keep indoor towels, accessories, and decor inside).</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1 select-none font-bold">✦</span>
+                                    <span>Treat the room’s furniture and design elements with gentle care.</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-blue-500 mt-1 select-none font-bold">✦</span>
+                                    <span>Maintain the cleanliness of your unit so it stays fresh and welcoming.</span>
+                                </li>
+                            </ul>
+                            <p class="font-bold text-slate-950 dark:text-white pt-3 border-t border-slate-200/50 dark:border-slate-800">
+                                Thank you for helping us preserving our business, by caring for this space.
+                            </p>
+                            <p class="text-xl font-extrabold text-center text-slate-950 dark:text-white pt-2">
+                                Have a wonderful stay!
+                            </p>
+                        </div>
+                        <button onclick="closeDialog()" class="w-full mt-5 bg-slate-800 text-white font-extrabold py-4 px-6 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 btn-premium haptic dark:bg-slate-700 dark:hover:bg-slate-600 text-center text-lg">
+                            To the App
+                        </button>
+                    </div>
+                `;
+            }
+        };
+
+        // --- Render UI Function ---
+        const renderUI = () => {
+            const isHe = language === 'he';
+            
+            // Set lang and direction attributes on html root
+            document.documentElement.setAttribute('lang', language || 'en');
+            document.documentElement.setAttribute('dir', 'ltr');
+            
+            // Translate top header texts
+            document.getElementById('lang-btn-text').textContent = isHe ? 'HE' : 'EN';
+            document.getElementById('hero-subtitle').textContent = TRANSLATIONS[language || 'en'].heroSubtitle;
+            document.getElementById('install-btn-text').textContent = TRANSLATIONS[language || 'en'].installBtnText;
+            document.getElementById('recently-viewed-title').textContent = TRANSLATIONS[language || 'en'].recentlyViewedTitle;
+            document.getElementById('offline-banner-text').textContent = TRANSLATIONS[language || 'en'].offlineBannerText;
+            
+            // Render Cards Grid
+            const cardsGrid = document.getElementById('cards-grid');
+            cardsGrid.innerHTML = '';
+            
+            CARDS_CONFIG.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                const isLastOdd = index === CARDS_CONFIG.length - 1 && CARDS_CONFIG.length % 2 !== 0;
+                const lastColSpan = isLastOdd ? 'col-span-2 max-w-[calc(50%-10px)] w-full mx-auto' : '';
+                cardEl.className = `${lastColSpan} glass rounded-2xl p-5 cursor-pointer shadow-lg card-hover haptic animate-scaleIn`;
+                cardEl.style.animationDelay = `${index * 0.08}s`;
+                
+                const grad = currentTheme === 'day' ? card.gradient : card.gradientNight;
+                const textCol = currentTheme === 'day' ? 'text-slate-900' : 'text-white';
+                const shadowNight = currentTheme === 'night' ? 'shadow-[0_0_20px_rgba(255,255,255,0.1)]' : '';
+                
+                // User requested review card name is strictly in English in both modes
+                const cardTitle = card.title;
+                
+                cardEl.innerHTML = `
+                    <div class="flex flex-col items-center text-center space-y-3">
+                        <div class="p-4 bg-gradient-to-br ${grad} backdrop-blur-sm rounded-2xl shadow-md icon-container border border-white/40 ${shadowNight}">
+                            ${card.getIcon()}
+                        </div>
+                        <h3 class="font-bold text-base tracking-tight ${textCol}">${cardTitle}</h3>
+                    </div>
+                `;
+                
+                cardEl.addEventListener('click', (e) => openDialogHandler(card.id));
+                cardsGrid.appendChild(cardEl);
+            });
+            
+            // Render Recently Viewed
+            renderRecentlyViewed();
+        };
+
+        const renderRecentlyViewed = () => {
+            const container = document.getElementById('recently-viewed-container');
+            const list = document.getElementById('recently-viewed-list');
+            
+            if (lastVisited.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+            
+            container.classList.remove('hidden');
+            list.innerHTML = '';
+            
+            lastVisited.forEach(id => {
+                const config = CARDS_CONFIG.find(c => c.id === id);
+                if (!config) return;
+                
+                const title = config.title; // Keep strictly in English as per card designs
+                
+                const btn = document.createElement('button');
+                btn.className = "px-3 py-1 bg-slate-100/60 backdrop-blur-sm border border-slate-200/50 rounded-full text-slate-700 text-sm hover:bg-slate-200/70 transition-all haptic dark:bg-slate-800/60 dark:border-slate-700/50 dark:text-slate-200 dark:hover:bg-slate-700/70";
+                btn.textContent = title;
+                btn.addEventListener('click', () => openDialogHandler(id));
+                list.appendChild(btn);
+            });
+        };
+
+        // --- Dialog & Modal Handlers ---
+        const openDialogHandler = (id) => {
+            if (navigator.vibrate) navigator.vibrate(50);
+            
+            if (id !== 'ios-install' && id !== 'browser-install' && id !== 'welcome') {
+                lastVisited = [id, ...lastVisited.filter(v => v !== id)].slice(0, 3);
+                sessionStorage.setItem('lastVisited', JSON.stringify(lastVisited));
+                renderRecentlyViewed();
+            }
+            
+            let title = '';
+            let content = '';
+            
+            if (id === 'welcome') {
+                title = 'Welcome to Grappa!';
+                content = getWelcomeContent(language);
+            } else if (id === 'ios-install') {
+                title = language === 'he' ? 'התקן אפליקציה' : 'Install App';
+                content = getIosInstallContent(language);
+            } else if (id === 'browser-install') {
+                title = language === 'he' ? 'התקן אפליקציה' : 'Install App';
+                content = getBrowserInstallContent(language);
+            } else {
+                const config = CARDS_CONFIG.find(c => c.id === id);
+                title = config ? config.title : '';
+                content = getCardContent(id, language);
+            }
+            
+            const modal = document.getElementById('dialog-modal');
+            const dialogTitle = document.getElementById('dialogTitle');
+            const dialogBody = document.getElementById('dialogBody');
+            const dialogContent = modal.querySelector('div');
+            
+            // Reset modal sizing to standard defaults
+            dialogContent.classList.remove('max-w-lg', 'max-w-xl', 'max-h-[90vh]', 'max-h-[95vh]', 'sm:max-h-[85vh]', 'sm:max-h-[90vh]');
+            dialogContent.classList.add('max-w-md', 'max-h-[85vh]', 'sm:max-h-[80vh]');
+            dialogTitle.style.fontSize = '';
+            
+            // 1.125x scaling for welcome modal
+            if (id === 'welcome') {
+                dialogContent.classList.remove('max-w-md', 'max-h-[85vh]', 'sm:max-h-[80vh]');
+                dialogContent.classList.add('max-w-lg', 'max-h-[90vh]', 'sm:max-h-[85vh]');
+                dialogTitle.style.fontSize = '1.6875rem'; // 27px (1.125x of 24px)
+            }
+            
+            dialogTitle.textContent = title;
+            dialogBody.innerHTML = content;
+            
+            if (language === 'he') {
+                const hasHebrew = /[\u0590-\u05FF]/.test(title);
+                dialogTitle.setAttribute('dir', hasHebrew ? 'rtl' : 'ltr');
+                dialogTitle.classList.add('text-right');
+                dialogTitle.classList.remove('text-left');
+                dialogBody.setAttribute('dir', 'rtl');
+                dialogBody.classList.add('text-right');
+                dialogBody.classList.remove('text-left');
+            } else {
+                dialogTitle.setAttribute('dir', 'ltr');
+                dialogTitle.classList.add('text-left');
+                dialogTitle.classList.remove('text-right');
+                dialogBody.setAttribute('dir', 'ltr');
+                dialogBody.classList.add('text-left');
+                dialogBody.classList.remove('text-right');
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            if (id === 'reviews') {
+                startReviewCarousel();
+            }
+        };
+
+        const closeDialog = () => {
+            const modal = document.getElementById('dialog-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            
+            if (reviewInterval) {
+                clearInterval(reviewInterval);
+                reviewInterval = null;
+            }
+        };
+
+        const openZoomImage = (src) => {
+            const modal = document.getElementById('image-modal');
+            const img = document.getElementById('zoomed-image-el');
+            img.src = src;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        };
+
+        const closeZoomImage = () => {
+            const modal = document.getElementById('image-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        // --- Leaflet Interactive Maps Implementation ---
+        let map = null;
+        let mapLayer = null;
+        let currentPolyline = null;
+        let startMarker = null;
+        let endMarker = null;
+        let locationWatcher = null;
+        let userLocMarker = null;
+        let userLocCircle = null;
+        
+        // Advanced Trail Telemetry & Compass State
+        let deviceHeading = null;
+        let wakeLock = null;
+        let activePoints = [];
+        let cumulativeDistances = [];
+        let totalTrackDistance = 0;
+        let minElevation = 0;
+        let maxElevation = 0;
+        let activeMapType = 'satellite';
+
+        // Screen Wake Lock API to prevent the screen from turning off while on a trail
+        const requestWakeLock = async () => {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log("Screen Wake Lock is active");
+                }
+            } catch (err) {
+                console.warn("Wake Lock request failed:", err);
+            }
+        };
+
+        const releaseWakeLock = () => {
+            if (wakeLock) {
+                wakeLock.release()
+                    .then(() => {
+                        wakeLock = null;
+                        console.log("Screen Wake Lock released");
+                    })
+                    .catch(err => console.warn("Wake Lock release failed:", err));
+            }
+        };
+
+        // Haversine formula to compute distance in km
+        const getDistance = (lat1, lon1, lat2, lon2) => {
+            const R = 6371; // Earth radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        };
+
+        // Find the index and distance of the nearest GPX point to a user location
+        const findClosestPoint = (userLat, userLon) => {
+            let minD = Infinity;
+            let closestIdx = -1;
+            for (let i = 0; i < activePoints.length; i++) {
+                const d = getDistance(userLat, userLon, activePoints[i][0], activePoints[i][1]);
+                if (d < minD) {
+                    minD = d;
+                    closestIdx = i;
+                }
+            }
+            return { index: closestIdx, distance: minD }; // distance in km
+        };
+
+        // Generate Leaflet divIcon with dynamic compass rotation arrow and pulse ring
+        const getDirectionalIcon = (heading) => {
+            const rotation = heading !== null ? `transform: rotate(${heading}deg);` : 'display: none;';
+            return L.divIcon({
+                className: 'custom-user-marker',
+                html: `
+                    <div class="relative w-8 h-8 flex items-center justify-center">
+                        <div class="absolute w-6 h-6 bg-blue-500/30 rounded-full animate-ping"></div>
+                        <svg class="absolute w-8 h-8 transition-transform duration-200" style="${rotation} top: 0; left: 0;" viewBox="0 0 32 32">
+                            <path d="M 16 2 L 24 12 L 18 10 L 18 30 L 14 30 L 14 10 L 8 12 Z" fill="#3b82f6" opacity="0.9" />
+                        </svg>
+                        <div class="absolute w-4 h-4 bg-blue-500 border-2 border-white rounded-full shadow-md z-10"></div>
+                    </div>
+                `,
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
+            });
+        };
+
+        // Generate SVG elevation profile path chart
+        const generateElevationSvg = () => {
+            if (activePoints.length < 2) return '';
+            const isHe = language === 'he';
+            
+            let pathData = `M 0 60 L 0 ${55 - ((activePoints[0][2] - minElevation) / (maxElevation - minElevation || 1)) * 50}`;
+            let lineData = `M 0 ${55 - ((activePoints[0][2] - minElevation) / (maxElevation - minElevation || 1)) * 50}`;
+            
+            const svgStep = Math.max(1, Math.floor(activePoints.length / 100));
+            for (let i = 1; i < activePoints.length; i += svgStep) {
+                const x = (cumulativeDistances[i] / totalTrackDistance) * 400;
+                const y = 55 - ((activePoints[i][2] - minElevation) / (maxElevation - minElevation || 1)) * 50;
+                pathData += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
+                lineData += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
+            }
+            
+            const xLast = 400;
+            const yLast = 55 - ((activePoints[activePoints.length - 1][2] - minElevation) / (maxElevation - minElevation || 1)) * 50;
+            pathData += ` L ${xLast} ${yLast.toFixed(1)} L 400 60 Z`;
+            lineData += ` L ${xLast} ${yLast.toFixed(1)}`;
+            
+            return `
+                <div class="relative">
+                    <svg class="w-full h-12 overflow-visible" viewBox="0 0 400 60" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="eleGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3"></stop>
+                                <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0"></stop>
+                            </linearGradient>
+                        </defs>
+                        <!-- Grid lines -->
+                        <line x1="0" y1="5" x2="400" y2="5" stroke="rgba(255,255,255,0.08)" stroke-dasharray="2,2" />
+                        <line x1="0" y1="30" x2="400" y2="30" stroke="rgba(255,255,255,0.08)" stroke-dasharray="2,2" />
+                        <line x1="0" y1="55" x2="400" y2="55" stroke="rgba(255,255,255,0.08)" stroke-dasharray="2,2" />
+                        
+                        <!-- Filled Area -->
+                        <path d="${pathData}" fill="url(#eleGrad)" />
+                        <!-- Top Line -->
+                        <path d="${lineData}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" />
+                        
+                        <!-- User progress dot -->
+                        <circle id="ele-user-dot" cx="-10" cy="-10" r="5" fill="#10b981" stroke="#ffffff" stroke-width="1.5" class="hidden animate-pulse" />
+                    </svg>
+                    <div class="flex justify-between text-[9px] text-slate-400 dark:text-slate-500 mt-1 font-bold">
+                        <span>${minElevation.toFixed(0)}m (${isHe ? 'מינימום' : 'Min'})</span>
+                        <span id="ele-progress-label">${isHe ? 'התקדמות' : 'Progress'}: 0%</span>
+                        <span>${maxElevation.toFixed(0)}m (${isHe ? 'מקסימום' : 'Max'})</span>
+                    </div>
+                </div>
+            `;
+        };
+
+        const toggleMapLayer = () => {
+            if (!map) return;
+            activeMapType = activeMapType === 'satellite' ? 'streets' : 'satellite';
+            
+            if (mapLayer) {
+                map.removeLayer(mapLayer);
+            }
+            
+            if (activeMapType === 'satellite') {
+                mapLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    maxZoom: 19
+                }).addTo(map);
+                document.getElementById('map-layer-btn').querySelector('span').textContent = 'map';
+                document.getElementById('map-layer-btn').setAttribute('aria-label', 'Toggle Street Map');
+            } else {
+                mapLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19
+                }).addTo(map);
+                document.getElementById('map-layer-btn').querySelector('span').textContent = 'public';
+                document.getElementById('map-layer-btn').setAttribute('aria-label', 'Toggle Satellite Map');
+            }
+            
+            mapLayer.on('tileerror', function() {
+                document.getElementById('map-container').classList.add('offline-map-grid');
+            });
+        };
+
+        const toggleElevationProfile = () => {
+            const section = document.getElementById('map-elevation-section');
+            const chevron = document.getElementById('map-ele-toggle');
+            if (section.classList.contains('hidden')) {
+                section.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                section.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        };
+
+        const parseGPX = (gpxText) => {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(gpxText, "text/xml");
+            const trkpts = xmlDoc.getElementsByTagName("trkpt");
+            const points = [];
+            for (let i = 0; i < trkpts.length; i++) {
+                const lat = parseFloat(trkpts[i].getAttribute("lat"));
+                const lon = parseFloat(trkpts[i].getAttribute("lon"));
+                const eleEl = trkpts[i].getElementsByTagName("ele")[0];
+                const ele = eleEl ? parseFloat(eleEl.textContent) : 0.0;
+                if (!isNaN(lat) && !isNaN(lon)) {
+                    points.push([lat, lon, isNaN(ele) ? 0.0 : Math.round(ele * 10) / 10]);
+                }
+            }
+            return points;
+        };
+
+        const handleViewTrail = (trailName, gpxUrl, distance) => {
+            // Close Hikes detail dialog
+            closeDialog();
+            
+            // Request Screen Wake Lock
+            requestWakeLock();
+            
+            // Open Map Modal
+            const mapModal = document.getElementById('map-modal');
+            mapModal.classList.remove('hidden');
+            mapModal.classList.add('flex');
+            
+            // Set bottom panel texts
+            const isHe = language === 'he';
+            document.getElementById('map-trail-title').textContent = trailName;
+            document.getElementById('map-trail-subtitle').textContent = isHe ? 'מסלול הליכה' : 'Hiking Route';
+            document.getElementById('map-lbl-distance').textContent = isHe ? 'מרחק' : 'Distance';
+            document.getElementById('map-lbl-speed').textContent = isHe ? 'מהירות' : 'Speed';
+            document.getElementById('map-lbl-elevation').textContent = isHe ? 'גובה' : 'Elevation';
+            document.getElementById('map-loading-text').textContent = TRANSLATIONS[language || 'en'].mapLoading;
+            
+            const bottomPanel = document.getElementById('map-bottom-panel');
+            if (isHe) {
+                bottomPanel.setAttribute('dir', 'rtl');
+                bottomPanel.classList.add('text-right');
+                bottomPanel.classList.remove('text-left');
+            } else {
+                bottomPanel.setAttribute('dir', 'ltr');
+                bottomPanel.classList.add('text-left');
+                bottomPanel.classList.remove('text-right');
+            }
+            
+            // Check offline status
+            const offlineBanner = document.getElementById('map-offline-notice');
+            if (!navigator.onLine) {
+                offlineBanner.textContent = TRANSLATIONS[language || 'en'].mapOfflineNotice;
+                offlineBanner.classList.remove('hidden');
+            } else {
+                offlineBanner.classList.add('hidden');
+            }
+            
+            // Show loading spinner
+            document.getElementById('map-spinner').classList.remove('hidden');
+            
+            // Initialize Leaflet Map
+            setTimeout(() => {
+                try {
+                    if (!map) {
+                        map = L.map('map-container', {
+                            zoomControl: false,
+                            attributionControl: false
+                        });
+                        L.control.zoom({ position: 'bottomleft' }).addTo(map);
+                    }
+                    
+                    // Clear previous layer
+                    if (mapLayer) map.removeLayer(mapLayer);
+                    
+                    // Add active layer based on activeMapType
+                    if (activeMapType === 'satellite') {
+                        mapLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                            maxZoom: 19
+                        }).addTo(map);
+                        document.getElementById('map-layer-btn').querySelector('span').textContent = 'map';
+                    } else {
+                        mapLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            maxZoom: 19
+                        }).addTo(map);
+                        document.getElementById('map-layer-btn').querySelector('span').textContent = 'public';
+                    }
+                    
+                    // Fallback to simple grid if tiles fail to load
+                    mapLayer.on('tileerror', function() {
+                        document.getElementById('map-container').classList.add('offline-map-grid');
+                    });
+                    
+                    // Helper function to render path
+                    const renderPolyline = (points) => {
+                        activePoints = points;
+                        
+                        // Compute distances and elevation limits
+                        cumulativeDistances = [0];
+                        let totalDist = 0;
+                        minElevation = points[0][2] || 0;
+                        maxElevation = points[0][2] || 0;
+                        
+                        for (let i = 1; i < points.length; i++) {
+                            const d = getDistance(points[i-1][0], points[i-1][1], points[i][0], points[i][1]);
+                            totalDist += d;
+                            cumulativeDistances.push(totalDist);
+                            
+                            const ele = points[i][2] || 0;
+                            if (ele < minElevation) minElevation = ele;
+                            if (ele > maxElevation) maxElevation = ele;
+                        }
+                        totalTrackDistance = totalDist;
+                        
+                        // Render SVG Elevation Chart
+                        document.getElementById('map-elevation-chart').innerHTML = generateElevationSvg();
+                        
+                        // Set text stats
+                        document.getElementById('map-trail-distance').textContent = `${totalTrackDistance.toFixed(1)} km`;
+                        document.getElementById('map-trail-speed').textContent = '--';
+                        document.getElementById('map-trail-elevation').textContent = `${(points[0][2] || 0).toFixed(0)}m`;
+                        
+                        const badge = document.getElementById('map-status-badge');
+                        if (badge) {
+                            badge.className = "px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-full shadow-sm bg-slate-100/80 text-slate-500 border border-slate-200/50 dark:bg-slate-800/80 dark:text-slate-400 dark:border-slate-700/50";
+                            badge.textContent = isHe ? 'מעקב כבוי' : 'TRACKING OFF';
+                        }
+
+                        const latlngs = points.map(p => [p[0], p[1]]);
+
+                        if (currentPolyline) map.removeLayer(currentPolyline);
+                        if (startMarker) map.removeLayer(startMarker);
+                        if (endMarker) map.removeLayer(endMarker);
+                        
+                        currentPolyline = L.polyline(latlngs, {
+                            color: '#3b82f6',
+                            weight: 5,
+                            opacity: 0.95
+                        }).addTo(map);
+                        
+                        const startPoint = latlngs[0];
+                        const endPoint = latlngs[latlngs.length - 1];
+                        
+                        startMarker = L.circleMarker(startPoint, {
+                            radius: 8,
+                            fillColor: '#10b981',
+                            color: '#ffffff',
+                            weight: 2,
+                            fillOpacity: 1
+                        }).addTo(map).bindPopup(isHe ? 'התחלה' : 'Start Point');
+                        
+                        endMarker = L.circleMarker(endPoint, {
+                            radius: 8,
+                            fillColor: '#ef4444',
+                            color: '#ffffff',
+                            weight: 2,
+                            fillOpacity: 1
+                        }).addTo(map).bindPopup(isHe ? 'סיום' : 'Finish Point');
+                        
+                        map.fitBounds(currentPolyline.getBounds(), { padding: [40, 40] });
+                        document.getElementById('map-spinner').classList.add('hidden');
+                    };
+
+                    // Check if pre-parsed tracks exist in the loaded gpx_data.js script
+                    const cleanKey = gpxUrl.replace(/^\.\//, '');
+                    if (typeof GPX_TRACKS !== 'undefined' && GPX_TRACKS[cleanKey]) {
+                        console.log("GPX track loaded from pre-parsed GPX_TRACKS dictionary:", cleanKey);
+                        const points = GPX_TRACKS[cleanKey];
+                        if (points && points.length > 0) {
+                            renderPolyline(points);
+                            return;
+                        }
+                    }
+
+                    // Fallback 1: Direct Cache API matching check first for instant loading
+                    const loadFromCache = () => {
+                        if (window.caches) {
+                            return caches.match(gpxUrl, { ignoreSearch: true })
+                                .then(response => {
+                                    if (response) {
+                                        return response.text().then(gpxText => {
+                                            const points = parseGPX(gpxText);
+                                            if (points.length > 0) {
+                                                renderPolyline(points);
+                                                return true;
+                                            }
+                                            return false;
+                                        });
+                                    }
+                                    return false;
+                                })
+                                .catch(err => {
+                                    console.warn("Direct Cache API check failed:", err);
+                                    return false;
+                                });
+                        }
+                        return Promise.resolve(false);
+                    };
+
+                    // Fallback 2: Network load
+                    const loadFromNetwork = () => {
+                        const fetchUrl = navigator.onLine ? `${gpxUrl}?v=${Date.now()}` : gpxUrl;
+                        return fetch(fetchUrl)
+                            .then(res => {
+                                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                                return res.text();
+                            })
+                            .then(gpxText => {
+                                const points = parseGPX(gpxText);
+                                if (points.length > 0) {
+                                    renderPolyline(points);
+                                } else {
+                                    throw new Error("Parsed GPX coordinate list is empty.");
+                                }
+                            });
+                    };
+
+                    loadFromCache().then(loaded => {
+                        if (loaded) {
+                            console.log("GPX loaded instantly from Cache API");
+                            return;
+                        }
+                        
+                        // Fallback to network
+                        loadFromNetwork().catch(err => {
+                            console.warn("GPX fetch failed, trying fallback to cached URL:", err);
+                            // Fallback to cache without cache-buster parameter
+                            return fetch(gpxUrl)
+                                .then(res => {
+                                    if (!res.ok) throw new Error(`Fallback HTTP error! status: ${res.status}`);
+                                    return res.text();
+                                })
+                                .then(gpxText => {
+                                    const points = parseGPX(gpxText);
+                                    if (points.length > 0) {
+                                        renderPolyline(points);
+                                    } else {
+                                        throw new Error("Fallback parsed GPX list empty.");
+                                    }
+                                })
+                                .catch(finalErr => {
+                                    console.error("Final GPX loading error:", finalErr);
+                                    alert(TRANSLATIONS[language || 'en'].gpxLoadError + "\n\nDetails: " + finalErr.message + "\nPath: " + gpxUrl);
+                                    document.getElementById('map-spinner').classList.add('hidden');
+                                    closeMap();
+                                });
+                        });
+                    });
+                } catch(e) {
+                    console.error("Leaflet initialization crash:", e);
+                    alert("Mapping crash: " + e.message);
+                    document.getElementById('map-spinner').classList.add('hidden');
+                    closeMap();
+                }
+            }, 100);
+        };
+
+        const closeMap = () => {
+            const mapModal = document.getElementById('map-modal');
+            mapModal.classList.add('hidden');
+            mapModal.classList.remove('flex');
+            
+            // Release Screen Wake Lock
+            releaseWakeLock();
+            
+            // Clean up compass orientation listener
+            window.removeEventListener('deviceorientation', handleOrientation, true);
+            deviceHeading = null;
+            
+            if (locationWatcher) {
+                navigator.geolocation.clearWatch(locationWatcher);
+                locationWatcher = null;
+            }
+            
+            const locBtn = document.getElementById('map-location-btn');
+            locBtn.classList.remove('bg-blue-600', 'text-white');
+            locBtn.classList.add('bg-white', 'text-slate-800');
+            
+            if (userLocMarker) { map.removeLayer(userLocMarker); userLocMarker = null; }
+            if (userLocCircle) { map.removeLayer(userLocCircle); userLocCircle = null; }
+            if (currentPolyline) { map.removeLayer(currentPolyline); currentPolyline = null; }
+            if (startMarker) { map.removeLayer(startMarker); startMarker = null; }
+            if (endMarker) { map.removeLayer(endMarker); endMarker = null; }
+            
+            document.getElementById('map-container').classList.remove('offline-map-grid');
+        };
+
+        // Compass event handler
+        const handleOrientation = (e) => {
+            let heading = null;
+            if (e.webkitCompassHeading) {
+                heading = e.webkitCompassHeading;
+            } else if (e.alpha !== null) {
+                heading = 360 - e.alpha;
+            }
+            if (heading !== null) {
+                deviceHeading = Math.round(heading);
+                if (userLocMarker) {
+                    userLocMarker.setIcon(getDirectionalIcon(deviceHeading));
+                }
+            }
+        };
+
+        const toggleLocationTracking = () => {
+            const btn = document.getElementById('map-location-btn');
+            const isHe = language === 'he';
+            
+            if (locationWatcher) {
+                navigator.geolocation.clearWatch(locationWatcher);
+                locationWatcher = null;
+                
+                window.removeEventListener('deviceorientation', handleOrientation, true);
+                deviceHeading = null;
+                
+                if (userLocMarker) { map.removeLayer(userLocMarker); userLocMarker = null; }
+                if (userLocCircle) { map.removeLayer(userLocCircle); userLocCircle = null; }
+                btn.classList.remove('bg-blue-600', 'text-white');
+                btn.classList.add('bg-white', 'text-slate-800');
+                
+                // Reset stats back to trail defaults
+                document.getElementById('map-trail-distance').textContent = `${totalTrackDistance.toFixed(1)} km`;
+                document.getElementById('map-trail-speed').textContent = '--';
+                if (activePoints.length > 0) {
+                    document.getElementById('map-trail-elevation').textContent = `${(activePoints[0][2] || 0).toFixed(0)}m`;
+                }
+                
+                const badge = document.getElementById('map-status-badge');
+                if (badge) {
+                    badge.className = "px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-full shadow-sm bg-slate-100/80 text-slate-500 border border-slate-200/50 dark:bg-slate-800/80 dark:text-slate-400 dark:border-slate-700/50";
+                    badge.textContent = isHe ? 'מעקב כבוי' : 'TRACKING OFF';
+                }
+                
+                // Hide user progress dot on SVG
+                const userDot = document.getElementById('ele-user-dot');
+                if (userDot) userDot.classList.add('hidden');
+                
+                const progressLabel = document.getElementById('ele-progress-label');
+                if (progressLabel) progressLabel.textContent = `${isHe ? 'התקדמות' : 'Progress'}: 0%`;
+                
+                return;
+            }
+            
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser.");
+                return;
+            }
+            
+            // Request compass permissions on iOS if available
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            window.addEventListener('deviceorientation', handleOrientation, true);
+                        }
+                    })
+                    .catch(err => console.warn("Orientation permission denied:", err));
+            } else {
+                window.addEventListener('deviceorientation', handleOrientation, true);
+            }
+            
+            btn.classList.remove('bg-white', 'text-slate-800');
+            btn.classList.add('bg-blue-600', 'text-white');
+            
+            let lastCoords = null;
+            let lastTime = null;
+            
+            locationWatcher = navigator.geolocation.watchPosition(
+                position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const accuracy = position.coords.accuracy;
+                    const latlng = [lat, lon];
+                    
+                    // 1. Calculate speed
+                    let speedKmh = 0;
+                    const now = Date.now();
+                    if (position.coords.speed !== null && position.coords.speed >= 0) {
+                        speedKmh = position.coords.speed * 3.6;
+                    } else if (lastCoords && lastTime) {
+                        const d = getDistance(lastCoords[0], lastCoords[1], lat, lon);
+                        const dT = (now - lastTime) / 3600000;
+                        if (dT > 0 && d < 0.05) { // Filter out unrealistic jumps
+                            speedKmh = d / dT;
+                        }
+                    }
+                    lastCoords = latlng;
+                    lastTime = now;
+                    
+                    document.getElementById('map-trail-speed').textContent = speedKmh > 0.5 ? `${speedKmh.toFixed(1)} km/h` : '0.0 km/h';
+                    
+                    // 2. Nearest point analysis
+                    if (activePoints.length > 0) {
+                        const closest = findClosestPoint(lat, lon);
+                        const closestPoint = activePoints[closest.index];
+                        const currentEle = closestPoint[2] || 0;
+                        document.getElementById('map-trail-elevation').textContent = `${currentEle.toFixed(0)}m`;
+                        
+                        const completedDist = cumulativeDistances[closest.index];
+                        document.getElementById('map-trail-distance').textContent = `${completedDist.toFixed(1)} / ${totalTrackDistance.toFixed(1)} km`;
+                        
+                        // Update status badge (Off-route warnings)
+                        const distMeters = closest.distance * 1000;
+                        const badge = document.getElementById('map-status-badge');
+                        if (badge) {
+                            if (distMeters > 50) {
+                                badge.className = "px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-full shadow-sm bg-rose-500 text-white border border-rose-600 animate-pulse";
+                                badge.textContent = isHe ? `מחוץ למסלול (${distMeters.toFixed(0)}מ')` : `OFF TRAIL (${distMeters.toFixed(0)}m)`;
+                                
+                                if (navigator.vibrate) {
+                                    navigator.vibrate([200, 100, 200]);
+                                }
+                            } else {
+                                badge.className = "px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-full shadow-sm bg-emerald-500 text-white border border-emerald-600";
+                                badge.textContent = isHe ? 'על המסלול' : 'ON TRAIL';
+                            }
+                        }
+                        
+                        // Update elevation chart user progress dot
+                        const progressPercent = (completedDist / totalTrackDistance) * 100;
+                        const x = (completedDist / totalTrackDistance) * 400;
+                        const y = 55 - ((currentEle - minElevation) / (maxElevation - minElevation || 1)) * 50;
+                        
+                        const userDot = document.getElementById('ele-user-dot');
+                        if (userDot) {
+                            userDot.setAttribute('cx', x);
+                            userDot.setAttribute('cy', y);
+                            userDot.classList.remove('hidden');
+                        }
+                        
+                        const progressLabel = document.getElementById('ele-progress-label');
+                        if (progressLabel) {
+                            progressLabel.textContent = `${isHe ? 'התקדמות' : 'Progress'}: ${progressPercent.toFixed(0)}%`;
+                        }
+                    }
+                    
+                    // 3. Update map marker & circle
+                    if (!userLocMarker) {
+                        userLocMarker = L.marker(latlng, {
+                            icon: getDirectionalIcon(deviceHeading)
+                        }).addTo(map);
+                        
+                        userLocCircle = L.circle(latlng, {
+                            radius: accuracy,
+                            color: '#3b82f6',
+                            weight: 1,
+                            fillColor: '#3b82f6',
+                            fillOpacity: 0.15
+                        }).addTo(map);
+                        
+                        map.setView(latlng, Math.min(map.getZoom(), 16));
+                    } else {
+                        userLocMarker.setLatLng(latlng);
+                        userLocMarker.setIcon(getDirectionalIcon(deviceHeading));
+                        userLocCircle.setLatLng(latlng).setRadius(accuracy);
+                    }
+                },
+                err => {
+                    console.warn("Geolocation watch error:", err);
+                    alert(TRANSLATIONS[language || 'en'].mapLocationError);
+                    
+                    navigator.geolocation.clearWatch(locationWatcher);
+                    locationWatcher = null;
+                    btn.classList.remove('bg-blue-600', 'text-white');
+                    btn.classList.add('bg-white', 'text-slate-800');
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
         };
 
-        // --- Ripple Effect Function ---
+        // --- Reviews Card Carousel ---
+        let currentReviewIndex = 0;
+        let reviewInterval = null;
+
+        const startReviewCarousel = () => {
+            if (reviewInterval) clearInterval(reviewInterval);
+            
+            updateReviewSlide();
+            
+            reviewInterval = setInterval(() => {
+                currentReviewIndex = (currentReviewIndex + 1);
+                updateReviewSlide();
+            }, 6000);
+        };
+
+        const updateReviewSlide = () => {
+            const el = document.getElementById('review-carousel');
+            if (!el) return;
+            
+            // Serve language-pure reviews
+            const reviewsList = language === 'he' ? GUEST_REVIEWS_HE : GUEST_REVIEWS_EN;
+            const review = reviewsList[currentReviewIndex % reviewsList.length];
+            
+            el.style.opacity = 0;
+            setTimeout(() => {
+                el.innerHTML = `
+                    <p class="text-lg italic font-medium text-slate-800 dark:text-slate-100 mb-2 leading-relaxed">
+                        ${review.text}
+                    </p>
+                    <p class="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wide uppercase">
+                        — ${review.author}
+                    </p>
+                `;
+                el.style.opacity = 1;
+            }, 150);
+        };
+
+        // --- PWA Installation & Service Worker Integration ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(registration => console.log('ServiceWorker registered:', registration.scope))
+                    .catch(err => console.log('ServiceWorker registration failed:', err));
+            });
+        }
+
+        const handleInstallClick = async () => {
+            if (isIOS) {
+                openDialogHandler('ios-install');
+            } else if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    localStorage.setItem('pwa-installed', 'true');
+                }
+                deferredPrompt = null;
+            } else {
+                openDialogHandler('browser-install');
+            }
+        };
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            if (!window.matchMedia('(display-mode: standalone)').matches && !window.navigator.standalone) {
+                document.getElementById('install-btn').classList.remove('hidden');
+            }
+        });
+
+        // --- Material Ripple Click Effect ---
         const createRipple = (event, element) => {
-            const rippleContainer = element.querySelector('.ripple-container');
-            if (!rippleContainer) return;
+            const rippleContainer = element.querySelector('.ripple-container') || document.createElement('div');
+            if (!element.querySelector('.ripple-container')) {
+                rippleContainer.className = 'ripple-container';
+                element.appendChild(rippleContainer);
+            }
 
             const rect = element.getBoundingClientRect();
             const size = Math.max(rect.width, rect.height);
@@ -342,670 +2085,119 @@
             }, 900);
         };
 
-        // --- Icon Components (Theme-aware) ---
-        const IosIcon = () => ( <span className="material-symbols-outlined" style={{fontSize: '24px'}}>ios</span> );
-        const GateIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="url(#iconGradient)" style={{transform: "scale(1.15)", transformOrigin: "center"}}><IconDefs /><path d="M180-250v-490 490ZM434.74-80q-8.74 0-15.24-6.35Q413-92.69 413-102v-227l56-165q3-9 10.58-14.5 7.57-5.5 17.42-5.5h299q9.85 0 17.42 5.5Q821-503 824-494l56 165v227q0 9.31-6.35 15.65Q867.31-80 858-80h-22.26q-8.74 0-15.24-6.35Q814-92.69 814-102v-45H479v45q0 9.31-6.35 15.65Q466.31-80 457-80h-22.26ZM466-359h361l-38.06-115H504l-38 115Zm74 146q16.58 0 27.79-11.21Q579-235.43 579-252q0-16.58-11.21-27.79T540-291q-16.58 0-27.79 11.21T501-252q0 16.57 11.21 27.79Q523.42-213 540-213Zm213 0q16.58 0 27.79-11.21Q792-235.43 792-252q0-16.58-11.21-27.79T753-291q-16.58 0-27.79 11.21T714-252q0 16.57 11.21 27.79Q736.42-213 753-213Zm-300 26h387v-132H453v132ZM40-160v-90h80v-490q0-24.75 17.63-42.38Q155.25-800 180-800h560q24.75 0 42.38 17.62Q800-764.75 800-740v166h-60v-166H180v490h173v90H40Zm413-27v-132 132Z"/></svg> );
-        const MapIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="url(#iconGradient)" style={{transform: "scale(1.15)", transformOrigin: "center"}}><IconDefs /><path d="m282-40 121-620q5-24 23-37t38-13q20 0 37.5 9t28.5 26l39 64q19 32 52.5 57t78.5 39v-75h40v550h-40v-414q-51-11-96-39t-80-69l-29 145 85 81v296h-60v-244l-100-95-74 339h-64Zm17-403-75-14q-10-2-17.5-13t-5.5-22l30-157q5-29 29-44.5t53-10.5l36 7-50 254Zm231-311q-30 0-51.5-21.5T457-827q0-30 21.5-51.5T530-900q30 0 51.5 21.5T603-827q0 30-21.5 51.5T530-754Z"/></svg> );
-        const WifiIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg> );
-        const TvIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="url(#iconGradient)" style={{transform: "scale(1.15)", transformOrigin: "center"}}><IconDefs /><path d="M320-320h60v-250h123l97 250h60l120-310h-70l-80 209-80-209H180v60h140v250ZM180-120q-24 0-42-18t-18-42v-600q0-24 18-42t42-18h600q24 0 42 18t18 42v600q0 24-18 42t-42 18H180Zm0-60h600v-600H180v600Zm0-600v600-600Z"/></svg> );
-        const GroceryIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg> );
-        const RestaurantIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/></svg> );
-        const PoolIcon = () => ( <svg className="w-8 h-8" viewBox="0 0 24 24" fill="url(#iconGradient)"><IconDefs /><path d="M22 21c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36C18.22 20.63 17.6 21 16.5 21s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36C11.56 20.63 10.95 21 9.83 21c-1.11 0-1.73-.37-2.18-.64-.37-.23-.6-.36-1.15-.36s-.78.13-1.15.36C4.9 20.63 4.29 21 3.17 21v-2c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36v2zm0-4.5c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.23-.6-.36-1.15-.36s-.78.13-1.15.36C4.34 14.63 3.72 15 2.61 15v-2c.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36v2zM8.67 12c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.23.6.36 1.15.36s.78-.13 1.15-.36c.12-.07.26-.15.41-.23L10.48 5C8.93 3.45 7.5 2.99 5 3v2.5c1.82-.01 2.89.39 4 1.5l1 1-3.25 3.25c.31.12.56.27.77.39.37.23.59.36 1.15.36z"/><circle cx="16.5" cy="5.5" r="2.5"/></svg> );
-        const SpaIcon = () => ( <span className="material-symbols-outlined icon-gradient-text" style={{ fontSize: '32px' }}>spa</span> );
-        const TrailServicesIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px" fill="url(#iconGradient)" style={{transform: "scale(1.15)", transformOrigin: "center"}}><IconDefs /><path d="M480-80q-106 0-173-31t-67-79q0-26 23-49.5t63-38.5l45 42q-20 5-39 18.5T299-190q17 20 70.5 35T480-140q57 0 111-15t71-35q-14-15-35-28t-41-18l46-42q42 15 65 38.5t23 49.5q0 48-67 79T480-80Zm1-195q109-81 164-164t55-155q0-112-71-169t-149-57q-77 0-148.5 57T260-594q0 73 55 152t166 167Zm-1 75Q340-304 270-402t-70-192q0-71 25.5-124.5t66-89.5q40.5-36 90-54t98.5-18q49 0 99 18t90 54q40 36 65.5 89.5T760-594q0 94-69.5 192T480-200Zm0-320q33 0 56.5-23.5T560-600q0-33-23.5-56.5T480-680q-33 0-56.5 23.5T400-600q0 33 23.5 56.5T480-520Zm0-80Z"/></svg> );
-        const CheckoutIcon = () => ( <span className="material-symbols-outlined icon-gradient-text" style={{ fontSize: '32px' }}>logout</span> );
-        const CloseIcon = () => ( <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg> );
-
-        // --- Main React Component ---
-        const BnBGuestGuide = () => {
-            const { useState, useEffect } = React;
-            const [openDialog, setOpenDialog] = useState(null);
-            const [zoomedImg, setZoomedImg] = useState(null);
-            const [isLoaded, setIsLoaded] = useState(false);
-            const [isOffline, setIsOffline] = useState(!navigator.onLine);
-            const [lastVisited, setLastVisited] = useState([]);
-            const [currentTheme, setCurrentTheme] = useState(getTheme());
-            const [deferredPrompt, setDeferredPrompt] = useState(null);
-            const [isIOS, setIsIOS] = useState(false);
-            const [isInstalled, setIsInstalled] = useState(false);
-            const [language, setLanguage] = useState(localStorage.getItem('preferredLanguage') || null);
-            const [showLanguageModal, setShowLanguageModal] = useState(false);
-
-            useEffect(() => {
-                setTimeout(() => {
-                    const ls = document.getElementById('loading-screen');
-                    if(ls) { ls.style.opacity = '0'; setTimeout(() => { ls.style.display = 'none'; }, 500); }
-                    setIsLoaded(true);
-                    // Show language selection if no preference is saved
-                    if (!language) {
-                        setShowLanguageModal(true);
-                    }
-                }, 1000);
-                const handleOnline = () => setIsOffline(false); const handleOffline = () => setIsOffline(true);
-                window.addEventListener('online', handleOnline); window.addEventListener('offline', handleOffline);
-                setLastVisited(JSON.parse(sessionStorage.getItem('lastVisited') || '[]'));
-
-                // Check if iOS
-                const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-                setIsIOS(iOS);
-
-                // Check if already installed
-                if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-                    setIsInstalled(true);
-                }
-
-
-                // Handle install prompt
-                const handleBeforeInstallPrompt = (e) => {
-                    e.preventDefault();
-                    setDeferredPrompt(e);
-                };
-
-                window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-
-
-                // Theme update interval
-                const themeInterval = setInterval(() => {
-                    const newTheme = getTheme();
-                    if (newTheme !== currentTheme) {
-                        setCurrentTheme(newTheme);
-                        applyTheme(newTheme);
-                    }
-                }, 60000);
-
-                return () => {
-                    window.removeEventListener('online', handleOnline);
-                    window.removeEventListener('offline', handleOffline);
-                    window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-                    clearInterval(themeInterval);
-                };
-            }, [currentTheme]);
-
-            const openImage = (src) => { setZoomedImg(src); };
-            const closeImage = () => setZoomedImg(null);
-
-            // Add ripple effect to interactive elements
-            useEffect(() => {
-                const handleClick = (e) => {
-                    const rippleElement = e.target.closest('.card-hover, .btn-premium, .haptic');
-                    if (rippleElement && !rippleElement.querySelector('.ripple-container')) {
-                        const container = document.createElement('div');
-                        container.className = 'ripple-container';
-                        rippleElement.appendChild(container);
-                    }
-                    if (rippleElement) {
-                        createRipple(e, rippleElement);
-                    }
-                };
-
-                document.addEventListener('click', handleClick);
-                return () => document.removeEventListener('click', handleClick);
-            }, []);
-
-            const cards = [
-                { id: 'gate', title: 'Gate Access', icon: <GateIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-800/70 via-white/10 to-slate-900/70', content: (
-                    <div className={language === 'en' ? "text-left" : "text-right"} dir={language === 'en' ? "ltr" : "rtl"}>
-                        <p className={`mb-6 leading-relaxed ${currentTheme === 'day' ? 'text-gray-600' : 'text-white'}`}>
-                            {language === 'en' 
-                                ? "This is a link to download the kibbutz gate opening app. Install the app, follow the instructions, and you'll be able to open the gate yourself. You need to get very close to the gate, almost touching it, then press the gate opening button in the app."
-                                : "זהו קישור להורדת אפליקציה לפתיחת שער הקיבוץ. יש להתקין את האפליקציה, למלא אחר ההנחיות ואז ניתן לפתוח את השער בעצמך. צריך להתקרב ממש אל השער, כמעט להצמד, ואז ללחוץ על פתיחת השער באפליקציה."
-                            }
-                        </p>
-                        <div className="space-y-4">
-                            <a href="https://goo.gl/fZTz4u" target="_blank" rel="noopener noreferrer" className="block bg-slate-800 text-white px-6 py-4 rounded-lg text-center hover:bg-slate-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold btn-premium haptic"><span className="flex items-center justify-center gap-2"><IosIcon />iPhone App</span></a>
-                            <a href="https://goo.gl/Giopvd" target="_blank" rel="noopener noreferrer" className="block bg-green-600 text-white px-6 py-4 rounded-lg text-center hover:bg-green-500 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold btn-premium haptic"><span className="flex items-center justify-center gap-2"><span className="material-symbols-outlined" style={{fontSize: '20px'}}>android</span>Android App</span></a>
-                        </div>
-                    </div>
-                )},
-                { id: 'wifi', title: 'WiFi Access', icon: <WifiIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-900/70 via-gray-200/12 to-gray-800/70', content: (
-                    <div className="text-center">
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-8 rounded-xl border border-slate-200" : "bg-slate-800/50 p-8 rounded-xl border border-slate-600"}>
-                            <div className={currentTheme === 'day' ? "bg-white p-6 rounded-xl shadow-inner border border-slate-100 space-y-5" : "bg-slate-900/50 p-6 rounded-xl shadow-inner border border-slate-700 space-y-5"}>
-                                <h4 className="font-bold text-2xl mb-2" style={{color: currentTheme === 'day' ? '#1f2937' : '#fff'}}>WiFi Connection</h4>
-                                <div className={currentTheme === 'day' ? "bg-slate-100 p-4 rounded-lg border" : "bg-slate-800/50 p-4 rounded-lg border border-slate-700"}>
-                                    <span className="font-semibold block mb-2" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Network Name:</span>
-                                    <p className="text-2xl font-mono font-bold select-all" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>GrappA Fiber</p>
-                                </div>
-                                <div className={currentTheme === 'day' ? "bg-slate-100 p-4 rounded-lg border" : "bg-slate-800/50 p-4 rounded-lg border border-slate-700"}>
-                                    <span className="font-semibold block mb-2" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Password:</span>
-                                    <p className="text-2xl font-mono font-bold select-all" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>grappA321</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )},
-                { id: 'tv', title: 'Entertainment', icon: <TvIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-900/70 via-white/12 to-slate-700/70', content: (
-                    <div className="space-y-6">
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
-                            <h4 className="font-bold text-2xl mb-4 flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}><span className="text-3xl">🏰</span> Disney+</h4>
-                            <div className={currentTheme === 'day' ? "bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4" : "bg-slate-900/50 p-5 rounded-xl shadow-sm border border-slate-700 space-y-4"}>
-                                <div className={currentTheme === 'day' ? "bg-slate-100 p-3 rounded-lg border" : "bg-slate-800/50 p-3 rounded-lg border border-slate-700"}>
-                                    <span className="font-semibold" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Profile:</span>
-                                    <span className="ml-3 font-mono text-lg font-bold" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>GrappA</span>
-                                </div>
-                                <div className={currentTheme === 'day' ? "bg-slate-100 p-3 rounded-lg border" : "bg-slate-800/50 p-3 rounded-lg border border-slate-700"}>
-                                    <span className="font-semibold" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Password:</span>
-                                    <span className="ml-3 font-mono text-lg font-bold" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>4114</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
-                            <h4 className="font-bold text-2xl mb-4 flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}><span className="text-3xl">🎬</span> Netflix</h4>
-                            <div className={currentTheme === 'day' ? "bg-white p-5 rounded-xl shadow-sm border border-slate-100" : "bg-slate-900/50 p-5 rounded-xl shadow-sm border border-slate-700"}>
-                                <div className={currentTheme === 'day' ? "bg-slate-100 p-3 rounded-lg border" : "bg-slate-800/50 p-3 rounded-lg border border-slate-700"}>
-                                    <span className="font-semibold" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.8)'}}>Profile:</span>
-                                    <span className="ml-3 font-mono text-lg font-bold" style={{color: currentTheme === 'day' ? '#334155' : '#fff'}}>GrappA</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )},
-                { id: 'grocery', title: 'Grocery Store', icon: <GroceryIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-700/70 via-gray-300/10 to-gray-900/70', content: (
-                    <div className={language === 'en' ? "text-center space-y-6" : "text-right space-y-6"} dir={language === 'en' ? "ltr" : "rtl"}>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
-                            <h4 className="font-bold text-2xl text-center mb-6" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                                {language === 'en' ? 'The Grocery Store' : 'המרכולית'}
-                            </h4>
-                            <div className={currentTheme === 'day' ? "bg-white p-2 rounded-xl shadow-sm border border-slate-100 mb-4" : "bg-slate-900/50 p-2 rounded-xl shadow-sm border border-slate-700 mb-4"}>
-                                <img src="./Grocery_hours.jpg" alt="Grocery store hours" className="w-full rounded-lg cursor-pointer" onClick={() => openImage('./Grocery_hours.jpg')} />
-                            </div>
-                            <a href="https://maps.app.goo.gl/ZQu19jrZTdUjW7pF6" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic">
-                                <span className="flex items-center justify-center gap-2">
-                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
-                                    Google Maps
-                                </span>
-                            </a>
-                        </div>
-                    </div>
-                )},
-                { id: 'pool', title: 'Swimming Pool', icon: <PoolIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-800/70 via-white/20 to-slate-900/70', content: (
-                    <div className={language === 'en' ? "text-center space-y-6" : "text-right space-y-6"} dir={language === 'en' ? "ltr" : "rtl"}>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
-                            <h4 className="font-bold text-2xl text-center mb-2 flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                                <span className="text-3xl">🏊‍♂️</span> {language === 'en' ? 'The Pool' : 'הבריכה'}
-                            </h4>
-                            <p className="text-sm text-center mb-4" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                                {language === 'en' ? 'The bathing season begins on Passover and ends after Sukkot' : 'עונת הרחצה מתחילה בפסח ונגמרת אחרי סוכות'}
-                            </p>
-                            <div className={currentTheme === 'day' ? "bg-white p-2 rounded-xl shadow-sm border border-slate-100 mb-4" : "bg-slate-900/50 p-2 rounded-xl shadow-sm border border-slate-700 mb-4"}>
-                                <img src="./swiming_pool_instructions.png?v=4" alt="Pool hours" className="w-full rounded-lg cursor-pointer" onClick={() => openImage('./swiming_pool_instructions.png?v=4')} />
-                            </div>
-                            <a href="https://maps.app.goo.gl/2DS7aXFMvxGATqcY8" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white px-8 py-4 rounded-xl text-center transition-all duration-300 transform hover:scale-105 shadow-md font-bold text-lg haptic">
-                                <span className="flex items-center justify-center gap-2">
-                                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
-                                    Google Maps
-                                </span>
-                            </a>
-                        </div>
-                    </div>
-                )},
-                { id: 'spa', title: 'Spa & Wellness', icon: <SpaIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-700/70 via-gray-100/8 to-slate-900/70', content: (
-                     <div className={language === 'en' ? "text-center" : "text-right"} dir={language === 'en' ? "ltr" : "rtl"}>
-                         <div className={currentTheme === 'day' ? "bg-slate-50 p-8 rounded-xl border border-slate-200" : "bg-slate-800/50 p-8 rounded-xl border border-slate-600"}>
-                             <h4 className="font-bold text-3xl mb-4 text-center" style={{color: currentTheme === 'day' ? '#1f2937' : '#fff'}}>
-                                 {language === 'en' ? 'Spa Services' : 'שירותי ספא'}
-                             </h4>
-                             <p className="text-lg mb-6 text-center" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.9)'}}>
-                                 {language === 'en' ? 'To book treatments, please contact Dafna.' : 'להזמנת טיפולים, אנא צרו קשר עם דפנה.'}
-                             </p>
-                             <div className={currentTheme === 'day' ? "bg-white p-5 rounded-xl shadow-sm border border-slate-100 space-y-4 text-center" : "bg-slate-900/50 p-5 rounded-xl shadow-sm border border-slate-700 space-y-4 text-center"}>
-                                 <p className="font-medium text-xl" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                                     <span className="font-semibold">{language === 'en' ? 'Dafna: ' : 'דפנה: '}</span>
-                                     <a href="tel:050-555-1383" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">050-555-1383</a>
-                                 </p>
-                                 <div className={currentTheme === 'day' ? "bg-white rounded-lg shadow-sm border" : "bg-slate-800/50 rounded-lg shadow-sm border border-slate-700"}>
-                                 <img src="https://i.imgur.com/5vg5NXj.png" alt="info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://i.imgur.com/5vg5NXj.png')} />
-                             </div>
-                             </div>
-                         </div>
-                     </div>
-                )},
-                { id: 'sushi', title: 'Sushi Restaurant', icon: <RestaurantIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-800/70 via-white/15 to-gray-700/70', content: (
-                    <div className={language === 'en' ? "text-center" : "text-right"} dir={language === 'en' ? "ltr" : "rtl"}>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
-                            <h4 className="font-bold mb-6 text-2xl text-center flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                                <span className="text-3xl">🍣</span> {language === 'en' ? 'The Sushi Restaurant' : 'מסעדת הסושי'}
-                            </h4>
-                            <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700"}>
-                                <img src="https://i.imgur.com/ChMRT7d.jpg" alt="Sushi Menu" className="w-full rounded-lg cursor-pointer shadow-md" onClick={() => openImage('https://i.imgur.com/ChMRT7d.jpg')} />
-                                <p className="text-sm mt-3 text-center font-semibold" style={{color: currentTheme === 'day' ? '#4b5563' : 'rgba(255,255,255,0.8)'}}>
-                                    {language === 'en' ? 'Full Menu with Prices' : 'תפריט מלא עם מחירים'}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                )},
-                { id: 'trips', title: 'Local Hikes', icon: <MapIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-slate-800/70 via-gray-100/15 to-gray-900/70', content: (
-                    <div className={language === 'en' ? "text-left space-y-6" : "text-right space-y-6"} dir={language === 'en' ? "ltr" : "rtl"}>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
-                            <h4 className="font-bold mb-3 text-lg" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                                {language === 'en' ? 'Navigation Apps' : 'אפליקציית ניווט'}
-                            </h4>
-                            <div className="space-y-3">
-                                <a href="https://play.google.com/store/apps/details?id=altitude.alarm.erol.apps" target="_blank" rel="noopener noreferrer" className="block bg-green-600 hover:bg-green-500 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">
-                                    <span className="flex items-center justify-center gap-2">
-                                        <span className="material-symbols-outlined" style={{fontSize: '20px'}}>android</span>
-                                        ALTLAS app
-                                    </span>
-                                </a>
-                                <a href="https://apps.apple.com/us/app/alltrails-hike-bike-run/id405075943" target="_blank" rel="noopener noreferrer" className="block bg-slate-800 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">
-                                    <span className="flex items-center justify-center gap-2">
-                                        <IosIcon />
-                                        AllTrails app
-                                    </span>
-                                </a>
-                            </div>
-                        </div>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
-                            <h4 className="font-bold mb-3 text-lg" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                                {language === 'en' ? 'Trail Gate Location' : 'מיקום השער למסלולים'}
-                            </h4>
-                            <a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" className="block bg-slate-600 hover:bg-slate-700 text-white font-semibold px-6 py-3 rounded-lg text-center transition-all duration-300 haptic shadow-md">Google Maps</a>
-                        </div>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
-                            <h4 className="font-bold mb-3 text-lg flex items-center justify-center gap-2" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                                <span className="material-symbols-outlined" style={{fontSize: '24px'}}>download</span>
-                                {language === 'en' ? 'Downloadable Trails' : 'מסלולים להורדה'}
-                            </h4>
-                            <div className="space-y-3">
-                                <a href="./walk_to_the_bulbouse_mountain.gpx" download="Bulbous_Mountain_Trail.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">
-                                    {language === 'en' ? '5km Trail to White Mountain and Bulbous Rocks' : 'מסלול 5 ק"מ להר הלבן ולבולבוסים'}
-                                </a>
-                                <a href="./Zepp20230405100344.gpx" download="14km_trip_to_the_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">
-                                    {language === 'en' ? '14km Trail to the High Mountain' : 'מסלול להר הגבוה 14 ק"מ'}
-                                </a>
-                                <a href="./Zepp20230118153553.gpx" download="12km_trip_to_mountains.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">
-                                    {language === 'en' ? '12km Trail to Southern and Western Views' : 'מסלול אל נופי הדרום והמערב 12 ק"מ'}
-                                </a>
-                                <a href="./12km_walk.gpx" download="12km_trip.gpx" className="block bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-lg text-center transition-all duration-300 shadow-md font-semibold btn-premium haptic">
-                                    {language === 'en' ? '12km Trail to Southern Views' : 'מסלול אל נופי הדרום 12 ק"מ'}
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                )},
-                { id: 'trail_services', title: 'Trail Services', icon: <TrailServicesIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-700/70 via-white/8 to-slate-800/70', content: (
-                    <div className={language === 'en' ? "text-center space-y-6" : "text-right space-y-6"} dir={language === 'en' ? "ltr" : "rtl"}>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-4 rounded-lg border border-slate-200" : "bg-slate-800/50 p-4 rounded-lg border border-slate-600"}>
-                            <h4 className="font-bold mb-3 text-lg text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                                {language === 'en' ? 'Pablo' : 'פאבלו'} - <a href="tel:053-9646316" className="text-blue-600 hover:text-blue-700 hover:underline">053-9646316</a>
-                            </h4>
-                            <div className="bg-white rounded-lg shadow-sm border">
-                                <img src="https://i.imgur.com/MBYTWps.png" alt="Logistics info" className="w-full rounded-lg cursor-pointer hover:opacity-90 transition-opacity" onClick={() => openImage('https://i.imgur.com/MBYTWps.png')} />
-                            </div>
-                        </div>
-                        <div className={currentTheme === 'day' ? "bg-slate-50 p-6 rounded-xl border border-slate-200" : "bg-slate-800/50 p-6 rounded-xl border border-slate-600"}>
-                            <h4 className="font-bold mb-4 text-lg text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                                {language === 'en' ? 'Jeep Tours with Mr. Desert' : 'טיולי ג\'יפים עם מר מדבר'}
-                            </h4>
-                            <div className={currentTheme === 'day' ? "bg-white p-4 rounded-xl shadow-sm border border-slate-100 space-y-3 text-center" : "bg-slate-900/50 p-4 rounded-xl shadow-sm border border-slate-700 space-y-3 text-center"}>
-                                <p className="font-medium" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                                    <span className="font-semibold">{language === 'en' ? 'Phone: ' : 'טלפון: '}</span>
-                                    <a href="tel:054-4249783" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">054-4249783</a>
-                                </p>
-                                <p className="font-medium" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                                    <span className="font-semibold">{language === 'en' ? 'Email: ' : 'אימייל: '}</span>
-                                    <a href="mailto:marmidbar@gmail.com" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">marmidbar@gmail.com</a>
-                                </p>
-                                <a href="https://aravadesert.co.il/marmaidbar/" target="_blank" rel="noopener noreferrer" className="!mt-4 block bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-lg text-center transition-all duration-300 haptic font-semibold shadow-md">
-                                    {language === 'en' ? 'Visit Website' : 'לאתר האינטרנט'}
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                )},
-                { id: 'checkout', title: 'Check-out Info', icon: <CheckoutIcon />, gradient: currentTheme === 'day' ? 'from-slate-100/50 to-slate-200/50' : 'from-gray-900/70 via-white/12 to-slate-700/70', content: (
-                    <div className={language === 'en' ? "text-left" : "text-right"} dir={language === 'en' ? "ltr" : "rtl"}>
-                      <div className={currentTheme === 'day' ? "bg-slate-50 p-8 rounded-xl border border-slate-200" : "bg-slate-800/50 p-8 rounded-xl border border-slate-600"}>
-                        <h4 className="font-bold mb-4 text-2xl text-center" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                            {language === 'en' ? 'Check-out Instructions' : 'הוראות צ\'ק-אאוט'}
-                        </h4>
-                        <div className="space-y-4 text-lg" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                          <p>{language === 'en' ? 'Check-out time is until' : 'זמן הצ\'ק-אאוט הוא עד השעה'} <strong className="font-semibold" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>11:00</strong> {language === 'en' ? 'AM' : 'בבוקר'}.</p>
-                          <p>{language === 'en' ? 'Please ensure all windows are closed and the air conditioner is turned off.' : 'אנא ודאו שכל החלונות סגורים והמזגן כבוי.'}</p>
-                          <p>{language === 'en' ? 'Leave the key on the table and make sure you haven\'t forgotten anything.' : 'את המפתח השאירו על השולחן וודאו שלא שכחתם דבר.'}</p>
-                          <p className="mt-6 font-semibold">{language === 'en' ? 'Thank you and we hope you enjoyed your stay!' : 'תודה רבה ומקווים שנהניתם!'}</p>
-                        </div>
-                      </div>
-                    </div>
-                )},
-            ];
-
-            // Add iOS install instructions to cards
-            if (openDialog === 'ios-install') {
-                cards.push({
-                    id: 'ios-install',
-                    title: 'Install App',
-                    content: (
-                        <div className="text-center space-y-4">
-                            <div className="text-6xl mb-4">📱</div>
-                            <h3 className="font-bold text-xl mb-4" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>Add to Home Screen</h3>
-                            <div className="text-left space-y-3" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                                <p className="flex items-start gap-2">
-                                    <span className="font-bold">1.</span>
-                                    <span>Tap the Share button <span className="inline-block align-middle">⬆️</span> at the bottom of Safari</span>
-                                </p>
-                                <p className="flex items-start gap-2">
-                                    <span className="font-bold">2.</span>
-                                    <span>Scroll down and tap "Add to Home Screen" <span className="inline-block align-middle">➕</span></span>
-                                </p>
-                                <p className="flex items-start gap-2">
-                                    <span className="font-bold">3.</span>
-                                    <span>Tap "Add" to install the app</span>
-                                </p>
-                            </div>
-                            <p className="text-sm mt-4" style={{color: currentTheme === 'day' ? '#64748b' : 'rgba(255,255,255,0.6)'}}>This allows offline access and faster loading!</p>
-                        </div>
-                    )
-                });
-            }
-
-            // Add browser-specific install instructions to cards
-            if (openDialog === 'browser-install') {
-                const userAgent = navigator.userAgent.toLowerCase();
-                cards.push({
-                    id: 'browser-install',
-                    title: 'Install App',
-                    content: (
-                        <div className="text-center space-y-4">
-                            <div className="text-6xl mb-4">📱</div>
-                            <h3 className="font-bold text-xl mb-4" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>Add to Home Screen</h3>
-                            <div className="text-left space-y-3" style={{color: currentTheme === 'day' ? '#475569' : 'rgba(255,255,255,0.9)'}}>
-                                {userAgent.includes('firefox') ? (
-                                    <>
-                                        <p className="font-semibold mb-2">Firefox Browser:</p>
-                                        <p className="flex items-start gap-2">
-                                            <span className="font-bold">1.</span>
-                                            <span>Look for the install icon ⊕ in the address bar</span>
-                                        </p>
-                                        <p className="flex items-start gap-2">
-                                            <span className="font-bold">2.</span>
-                                            <span>Click it and select "Install"</span>
-                                        </p>
-                                    </>
-                                ) : userAgent.includes('samsung') ? (
-                                    <>
-                                        <p className="font-semibold mb-2">Samsung Internet:</p>
-                                        <p className="flex items-start gap-2">
-                                            <span className="font-bold">1.</span>
-                                            <span>Tap the menu button (⋮) at the bottom</span>
-                                        </p>
-                                        <p className="flex items-start gap-2">
-                                            <span className="font-bold">2.</span>
-                                            <span>Select "Add page to" → "Home screen"</span>
-                                        </p>
-                                    </>
-                                ) : userAgent.includes('edge') ? (
-                                    <>
-                                        <p className="font-semibold mb-2">Microsoft Edge:</p>
-                                        <p className="flex items-start gap-2">
-                                            <span className="font-bold">1.</span>
-                                            <span>Tap the menu (•••) at the bottom</span>
-                                        </p>
-                                        <p className="flex items-start gap-2">
-                                            <span className="font-bold">2.</span>
-                                            <span>Select "Add to phone"</span>
-                                        </p>
-                                    </>
-                                ) : userAgent.includes('opera') ? (
-                                    <>
-                                        <p className="font-semibold mb-2">Opera Browser:</p>
-                                        <p className="flex items-start gap-2">
-                                            <span className="font-bold">1.</span>
-                                            <span>Tap the Opera menu button</span>
-                                        </p>
-                                        <p className="flex items-start gap-2">
-                                            <span className="font-bold">2.</span>
-                                            <span>Select "Home screen" or "Add to Home screen"</span>
-                                        </p>
-                                    </>
-                                ) : (
-                                    <>
-                                        <p className="font-semibold mb-2">Your Browser:</p>
-                                        <p className="flex items-start gap-2">
-                                            <span className="font-bold">1.</span>
-                                            <span>Open the browser menu (⋮ or •••)</span>
-                                        </p>
-                                        <p className="flex items-start gap-2">
-                                            <span className="font-bold">2.</span>
-                                            <span>Look for "Install app" or "Add to Home screen"</span>
-                                        </p>
-                                        <p className="flex items-start gap-2">
-                                            <span className="font-bold">3.</span>
-                                            <span>Follow the prompts to install</span>
-                                        </p>
-                                    </>
-                                )}
-                            </div>
-                            <p className="text-sm mt-4" style={{color: currentTheme === 'day' ? '#64748b' : 'rgba(255,255,255,0.6)'}}>This allows offline access and faster loading!</p>
-                        </div>
-                    )
-                });
-            }
-
-            const openDialogHandler = (id) => {
-                setOpenDialog(id);
-                if (navigator.vibrate) navigator.vibrate(50); // Only vibrate when opening dialog
-                const newVisited = [id, ...lastVisited.filter(v => v !== id)].slice(0, 3);
-                setLastVisited(newVisited);
-                sessionStorage.setItem('lastVisited', JSON.stringify(newVisited));
+        // --- Share Handler ---
+        const handleShare = async () => {
+            const shareData = {
+                title: 'GrappA Guest Guide',
+                text: 'Check out the GrappA Guest Guide - Your complete resort companion!',
+                url: window.location.href
             };
-            const closeDialog = () => { setOpenDialog(null); };
 
-            const handleInstallClick = async () => {
-                if (isIOS) {
-                    // Show iOS instructions
-                    setOpenDialog('ios-install');
-                } else if (deferredPrompt) {
-                    // Show Chrome install prompt
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        localStorage.setItem('pwa-installed', 'true');
-                    }
-                    setDeferredPrompt(null);
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
                 } else {
-                    // Enhanced fallback for browsers without install prompt support
-                    // Show browser-specific instructions dialog
-                    setOpenDialog('browser-install');
-                    console.log('No install prompt available, showing browser-specific instructions');
+                    await navigator.clipboard.writeText(window.location.href);
+                    const notification = document.createElement('div');
+                    notification.className = 'fixed top-20 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg animate-slideUp z-50';
+                    notification.textContent = 'Link copied to clipboard!';
+                    document.body.appendChild(notification);
+                    setTimeout(() => notification.remove(), 3000);
                 }
-            };
-
-            const handleShare = async () => {
-                const shareData = {
-                    title: 'GrappA Guest Guide',
-                    text: 'Check out the GrappA Guest Guide - Your complete resort companion!',
-                    url: window.location.href
-                };
-
-                try {
-                    if (navigator.share) {
-                        // Use native share if available (mobile)
-                        await navigator.share(shareData);
-                        console.log('Shared successfully');
-                    } else {
-                        // Fallback: copy to clipboard
-                        await navigator.clipboard.writeText(window.location.href);
-                        // Show a temporary notification
-                        const notification = document.createElement('div');
-                        notification.className = 'fixed top-20 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg animate-slideUp z-50';
-                        notification.textContent = 'Link copied to clipboard!';
-                        document.body.appendChild(notification);
-                        setTimeout(() => notification.remove(), 3000);
-                    }
-                } catch (err) {
-                    console.log('Error sharing:', err);
-                }
-            };
-            
-            const selectLanguage = (lang) => {
-                console.log('Language selected:', lang);
-                setLanguage(lang);
-                localStorage.setItem('preferredLanguage', lang);
-                setShowLanguageModal(false);
-            };
-
-            return (
-                <div className="min-h-screen p-4 relative">
-                    <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                        {/* Theme-aware Bubbles */}
-                        <div className="absolute w-40 h-40 rounded-full top-10 left-10 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-1), var(--bubble-2))`}}></div>
-                        <div className="absolute w-32 h-32 rounded-full top-60 right-16 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-2), var(--bubble-3))`, animationDelay: '0.5s'}}></div>
-                        <div className="absolute w-28 h-28 rounded-full bottom-20 left-1/3 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-3), var(--bubble-1))`, animationDelay: '2s'}}></div>
-                        <div className="absolute w-36 h-36 rounded-full bottom-40 right-10 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-1), var(--bubble-4))`, animationDelay: '1s'}}></div>
-                        <div className="absolute w-24 h-24 rounded-full top-1/3 left-1/2 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-3), var(--bubble-2))`, animationDelay: '3s'}}></div>
-                        <div className="absolute w-44 h-44 rounded-full bottom-10 left-10 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-2), var(--bubble-4))`, animationDelay: '2.5s'}}></div>
-                        <div className="absolute w-20 h-20 rounded-full top-20 right-1/3 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-1), var(--bubble-3))`, animationDelay: '1.5s'}}></div>
-                        <div className="absolute w-48 h-48 rounded-full top-1/2 right-1/4 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-4), var(--bubble-2))`, animationDelay: '4s'}}></div>
-
-                        {/* Additional Small Bubbles */}
-                        <div className="absolute w-16 h-16 rounded-full top-5 right-5 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-3), var(--bubble-1))`, animationDelay: '0.5s'}}></div>
-                        <div className="absolute w-12 h-12 rounded-full bottom-32 right-20 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-1), var(--bubble-2))`, animationDelay: '3.5s'}}></div>
-                        <div className="absolute w-14 h-14 rounded-full top-40 left-5 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-3), var(--bubble-2))`, animationDelay: '2.5s'}}></div>
-                        <div className="absolute w-10 h-10 rounded-full bottom-5 right-1/2 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-2), var(--bubble-4))`, animationDelay: '1.8s'}}></div>
-                        <div className="absolute w-18 h-18 rounded-full top-3/4 left-20 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-1), var(--bubble-3))`, animationDelay: '4.5s'}}></div>
-                        <div className="absolute w-8 h-8 rounded-full top-2/3 right-10 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-2), var(--bubble-1))`, animationDelay: '0.8s'}}></div>
-                        <div className="absolute w-15 h-15 rounded-full bottom-1/4 left-1/4 animate-float" style={{background: `linear-gradient(to bottom right, var(--bubble-3), var(--bubble-2))`, animationDelay: '3.2s'}}></div>
-                        <div className="absolute w-11 h-11 rounded-full top-10 left-1/3 animate-pulse" style={{background: `linear-gradient(to bottom right, var(--bubble-1), var(--bubble-2))`, animationDelay: '2.2s'}}></div>
-                    </div>
-
-                    {isOffline && ( <div className="fixed top-4 left-4 right-4 bg-amber-500 text-white px-4 py-2 rounded-lg shadow-lg text-center animate-slideUp z-50"><span className="font-semibold">Offline Mode</span> - Some features may be limited</div> )}
-
-                    {/* Top buttons - positioned above everything */}
-                    <div className="absolute top-0 right-0 p-2 flex gap-2 z-50">
-                        {language && (
-                            <button
-                                onClick={() => {
-                                    console.log('Language button clicked');
-                                    setShowLanguageModal(true);
-                                }}
-                                className={`px-3 py-3 rounded-xl transition-all haptic shadow-lg ${
-                                    currentTheme === 'day' 
-                                        ? 'bg-slate-600 hover:bg-slate-700 text-white' 
-                                        : 'bg-slate-700 hover:bg-slate-800 text-white'
-                                }`}
-                                aria-label="Change Language"
-                            >
-                                <span className="text-sm font-bold">{language === 'en' ? 'EN' : 'HE'}</span>
-                            </button>
-                        )}
-                        <button
-                            onClick={handleShare}
-                            className={`px-3 py-3 rounded-xl transition-all haptic shadow-lg ${
-                                currentTheme === 'day'
-                                    ? 'bg-slate-600 hover:bg-slate-700 text-white'
-                                    : 'bg-slate-700 hover:bg-slate-800 text-white'
-                            }`}
-                            aria-label="Share GrappA Guest Guide"
-                        >
-                            <span className="material-symbols-outlined" style={{fontSize: '24px'}}>
-                                share
-                            </span>
-                        </button>
-                    </div>
-
-                    <div className={`text-center mb-8 pt-16 transition-all duration-1000 ${isLoaded ? 'animate-fadeIn' : 'opacity-0'}`}>
-                        <div className="glass-enhanced rounded-2xl p-6 max-w-md mx-auto shadow-xl">
-                            <h1 className="text-4xl font-black mb-2 gradient-text">GrappA Guest Guide</h1>
-                            <p className={`text-lg font-medium ${currentTheme === 'day' ? 'text-slate-600' : 'text-white'}`}>
-                                {language === 'en' ? 'Resort Information & Services' : 'Resort Information & Services'}
-                            </p>
-                            {/* Manual Install Button for Testing */}
-                            {!isInstalled && (
-                                <button
-                                    onClick={handleInstallClick}
-                                    className="mt-4 px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-medium transition-all shadow-md haptic text-sm"
-                                >
-                                    <span className="flex items-center gap-2">
-                                        <span>📲</span>
-                                        <span>Add to Home Screen</span>
-                                    </span>
-                                </button>
-                            )}
-                        </div>
-                        {lastVisited.length > 0 && (
-                            <div className="mt-6 max-w-md mx-auto"><p className="text-sm mb-2" style={{color: currentTheme === 'day' ? '#64748b' : 'rgba(255,255,255,0.6)'}}>Recently viewed:</p>
-                                <div className="flex gap-2 justify-center flex-wrap">
-                                    {lastVisited.map(id => {
-                                        const card = cards.find(c => c.id === id);
-                                        return card ? ( <button key={id} onClick={() => openDialogHandler(id)} className="px-3 py-1 bg-slate-100/60 backdrop-blur-sm border border-slate-200/50 rounded-full text-slate-700 text-sm hover:bg-slate-200/70 transition-all haptic">{card.title}</button> ) : null;
-                                    })}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-5 max-w-lg mx-auto">
-                        {cards.map((card, index) => (
-                            <div key={card.id} onClick={() => openDialogHandler(card.id)} className={`glass rounded-2xl p-5 cursor-pointer shadow-lg card-hover haptic ${ isLoaded ? 'animate-scaleIn' : 'opacity-0' }`} style={{animationDelay: `${index * 0.08}s`}}>
-                                <div className="flex flex-col items-center text-center space-y-3">
-                                    <div className={`p-4 bg-gradient-to-br ${card.gradient} backdrop-blur-sm rounded-2xl shadow-md icon-container border border-white/40 ${currentTheme === 'night' ? 'shadow-[0_0_20px_rgba(255,255,255,0.1)]' : ''}`}>{card.icon}</div>
-                                    <h3 className={`font-bold text-base tracking-tight ${currentTheme === 'day' ? 'text-slate-900' : 'text-white'}`}>{card.title}</h3>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {openDialog && (
-                        <div className="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={closeDialog} role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
-                            <div className={`backdrop-blur-sm rounded-2xl max-w-md w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slideUp border modal-dialog ${currentTheme === 'day' ? 'bg-slate-50/95 border-white/30' : 'bg-slate-900/95 border-slate-700/30'}`} onClick={(e) => e.stopPropagation()}>
-                                <div className={`backdrop-blur-sm border-b p-5 flex justify-between items-center ${currentTheme === 'day' ? 'bg-white/80 border-slate-200/50' : 'bg-slate-800/80 border-slate-700/50'}`}>
-                                    <h2 id="dialogTitle" className="text-2xl font-black" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>{cards.find(c => c.id === openDialog)?.title}</h2>
-                                    <button onClick={closeDialog} className={`p-3 rounded-full haptic transition-colors ${currentTheme === 'day' ? 'text-slate-500 hover:bg-slate-100/70' : 'text-slate-400 hover:bg-slate-700/70'}`} aria-label="Close dialog">
-                                      <CloseIcon />
-                                    </button>
-                                </div>
-                                <div className="p-6 overflow-y-auto max-h-[calc(85vh-74px)]"><div className="space-y-4">{cards.find(c => c.id === openDialog)?.content}</div></div>
-                            </div>
-                        </div>
-                    )}
-
-                    {zoomedImg && (
-                        <div className="fixed inset-0 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={closeImage}>
-                            <div className="relative max-w-full max-h-full flex flex-col items-center">
-                                <button onClick={closeImage} className={`mb-3 p-3 rounded-full haptic transition-colors ${currentTheme === 'day' ? 'text-white bg-black/50 hover:bg-black/70' : 'text-white bg-white/20 hover:bg-white/30'} backdrop-blur-sm`} aria-label="Close image">
-                                    <CloseIcon />
-                                </button>
-                                <img src={zoomedImg} alt="Zoomed view" className="max-w-full max-h-[85vh] rounded-xl shadow-2xl animate-zoomIn" onClick={(e) => e.stopPropagation()} />
-                            </div>
-                        </div>
-                    )}
-                    
-                    {/* Language Selection Modal */}
-                    {showLanguageModal && (
-                        <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn" onClick={() => language && setShowLanguageModal(false)}>
-                            <div className={`backdrop-blur-sm rounded-2xl max-w-sm w-full p-8 shadow-2xl animate-slideUp border ${currentTheme === 'day' ? 'bg-white/95 border-slate-200' : 'bg-slate-900/95 border-slate-700'}`} onClick={(e) => e.stopPropagation()}>
-                                <h2 className="text-2xl font-bold text-center mb-6" style={{color: currentTheme === 'day' ? '#1e293b' : '#fff'}}>
-                                    Choose Language / בחר שפה
-                                </h2>
-                                <div className="space-y-4">
-                                    <button
-                                        onClick={() => selectLanguage('he')}
-                                        className="w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg haptic"
-                                    >
-                                        עברית
-                                        <span className="block text-sm font-normal mt-1">Hebrew (Current Style)</span>
-                                    </button>
-                                    <button
-                                        onClick={() => selectLanguage('en')}
-                                        className="w-full px-6 py-4 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold text-lg transition-all transform hover:scale-105 shadow-lg haptic"
-                                    >
-                                        English
-                                        <span className="block text-sm font-normal mt-1">Full English Interface</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            );
+            } catch (err) {
+                console.log('Sharing failed:', err);
+            }
         };
 
-        const container = document.getElementById('root');
-        const root = ReactDOM.createRoot(container);
-        root.render(<BnBGuestGuide />);
+        // --- Event Listeners and Initializer ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hide loading screen
+            setTimeout(() => {
+                const ls = document.getElementById('loading-screen');
+                if (ls) {
+                    ls.style.opacity = '0';
+                    setTimeout(() => { ls.style.display = 'none'; }, 500);
+                }
+                
+                if (!language) {
+                    document.getElementById('language-modal').classList.remove('hidden');
+                    document.getElementById('language-modal').classList.add('flex');
+                } else {
+                    renderUI();
+                    setTimeout(() => {
+                        openDialogHandler('welcome');
+                    }, 600);
+                }
+            }, 1000);
+
+            // Online/Offline status listeners
+            const handleOnline = () => {
+                document.getElementById('offline-banner').classList.add('hidden');
+            };
+            const handleOffline = () => {
+                document.getElementById('offline-banner').classList.remove('hidden');
+            };
+            window.addEventListener('online', handleOnline);
+            window.addEventListener('offline', handleOffline);
+            if (!navigator.onLine) handleOffline();
+
+            // Language change options clicked
+            document.getElementById('lang-opt-he').addEventListener('click', () => {
+                language = 'he';
+                localStorage.setItem('preferredLanguage', 'he');
+                document.getElementById('language-modal').classList.add('hidden');
+                document.getElementById('language-modal').classList.remove('flex');
+                renderUI();
+                setTimeout(() => {
+                    openDialogHandler('welcome');
+                }, 100);
+            });
+            document.getElementById('lang-opt-en').addEventListener('click', () => {
+                language = 'en';
+                localStorage.setItem('preferredLanguage', 'en');
+                document.getElementById('language-modal').classList.add('hidden');
+                document.getElementById('language-modal').classList.remove('flex');
+                renderUI();
+                setTimeout(() => {
+                    openDialogHandler('welcome');
+                }, 100);
+            });
+
+            // Lang toggle button click (Header)
+            document.getElementById('lang-btn').addEventListener('click', () => {
+                language = language === 'en' ? 'he' : 'en';
+                localStorage.setItem('preferredLanguage', language);
+                renderUI();
+            });
+
+            // Share button click
+            document.getElementById('share-btn').addEventListener('click', handleShare);
+
+            // Install PWA button click
+            document.getElementById('install-btn').addEventListener('click', handleInstallClick);
+
+            // Modal closers
+            document.getElementById('dialog-close-btn').addEventListener('click', closeDialog);
+            document.getElementById('dialog-modal').addEventListener('click', closeDialog);
+            
+            // Map Modal closers & Geolocation click
+            document.getElementById('map-close-btn').addEventListener('click', closeMap);
+            document.getElementById('map-location-btn').addEventListener('click', toggleLocationTracking);
+            document.getElementById('map-layer-btn').addEventListener('click', toggleMapLayer);
+            document.getElementById('map-panel-header').addEventListener('click', toggleElevationProfile);
+            
+            // Zoom Image closers
+            document.getElementById('image-close-btn').addEventListener('click', closeZoomImage);
+            document.getElementById('image-modal').addEventListener('click', closeZoomImage);
+
+            // Attach click ripple handler to haptics/cards
+            document.addEventListener('click', (e) => {
+                const element = e.target.closest('.card-hover, .btn-premium, .haptic');
+                if (element) {
+                    createRipple(e, element);
+                }
+            });
+        });
     </script>
 </body>
 </html>
