@@ -384,13 +384,8 @@
 
     <!-- Modals -->
     <!-- Content Detail Dialog Modal -->
-    <div id="dialog-modal" class="fixed inset-0 bg-black/45 backdrop-blur-sm items-end sm:items-center justify-center p-0 sm:p-4 z-50 hidden animate-fadeIn" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
-        <div class="backdrop-blur-md rounded-t-3xl sm:rounded-2xl max-w-md w-full max-h-[85vh] sm:max-h-[80vh] overflow-hidden shadow-2xl animate-slideUp border border-white/20 dark:border-slate-800 bg-slate-50/95 dark:bg-slate-900/95 flex flex-col mt-auto sm:mt-0">
-            <!-- Mobile Grab Handle -->
-            <div class="flex justify-center py-2.5 sm:hidden">
-                <div class="w-12 h-1 bg-slate-300 dark:bg-slate-700 rounded-full"></div>
-            </div>
-            
+    <div id="dialog-modal" class="fixed inset-0 bg-black/45 backdrop-blur-sm items-center justify-center p-4 z-50 hidden animate-fadeIn" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+        <div class="backdrop-blur-md rounded-2xl max-w-md w-full max-h-[85vh] overflow-hidden shadow-2xl animate-slideUp border border-white/20 dark:border-slate-800 bg-slate-50/95 dark:bg-slate-900/95 flex flex-col">
             <div class="border-b p-5 flex justify-between items-center bg-white/40 border-slate-200/50 dark:bg-slate-800/40 dark:border-slate-800/80">
                 <h2 id="dialogTitle" class="text-2xl font-black text-slate-800 dark:text-white"></h2>
                 <button id="dialog-close-btn" class="p-2 rounded-full haptic transition-colors text-slate-500 hover:bg-slate-250/50 dark:text-slate-400 dark:hover:bg-slate-800/50" aria-label="Close dialog">
@@ -1123,7 +1118,7 @@
                                 שתהיה לכם חופשה נפלאה!
                             </p>
                         </div>
-                        <button onclick="closeDialog()" class="w-full mt-5 bg-slate-800 text-white font-extrabold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 btn-premium haptic dark:bg-slate-700 dark:hover:bg-slate-600 text-center text-base">
+                        <button onclick="closeDialog(true)" class="w-full mt-5 bg-slate-800 text-white font-extrabold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 btn-premium haptic dark:bg-slate-700 dark:hover:bg-slate-600 text-center text-base">
                             לאפליקציה
                         </button>
                     </div>
@@ -1159,7 +1154,7 @@
                                 Have a wonderful stay!
                             </p>
                         </div>
-                        <button onclick="closeDialog()" class="w-full mt-5 bg-slate-800 text-white font-extrabold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 btn-premium haptic dark:bg-slate-700 dark:hover:bg-slate-600 text-center text-base">
+                        <button onclick="closeDialog(true)" class="w-full mt-5 bg-slate-800 text-white font-extrabold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 btn-premium haptic dark:bg-slate-700 dark:hover:bg-slate-600 text-center text-base">
                             To the App
                         </button>
                     </div>
@@ -1276,6 +1271,17 @@
             const dialogBody = document.getElementById('dialogBody');
             const dialogContent = modal.querySelector('div');
             
+            // Set current dialog ID to track modal state
+            modal.dataset.currentId = id;
+            
+            // Hide the 'X' close button on the Welcome modal
+            const closeBtn = document.getElementById('dialog-close-btn');
+            if (id === 'welcome') {
+                closeBtn.classList.add('hidden');
+            } else {
+                closeBtn.classList.remove('hidden');
+            }
+            
             // Reset modal sizing to standard defaults
             dialogContent.classList.remove('max-w-lg', 'max-w-xl', 'max-h-[90vh]', 'max-h-[95vh]', 'sm:max-h-[85vh]', 'sm:max-h-[90vh]');
             dialogContent.classList.add('max-w-md', 'max-h-[85vh]', 'sm:max-h-[80vh]');
@@ -1309,10 +1315,17 @@
             }
         };
 
-        const closeDialog = () => {
+        const closeDialog = (force = false) => {
             const modal = document.getElementById('dialog-modal');
+            
+            // If the welcome modal is active, prevent any closure unless explicitly forced (i.e. by the CTA button)
+            if (modal.dataset.currentId === 'welcome' && force !== true) {
+                return;
+            }
+            
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            modal.dataset.currentId = '';
             
             if (reviewInterval) {
                 clearInterval(reviewInterval);
@@ -2170,8 +2183,12 @@
             document.getElementById('install-btn').addEventListener('click', handleInstallClick);
 
             // Modal closers
-            document.getElementById('dialog-close-btn').addEventListener('click', closeDialog);
-            document.getElementById('dialog-modal').addEventListener('click', closeDialog);
+            document.getElementById('dialog-close-btn').addEventListener('click', () => closeDialog(false));
+            document.getElementById('dialog-modal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    closeDialog(false);
+                }
+            });
             
             // Map Modal closers & Geolocation click
             document.getElementById('map-close-btn').addEventListener('click', closeMap);
