@@ -1,4 +1,4 @@
-const CACHE_NAME = 'grappa-guest-guide-v28';
+const CACHE_NAME = 'grappa-guest-guide-v29';
 
 // A comprehensive list of assets to cache for a full offline experience.
 const URLS_TO_CACHE = [
