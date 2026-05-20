@@ -1919,7 +1919,51 @@
                     const accuracy = position.coords.accuracy;
                     const latlng = [lat, lon];
                     
-                    // 1. Calculate speed
+                    // 1. Update map marker & circle (Always update so user sees accuracy radius shrinking)
+                    if (!userLocMarker) {
+                        userLocMarker = L.marker(latlng, {
+                            icon: getDirectionalIcon(deviceHeading)
+                        }).addTo(map);
+                        
+                        userLocCircle = L.circle(latlng, {
+                            radius: accuracy,
+                            color: '#3b82f6',
+                            weight: 1,
+                            fillColor: '#3b82f6',
+                            fillOpacity: 0.15
+                        }).addTo(map);
+                        
+                        map.setView(latlng, Math.min(map.getZoom(), 16));
+                    } else {
+                        userLocMarker.setLatLng(latlng);
+                        userLocCircle.setLatLng(latlng).setRadius(accuracy);
+                        
+                        // Update rotation directly on the existing DOM element to prevent recreation flickering
+                        const markerElement = userLocMarker.getElement();
+                        if (markerElement) {
+                            const svg = markerElement.querySelector('svg');
+                            if (svg) {
+                                if (deviceHeading !== null) {
+                                    svg.style.display = 'block';
+                                    svg.style.transform = `rotate(${deviceHeading}deg)`;
+                                } else {
+                                    svg.style.display = 'none';
+                                }
+                            }
+                        }
+                    }
+
+                    // Ignore trail calculations if GPS accuracy is worse than 60 meters (GPS jitter)
+                    if (accuracy > 60) {
+                        const badge = document.getElementById('map-status-badge');
+                        if (badge) {
+                            badge.className = "px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-full shadow-sm bg-amber-500 text-white border border-amber-600 animate-pulse";
+                            badge.textContent = isHe ? 'מחפש לווינים...' : 'CALIBRATING...';
+                        }
+                        return; // Skip speed and trail proximity calculations
+                    }
+                    
+                    // 2. Calculate speed
                     let speedKmh = 0;
                     const now = Date.now();
                     if (position.coords.speed !== null && position.coords.speed >= 0) {
@@ -1936,7 +1980,7 @@
                     
                     document.getElementById('map-trail-speed').textContent = speedKmh > 0.5 ? `${speedKmh.toFixed(1)} km/h` : '0.0 km/h';
                     
-                    // 2. Nearest point analysis
+                    // 3. Nearest point analysis
                     if (activePoints.length > 0) {
                         const closest = findClosestPoint(lat, lon);
                         const closestPoint = activePoints[closest.index];
@@ -1978,40 +2022,6 @@
                         const progressLabel = document.getElementById('ele-progress-label');
                         if (progressLabel) {
                             progressLabel.textContent = `${isHe ? 'התקדמות' : 'Progress'}: ${progressPercent.toFixed(0)}%`;
-                        }
-                    }
-                    
-                    // 3. Update map marker & circle
-                    if (!userLocMarker) {
-                        userLocMarker = L.marker(latlng, {
-                            icon: getDirectionalIcon(deviceHeading)
-                        }).addTo(map);
-                        
-                        userLocCircle = L.circle(latlng, {
-                            radius: accuracy,
-                            color: '#3b82f6',
-                            weight: 1,
-                            fillColor: '#3b82f6',
-                            fillOpacity: 0.15
-                        }).addTo(map);
-                        
-                        map.setView(latlng, Math.min(map.getZoom(), 16));
-                    } else {
-                        userLocMarker.setLatLng(latlng);
-                        userLocCircle.setLatLng(latlng).setRadius(accuracy);
-                        
-                        // Update rotation directly on the existing DOM element to prevent recreation flickering
-                        const markerElement = userLocMarker.getElement();
-                        if (markerElement) {
-                            const svg = markerElement.querySelector('svg');
-                            if (svg) {
-                                if (deviceHeading !== null) {
-                                    svg.style.display = 'block';
-                                    svg.style.transform = `rotate(${deviceHeading}deg)`;
-                                } else {
-                                    svg.style.display = 'none';
-                                }
-                            }
                         }
                     }
                 },
