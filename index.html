@@ -113,18 +113,12 @@
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: -2;
             background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 25%, var(--bg-gradient-3) 50%, var(--bg-gradient-2) 75%, var(--bg-gradient-1) 100%);
             background-size: 400% 400%;
             animation: gradientShift 20s ease infinite;
-            transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateZ(0);
-            will-change: transform, background-position;
+            will-change: background-position;
+            transform: translate3d(0,0,0);
+            -webkit-transform: translate3d(0,0,0);
         }
         .loading-screen { position: fixed; inset: 0; background: linear-gradient(135deg, var(--bg-gradient-2) 0%, var(--bg-gradient-3) 100%); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease-out; }
         .loading-spinner { width: 60px; height: 60px; border: 4px solid var(--shadow-light); border-top-color: var(--text-secondary); border-radius: 50%; animation: spin 1s linear infinite; }
@@ -152,7 +146,7 @@
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid var(--glass-border);
             box-shadow: 0 8px 32px var(--shadow-medium), inset 0 0 0 1px var(--glass-border);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .glass-enhanced {
             background: var(--glass-bg-enhanced);
@@ -160,7 +154,7 @@
             -webkit-backdrop-filter: blur(25px) saturate(200%);
             border: 1px solid var(--glass-border);
             box-shadow: 0 12px 48px var(--shadow-heavy), inset 0 0 0 1px var(--glass-border);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         /* 3D Depth Shadow System */
         .card-hover {
@@ -326,6 +320,29 @@
             background-image: radial-gradient(#d4b996 1px, transparent 0), radial-gradient(#d4b996 1px, transparent 0);
             background-size: 24px 24px;
             background-position: 0 0, 12px 12px;
+        }
+
+        /* Mobile performance & hardware acceleration optimizations to prevent flickering */
+        #dialog-modal, #map-modal, #image-modal, #language-modal {
+            will-change: opacity;
+            transform: translate3d(0, 0, 0);
+            -webkit-transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        #dialog-modal > div, #language-modal > div, #image-modal > div {
+            will-change: transform, opacity;
+            transform: translate3d(0, 0, 0);
+            -webkit-transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .animate-float, .animate-pulse {
+            will-change: transform, opacity;
+            transform: translate3d(0, 0, 0);
+            -webkit-transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
         }
     </style>
 </head>
@@ -1813,8 +1830,7 @@
                 heading = 360 - e.alpha;
             }
             if (heading !== null) {
-                // Apply correction: 300 degrees counter-clockwise offset (equivalent to adding 60 degrees clockwise)
-                deviceHeading = Math.round((heading + 60) % 360);
+                deviceHeading = Math.round(heading);
                 if (userLocMarker) {
                     // Update rotation directly on the existing DOM element to prevent recreation flickering
                     const markerElement = userLocMarker.getElement();
@@ -2218,26 +2234,6 @@
             document.getElementById('map-location-btn').addEventListener('click', toggleLocationTracking);
             document.getElementById('map-layer-btn').addEventListener('click', toggleMapLayer);
             document.getElementById('map-panel-header').addEventListener('click', toggleElevationProfile);
-
-            // Prevent map from panning/dragging during two-finger zoom/rotation gestures
-            const mapContainer = document.getElementById('map-container');
-            const handleMapTouch = (e) => {
-                if (map) {
-                    if (e.touches.length >= 2) {
-                        if (map.dragging.enabled()) {
-                            map.dragging.disable();
-                        }
-                    } else {
-                        if (!map.dragging.enabled()) {
-                            map.dragging.enable();
-                        }
-                    }
-                }
-            };
-            mapContainer.addEventListener('touchstart', handleMapTouch, { passive: true });
-            mapContainer.addEventListener('touchmove', handleMapTouch, { passive: true });
-            mapContainer.addEventListener('touchend', handleMapTouch, { passive: true });
-            mapContainer.addEventListener('touchcancel', handleMapTouch, { passive: true });
             
             // Zoom Image closers
             document.getElementById('image-close-btn').addEventListener('click', closeZoomImage);
