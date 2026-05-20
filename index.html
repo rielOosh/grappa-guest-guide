@@ -1098,20 +1098,11 @@
                             <p class="font-semibold">
                                 כדי לעזור לנו לשמור על היחידות במצב מושלם, כך שיישארו יפהפיות גם בביקור הבא שלכם, ולמען האורחים שיגיעו אחריכם, נודה לכם אם תקפידו על הדברים הבאים:
                             </p>
-                            <ul class="space-y-3.5 pl-0 list-none">
-                                <li class="flex items-start gap-2">
-                                    <span class="text-blue-500 mt-1 select-none font-bold">✦</span>
-                                    <span>התרווחו ותיהנו מכל הפינוקים שהיחידה מציעה (אנא השאירו את מגבות החדר, האביזרים ופריטי העיצוב בתוך היחידה).</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-blue-500 mt-1 select-none font-bold">✦</span>
-                                    <span>התייחסו בעדינות ובאכפתיות לריהוט ולאלמנטים העיצוביים.</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-blue-500 mt-1 select-none font-bold">✦</span>
-                                    <span>שמרו על ניקיון היחידה, כדי שתישאר רעננה ומזמינה.</span>
-                                </li>
-                            </ul>
+                            <div class="space-y-4">
+                                <p>התרווחו ותיהנו מכל הפינוקים שהיחידה מציעה (אנא השאירו את מגבות החדר, האביזרים ופריטי העיצוב בתוך היחידה).</p>
+                                <p>התייחסו בעדינות ובאכפתיות לריהוט ולאלמנטים העיצוביים.</p>
+                                <p>שמרו על ניקיון היחידה, כדי שתישאר רעננה ומזמינה.</p>
+                            </div>
                             <p class="font-bold text-slate-950 dark:text-white pt-3 border-t border-slate-200/50 dark:border-slate-800">
                                 תודה על האכפתיות שלכם כלפי המקום ועל כך שאתם עוזרים לנו לשמור על העסק שלנו.
                             </p>
@@ -1134,20 +1125,11 @@
                             <p class="font-semibold">
                                 To help us keep the units in perfect condition, ensuring they remain just as beautiful when you return to visit us, and for the travelers who follow you, we kindly ask that you:
                             </p>
-                            <ul class="space-y-3.5 pl-0 list-none">
-                                <li class="flex items-start gap-2">
-                                    <span class="text-blue-500 mt-1 select-none font-bold">✦</span>
-                                    <span>Cozy up and enjoy all room amenities inside the unit (please keep indoor towels, accessories, and decor inside).</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-blue-500 mt-1 select-none font-bold">✦</span>
-                                    <span>Treat the room’s furniture and design elements with gentle care.</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-blue-500 mt-1 select-none font-bold">✦</span>
-                                    <span>Maintain the cleanliness of your unit so it stays fresh and welcoming.</span>
-                                </li>
-                            </ul>
+                            <div class="space-y-4">
+                                <p>Cozy up and enjoy all room amenities inside the unit (please keep indoor towels, accessories, and decor inside).</p>
+                                <p>Treat the room’s furniture and design elements with gentle care.</p>
+                                <p>Maintain the cleanliness of your unit so it stays fresh and welcoming.</p>
+                            </div>
                             <p class="font-bold text-slate-950 dark:text-white pt-3 border-t border-slate-200/50 dark:border-slate-800">
                                 Thank you for helping us preserving our business, by caring for this space.
                             </p>
@@ -1278,10 +1260,14 @@
             dialogTitle.style.fontSize = '';
             
             // 1.125x scaling for welcome modal
+            const closeBtn = document.getElementById('dialog-close-btn');
             if (id === 'welcome') {
                 dialogContent.classList.remove('max-w-md', 'max-h-[85vh]');
                 dialogContent.classList.add('max-w-lg', 'max-h-[90vh]');
                 dialogTitle.style.fontSize = '1.6875rem'; // 27px (1.125x of 24px)
+                if (closeBtn) closeBtn.classList.add('hidden');
+            } else {
+                if (closeBtn) closeBtn.classList.remove('hidden');
             }
             
             dialogTitle.textContent = title;
@@ -1487,7 +1473,8 @@
             
             if (activeMapType === 'satellite') {
                 mapLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                    maxZoom: 19
+                    maxZoom: 19,
+                    maxNativeZoom: 18
                 }).addTo(map);
                 document.getElementById('map-layer-btn').querySelector('span').textContent = 'map';
                 document.getElementById('map-layer-btn').setAttribute('aria-label', 'Toggle Street Map');
@@ -1594,7 +1581,8 @@
                     // Add active layer based on activeMapType
                     if (activeMapType === 'satellite') {
                         mapLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                            maxZoom: 19
+                            maxZoom: 19,
+                            maxNativeZoom: 18
                         }).addTo(map);
                         document.getElementById('map-layer-btn').querySelector('span').textContent = 'map';
                     } else {
@@ -1819,7 +1807,15 @@
             if (heading !== null) {
                 deviceHeading = Math.round(heading);
                 if (userLocMarker) {
-                    userLocMarker.setIcon(getDirectionalIcon(deviceHeading));
+                    // Update rotation directly on the existing DOM element to prevent recreation flickering
+                    const markerElement = userLocMarker.getElement();
+                    if (markerElement) {
+                        const svg = markerElement.querySelector('svg');
+                        if (svg) {
+                            svg.style.display = 'block';
+                            svg.style.transform = `rotate(${deviceHeading}deg)`;
+                        }
+                    }
                 }
             }
         };
@@ -1973,8 +1969,21 @@
                         map.setView(latlng, Math.min(map.getZoom(), 16));
                     } else {
                         userLocMarker.setLatLng(latlng);
-                        userLocMarker.setIcon(getDirectionalIcon(deviceHeading));
                         userLocCircle.setLatLng(latlng).setRadius(accuracy);
+                        
+                        // Update rotation directly on the existing DOM element to prevent recreation flickering
+                        const markerElement = userLocMarker.getElement();
+                        if (markerElement) {
+                            const svg = markerElement.querySelector('svg');
+                            if (svg) {
+                                if (deviceHeading !== null) {
+                                    svg.style.display = 'block';
+                                    svg.style.transform = `rotate(${deviceHeading}deg)`;
+                                } else {
+                                    svg.style.display = 'none';
+                                }
+                            }
+                        }
                     }
                 },
                 err => {
@@ -2185,7 +2194,15 @@
 
             // Modal closers
             document.getElementById('dialog-close-btn').addEventListener('click', closeDialog);
-            document.getElementById('dialog-modal').addEventListener('click', closeDialog);
+            document.getElementById('dialog-modal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    const closeBtn = document.getElementById('dialog-close-btn');
+                    const isWelcome = closeBtn && closeBtn.classList.contains('hidden');
+                    if (!isWelcome) {
+                        closeDialog();
+                    }
+                }
+            });
             
             // Map Modal closers & Geolocation click
             document.getElementById('map-close-btn').addEventListener('click', closeMap);
