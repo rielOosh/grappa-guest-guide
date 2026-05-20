@@ -35,7 +35,6 @@
     <!-- Leaflet.js Mapping Library (for the interactive hikes map) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js"></script>
     <script src="./gpx_data.js"></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1579,34 +1578,9 @@
                     if (!map) {
                         map = L.map('map-container', {
                             zoomControl: false,
-                            attributionControl: false,
-                            rotate: true,
-                            touchRotate: true,
-                            touchZoom: 'center'
+                            attributionControl: false
                         });
                         L.control.zoom({ position: 'bottomleft' }).addTo(map);
-
-                        // Prevent map from panning/dragging during pinch-rotate gesture
-                        map.on('rotatestart', () => {
-                            map.dragging.disable();
-                        });
-                        map.on('rotateend', () => {
-                            map.dragging.enable();
-                        });
-
-                        // Dynamically update location marker direction when map is rotated
-                        map.on('rotate', () => {
-                            if (userLocMarker && deviceHeading !== null) {
-                                const markerElement = userLocMarker.getElement();
-                                if (markerElement) {
-                                    const svg = markerElement.querySelector('svg');
-                                    if (svg) {
-                                        const bearing = map.getBearing();
-                                        svg.style.transform = `rotate(${deviceHeading - bearing}deg)`;
-                                    }
-                                }
-                            }
-                        });
                     }
                     
                     // Clear previous layer
@@ -1846,9 +1820,8 @@
                     if (markerElement) {
                         const svg = markerElement.querySelector('svg');
                         if (svg) {
-                            const bearing = (map && typeof map.getBearing === 'function') ? map.getBearing() : 0;
                             svg.style.display = 'block';
-                            svg.style.transform = `rotate(${deviceHeading - bearing}deg)`;
+                            svg.style.transform = `rotate(${deviceHeading}deg)`;
                         }
                     }
                 }
@@ -1988,10 +1961,9 @@
                     }
                     
                     // 3. Update map marker & circle
-                    const bearing = (map && typeof map.getBearing === 'function') ? map.getBearing() : 0;
                     if (!userLocMarker) {
                         userLocMarker = L.marker(latlng, {
-                            icon: getDirectionalIcon(deviceHeading !== null ? deviceHeading - bearing : null)
+                            icon: getDirectionalIcon(deviceHeading)
                         }).addTo(map);
                         
                         userLocCircle = L.circle(latlng, {
@@ -2014,7 +1986,7 @@
                             if (svg) {
                                 if (deviceHeading !== null) {
                                     svg.style.display = 'block';
-                                    svg.style.transform = `rotate(${deviceHeading - bearing}deg)`;
+                                    svg.style.transform = `rotate(${deviceHeading}deg)`;
                                 } else {
                                     svg.style.display = 'none';
                                 }
