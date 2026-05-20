@@ -74,6 +74,8 @@
             --shadow-medium: rgba(0, 0, 0, 0.15);
             --shadow-heavy: rgba(0, 0, 0, 0.25);
             --shadow-xl: rgba(0, 0, 0, 0.4);
+            --scrollbar-thumb: rgba(100, 116, 139, 0.45);
+            --scrollbar-thumb-hover: rgba(71, 85, 105, 0.7);
         }
 
         /* Night Theme (8 PM - 8 AM) - Original colors */
@@ -103,6 +105,8 @@
             --shadow-medium: rgba(0, 0, 0, 0.3);
             --shadow-heavy: rgba(0, 0, 0, 0.5);
             --shadow-xl: rgba(0, 0, 0, 0.7);
+            --scrollbar-thumb: rgba(255, 255, 255, 0.25);
+            --scrollbar-thumb-hover: rgba(255, 255, 255, 0.55);
         }
 
         * { -webkit-tap-highlight-color: transparent; }
@@ -241,8 +245,8 @@
         }
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; transition: background 0.3s ease; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 10px; transition: background 0.3s ease; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
         .haptic { transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1); }
         .haptic:active { transform: scale(0.98); }
         .gradient-text {
