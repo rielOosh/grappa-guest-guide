@@ -1102,54 +1102,54 @@
             
             if (isHe) {
                 return `
-                    <div class="${alignClass} space-y-5" dir="${dirAttr}">
-                        <div class="space-y-5 text-lg leading-relaxed text-slate-900 dark:text-white">
+                    <div class="${alignClass} space-y-3.5 md:space-y-5" dir="${dirAttr}">
+                        <div class="space-y-3 md:space-y-4 text-sm md:text-base leading-relaxed text-slate-900 dark:text-white">
                             <p class="font-bold text-slate-950 dark:text-white">
                                 השקענו את כל הלב בעיצוב המקום, ובחרנו כל פרט בקפידה כדי להעניק לכם חופשה יוקרתית ונעימה.
                             </p>
                             <p class="font-semibold">
                                 כדי לעזור לנו לשמור על היחידות במצב מושלם, כך שיישארו יפהפיות גם בביקור הבא שלכם, ולמען האורחים שיגיעו אחריכם, נודה לכם אם תקפידו על הדברים הבאים:
                             </p>
-                            <div class="space-y-4">
+                            <div class="space-y-2 md:space-y-3 border-r-2 border-slate-300 dark:border-slate-700 pr-3 my-2 text-xs md:text-sm">
                                 <p>התרווחו ותיהנו מכל הפינוקים שהיחידה מציעה (אנא השאירו את מגבות החדר, האביזרים ופריטי העיצוב בתוך היחידה).</p>
                                 <p>התייחסו בעדינות ובאכפתיות לריהוט ולאלמנטים העיצוביים.</p>
                                 <p>שמרו על ניקיון היחידה, כדי שתישאר רעננה ומזמינה.</p>
                             </div>
-                            <p class="font-bold text-slate-950 dark:text-white pt-3 border-t border-slate-200/50 dark:border-slate-800">
+                            <p class="font-bold text-slate-950 dark:text-white pt-2 border-t border-slate-200/50 dark:border-slate-800">
                                 תודה על האכפתיות שלכם כלפי המקום ועל כך שאתם עוזרים לנו לשמור על העסק שלנו.
                             </p>
-                            <p class="text-xl font-extrabold text-center text-slate-950 dark:text-white pt-2">
+                            <p class="text-base md:text-lg font-extrabold text-center text-slate-950 dark:text-white pt-1">
                                 שתהיה לכם חופשה נפלאה!
                             </p>
                         </div>
-                        <button onclick="closeDialog()" class="w-full mt-5 bg-slate-800 text-white font-extrabold py-4 px-6 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 btn-premium haptic dark:bg-slate-700 dark:hover:bg-slate-600 text-center text-lg">
+                        <button onclick="closeDialog()" class="w-full mt-3 bg-slate-800 text-white font-extrabold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 btn-premium haptic dark:bg-slate-700 dark:hover:bg-slate-600 text-center text-base md:text-lg">
                             לאפליקציה
                         </button>
                     </div>
                 `;
             } else {
                 return `
-                    <div class="${alignClass} space-y-5" dir="${dirAttr}">
-                        <div class="space-y-5 text-lg leading-relaxed text-slate-900 dark:text-white">
+                    <div class="${alignClass} space-y-3.5 md:space-y-5" dir="${dirAttr}">
+                        <div class="space-y-3 md:space-y-4 text-sm md:text-base leading-relaxed text-slate-900 dark:text-white">
                             <p class="font-bold text-slate-950 dark:text-white">
                                 We have invested our hearts into designing this space, choosing every detail to offer you a premium, unforgettable getaway.
                             </p>
                             <p class="font-semibold">
                                 To help us keep the units in perfect condition, ensuring they remain just as beautiful when you return to visit us, and for the travelers who follow you, we kindly ask that you:
                             </p>
-                            <div class="space-y-4">
+                            <div class="space-y-2 md:space-y-3 border-l-2 border-slate-300 dark:border-slate-700 pl-3 my-2 text-xs md:text-sm">
                                 <p>Cozy up and enjoy all room amenities inside the unit (please keep indoor towels, accessories, and decor inside).</p>
                                 <p>Treat the room’s furniture and design elements with gentle care.</p>
                                 <p>Maintain the cleanliness of your unit so it stays fresh and welcoming.</p>
                             </div>
-                            <p class="font-bold text-slate-950 dark:text-white pt-3 border-t border-slate-200/50 dark:border-slate-800">
+                            <p class="font-bold text-slate-950 dark:text-white pt-2 border-t border-slate-200/50 dark:border-slate-800">
                                 Thank you for helping us preserving our business, by caring for this space.
                             </p>
-                            <p class="text-xl font-extrabold text-center text-slate-950 dark:text-white pt-2">
+                            <p class="text-base md:text-lg font-extrabold text-center text-slate-950 dark:text-white pt-1">
                                 Have a wonderful stay!
                             </p>
                         </div>
-                        <button onclick="closeDialog()" class="w-full mt-5 bg-slate-800 text-white font-extrabold py-4 px-6 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 btn-premium haptic dark:bg-slate-700 dark:hover:bg-slate-600 text-center text-lg">
+                        <button onclick="closeDialog()" class="w-full mt-3 bg-slate-800 text-white font-extrabold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 btn-premium haptic dark:bg-slate-700 dark:hover:bg-slate-600 text-center text-base md:text-lg">
                             To the App
                         </button>
                     </div>
@@ -1275,8 +1275,8 @@
             const closeBtn = document.getElementById('dialog-close-btn');
             if (id === 'welcome') {
                 dialogContent.classList.remove('max-w-md', 'max-h-[85vh]');
-                dialogContent.classList.add('max-w-lg', 'max-h-[90vh]');
-                dialogTitle.style.fontSize = '1.6875rem'; // 27px (1.125x of 24px)
+                dialogContent.classList.add('max-w-lg', 'max-h-[92vh]');
+                dialogTitle.style.fontSize = window.innerWidth < 768 ? '1.35rem' : '1.6875rem'; // Responsive text size
                 if (closeBtn) closeBtn.classList.add('hidden');
             } else {
                 if (closeBtn) closeBtn.classList.remove('hidden');
