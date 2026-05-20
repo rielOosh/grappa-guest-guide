@@ -1581,9 +1581,32 @@
                             zoomControl: false,
                             attributionControl: false,
                             rotate: true,
-                            touchRotate: true
+                            touchRotate: true,
+                            touchZoom: 'center'
                         });
                         L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+                        // Prevent map from panning/dragging during pinch-rotate gesture
+                        map.on('rotatestart', () => {
+                            map.dragging.disable();
+                        });
+                        map.on('rotateend', () => {
+                            map.dragging.enable();
+                        });
+
+                        // Dynamically update location marker direction when map is rotated
+                        map.on('rotate', () => {
+                            if (userLocMarker && deviceHeading !== null) {
+                                const markerElement = userLocMarker.getElement();
+                                if (markerElement) {
+                                    const svg = markerElement.querySelector('svg');
+                                    if (svg) {
+                                        const bearing = map.getBearing();
+                                        svg.style.transform = `rotate(${deviceHeading - bearing}deg)`;
+                                    }
+                                }
+                            }
+                        });
                     }
                     
                     // Clear previous layer
@@ -1823,8 +1846,9 @@
                     if (markerElement) {
                         const svg = markerElement.querySelector('svg');
                         if (svg) {
+                            const bearing = (map && typeof map.getBearing === 'function') ? map.getBearing() : 0;
                             svg.style.display = 'block';
-                            svg.style.transform = `rotate(${deviceHeading}deg)`;
+                            svg.style.transform = `rotate(${deviceHeading - bearing}deg)`;
                         }
                     }
                 }
@@ -1964,9 +1988,10 @@
                     }
                     
                     // 3. Update map marker & circle
+                    const bearing = (map && typeof map.getBearing === 'function') ? map.getBearing() : 0;
                     if (!userLocMarker) {
                         userLocMarker = L.marker(latlng, {
-                            icon: getDirectionalIcon(deviceHeading)
+                            icon: getDirectionalIcon(deviceHeading !== null ? deviceHeading - bearing : null)
                         }).addTo(map);
                         
                         userLocCircle = L.circle(latlng, {
@@ -1989,7 +2014,7 @@
                             if (svg) {
                                 if (deviceHeading !== null) {
                                     svg.style.display = 'block';
-                                    svg.style.transform = `rotate(${deviceHeading}deg)`;
+                                    svg.style.transform = `rotate(${deviceHeading - bearing}deg)`;
                                 } else {
                                     svg.style.display = 'none';
                                 }
@@ -2220,6 +2245,26 @@
             document.getElementById('map-location-btn').addEventListener('click', toggleLocationTracking);
             document.getElementById('map-layer-btn').addEventListener('click', toggleMapLayer);
             document.getElementById('map-panel-header').addEventListener('click', toggleElevationProfile);
+
+            // Prevent map from panning/dragging during two-finger zoom/rotation gestures
+            const mapContainer = document.getElementById('map-container');
+            const handleMapTouch = (e) => {
+                if (map) {
+                    if (e.touches.length >= 2) {
+                        if (map.dragging.enabled()) {
+                            map.dragging.disable();
+                        }
+                    } else {
+                        if (!map.dragging.enabled()) {
+                            map.dragging.enable();
+                        }
+                    }
+                }
+            };
+            mapContainer.addEventListener('touchstart', handleMapTouch, { passive: true });
+            mapContainer.addEventListener('touchmove', handleMapTouch, { passive: true });
+            mapContainer.addEventListener('touchend', handleMapTouch, { passive: true });
+            mapContainer.addEventListener('touchcancel', handleMapTouch, { passive: true });
             
             // Zoom Image closers
             document.getElementById('image-close-btn').addEventListener('click', closeZoomImage);
