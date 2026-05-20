@@ -1813,7 +1813,8 @@
                 heading = 360 - e.alpha;
             }
             if (heading !== null) {
-                deviceHeading = Math.round(heading);
+                // Apply correction: 300 degrees counter-clockwise offset (equivalent to adding 60 degrees clockwise)
+                deviceHeading = Math.round((heading + 60) % 360);
                 if (userLocMarker) {
                     // Update rotation directly on the existing DOM element to prevent recreation flickering
                     const markerElement = userLocMarker.getElement();
