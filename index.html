@@ -1776,6 +1776,7 @@
             
             // Clean up compass orientation listener
             window.removeEventListener('deviceorientation', handleOrientation, true);
+            window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
             deviceHeading = null;
             
             if (locationWatcher) {
@@ -1799,28 +1800,52 @@
         // Compass event handler
         const handleOrientation = (e) => {
             let heading = null;
-            if (e.webkitCompassHeading) {
+            
+            // 1. iOS Safari uses webkitCompassHeading (magnetic North absolute)
+            if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) {
                 heading = e.webkitCompassHeading;
-            } else if (e.alpha !== null) {
+            } 
+            // 2. Android Chrome uses alpha from deviceorientationabsolute (magnetic North absolute)
+            else if (e.alpha !== null && e.alpha !== undefined) {
                 heading = 360 - e.alpha;
             }
+            
             if (heading !== null) {
+                // Adjust for screen orientation (portrait vs landscape angle)
+                let screenAdjustment = 0;
+                if (window.orientation !== undefined) {
+                    screenAdjustment = window.orientation;
+                } else if (window.screen && window.screen.orientation && window.screen.orientation.angle !== undefined) {
+                    screenAdjustment = window.screen.orientation.angle;
+                }
+                
+                heading = (heading + screenAdjustment + 360) % 360;
                 deviceHeading = Math.round(heading);
+                
                 if (userLocMarker) {
-                    userLocMarker.setIcon(getDirectionalIcon(deviceHeading));
+                    // Update rotation directly on the existing DOM element to prevent recreation flickering
+                    const markerElement = userLocMarker.getElement();
+                    if (markerElement) {
+                        const svg = markerElement.querySelector('svg');
+                        if (svg) {
+                            svg.style.display = 'block';
+                            svg.style.transform = `rotate(${deviceHeading}deg)`;
+                        }
+                    }
                 }
             }
         };
 
         const toggleLocationTracking = () => {
             const btn = document.getElementById('map-location-btn');
-            const isHe = language === 'he';
+                        const isHe = language === 'he';
             
             if (locationWatcher) {
                 navigator.geolocation.clearWatch(locationWatcher);
                 locationWatcher = null;
                 
                 window.removeEventListener('deviceorientation', handleOrientation, true);
+                window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
                 deviceHeading = null;
                 
                 if (userLocMarker) { map.removeLayer(userLocMarker); userLocMarker = null; }
@@ -1866,7 +1891,11 @@
                     })
                     .catch(err => console.warn("Orientation permission denied:", err));
             } else {
-                window.addEventListener('deviceorientation', handleOrientation, true);
+                if ('ondeviceorientationabsolute' in window) {
+                    window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+                } else {
+                    window.addEventListener('deviceorientation', handleOrientation, true);
+                }
             }
             
             btn.classList.remove('bg-white', 'text-slate-800');
@@ -1961,8 +1990,21 @@
                         map.setView(latlng, Math.min(map.getZoom(), 16));
                     } else {
                         userLocMarker.setLatLng(latlng);
-                        userLocMarker.setIcon(getDirectionalIcon(deviceHeading));
                         userLocCircle.setLatLng(latlng).setRadius(accuracy);
+                        
+                        // Update rotation directly on the existing DOM element to prevent recreation flickering
+                        const markerElement = userLocMarker.getElement();
+                        if (markerElement) {
+                            const svg = markerElement.querySelector('svg');
+                            if (svg) {
+                                if (deviceHeading !== null) {
+                                    svg.style.display = 'block';
+                                    svg.style.transform = `rotate(${deviceHeading}deg)`;
+                                } else {
+                                    svg.style.display = 'none';
+                                }
+                            }
+                        }
                     }
                 },
                 err => {
