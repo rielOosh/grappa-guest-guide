@@ -1,4 +1,4 @@
-const CACHE_NAME = 'grappa-guest-guide-v26';
+const CACHE_NAME = 'grappa-guest-guide-v27';
 
 // A comprehensive list of assets to cache for a full offline experience.
 const URLS_TO_CACHE = [
@@ -9,6 +9,7 @@ const URLS_TO_CACHE = [
   // Leaflet.js Mapping Library (loaded and cached for offline hiking map)
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
+  'https://cdn.jsdelivr.net/npm/leaflet-rotate@0.2.8/dist/leaflet-rotate-src.js',
   
   'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
   'https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Heebo:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap',
