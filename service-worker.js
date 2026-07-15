@@ -1,4 +1,4 @@
-const CACHE_NAME = 'grappa-guest-guide-v33';
+const CACHE_NAME = 'grappa-guest-guide-v34';
 
 // A comprehensive list of assets to cache for a full offline experience.
 const URLS_TO_CACHE = [
@@ -23,7 +23,7 @@ const URLS_TO_CACHE = [
   'https://i.imgur.com/MBYTWps.png', // Logistics info
   'https://i.imgur.com/ChMRT7d.jpg', // Sushi menu
   './Grocery_hours.jpg',
-  './swiming_pool_instructions.png?v=4',
+  './swiming_pool_instructions.png?v=6',
   'https://i.imgur.com/5vg5NXj.png',  // Spa info (fixed URL)
   
   // Downloadable Trail Files - Caching these ensures guests can access them without a connection.
