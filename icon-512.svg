@@ -1,5 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#64748b"/>
-  <text x="256" y="240" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white">GrappA</text>
-  <text x="256" y="320" text-anchor="middle" dominant-baseline="middle" font-family="Arial, sans-serif" font-size="36" fill="white">Guest Guide</text>
+  <!-- Top Panel: Pale Desert Olive-Champagne -->
+  <rect width="512" height="304" fill="#E2E4A8"/>
+  <!-- Bottom Panel: Warm Desert Clay-Taupe -->
+  <rect y="304" width="512" height="208" fill="#7C7267"/>
+  <!-- Continuous Single-Line Stemmed Grappa Glass & Bulbous Decanter -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Decanter Stopper Rim -->
+    <path d="M 272 96 L 342 96"/>
+    <!-- Left Goblet Bowl -->
+    <path d="M 155 138 C 150 180, 160 202, 184 202 C 208 202, 218 180, 213 138"/>
+    <!-- Goblet Stem flowing into Decanter Left Side -->
+    <path d="M 184 202 L 184 256 C 184 264, 174 270, 146 270 M 184 256 C 184 267, 202 270, 235 270 C 262 270, 272 266, 264 254 C 250 232, 250 198, 285 184 C 293 181, 296 176, 296 168 L 296 96"/>
+    <!-- Decanter Right Side -->
+    <path d="M 318 96 L 318 168 C 318 176, 321 181, 329 184 C 364 198, 364 232, 350 254 C 342 266, 352 270, 378 270"/>
+  </g>
+  <!-- Calligraphic Serif Wordmark -->
+  <text x="256" y="416" text-anchor="middle" font-family="'Cormorant Garamond', 'Georgia', 'Times New Roman', serif" font-size="102" font-weight="600" letter-spacing="4" fill="#FFFFFF">GrappA</text>
+  <text x="256" y="464" text-anchor="middle" font-family="'Inter', 'Heebo', sans-serif" font-size="24" font-weight="500" letter-spacing="6" fill="#E2E4A8" opacity="0.9">KIBBUTZ YAHEL</text>
 </svg>

@@ -1,154 +1,133 @@
-const CACHE_NAME = 'grappa-guest-guide-v35';
+const CACHE_NAME = 'grappa-guest-guide-v36';
 
-// A comprehensive list of assets to cache for a full offline experience.
+// Comprehensive list of App Shell assets to pre-cache for a reliable offline experience.
+// Note: Pre-parsed trail coordinates for all 4 hikes live in ./gpx_data.js (143 KB),
+// while raw .gpx files are cached on-demand if downloaded.
 const URLS_TO_CACHE = [
-  // Core files
+  // Core App Shell
   './',
   './index.html',
-  
-  // Leaflet.js Mapping Library (loaded and cached for offline hiking map)
+  './manifest.json',
+
+  // Leaflet.js Mapping Library (cached for offline hiking map)
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-  
+
+  // Typography & Icon Fonts
   'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200',
-  'https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Heebo:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap',
-  
-  // App Icons
+  'https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Frank+Ruhl+Libre:wght@500;600;700;800&family=Heebo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap',
+
+  // App Icons & Brand Marks
   './grappa_icon_192px.png',
   './grappa_icon_512px.png',
-  
-  // Key Images - All images used in the app for a complete offline UI.
-  './grappa_icon.png', // OG Image (local)
-  'https://i.imgur.com/s6g6A4b.png', // App Icon
-  'https://i.imgur.com/MBYTWps.png', // Logistics info
-  'https://i.imgur.com/ChMRT7d.jpg', // Sushi menu
+  './grappa_icon.png',
+  './icon-192.svg',
+  './icon-512.svg',
+
+  // Local Schedules, Menus & Pool Regulations
   './Grocery_hours.jpg',
   './swiming_pool_instructions.jpg?v=8',
-  'https://i.imgur.com/5vg5NXj.png',  // Spa info (fixed URL)
-  
-  // Downloadable Trail Files - Caching these ensures guests can access them without a connection.
-  './gpx_data.js',
-  './walk_to_the_bulbouse_mountain.gpx',
-  './Zepp20230405100344.gpx',
-  './Zepp20230118153553.gpx',
-  './12km_walk.gpx'
+  './swimming_pool_rules_en-v2.pdf',
+  './swimming_pool_rules_he-v2.pdf',
+  'https://i.imgur.com/ChMRT7d.jpg', // Sushi menu
+  'https://i.imgur.com/5vg5NXj.png', // Spa info
+
+  // Pre-parsed Offline Trail Data (all 4 desert hikes)
+  './gpx_data.js'
 ];
 
-// The 'install' event is fired when the service worker is first installed.
+// Install event: pre-cache App Shell assets individually so a single external failure never blocks install
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Service Worker: Caching App Shell');
-        // Cache each URL individually to handle CORS issues gracefully
+        console.log('Service Worker: Caching App Shell (v36)');
         return Promise.all(
           URLS_TO_CACHE.map(url => {
             return cache.add(url).catch(err => {
-              console.warn('Failed to cache:', url, err);
-              // Continue with other resources even if one fails
+              console.warn('Failed to pre-cache:', url, err);
             });
           })
         );
       })
-      .then(() => {
-        // This forces the waiting service worker to become the active service worker.
-        console.log('Service Worker: Skip waiting');
-        return self.skipWaiting();
-      })
+      .then(() => self.skipWaiting())
   );
 });
 
-// The 'activate' event is fired when the service worker becomes active.
-// It's the perfect place to clean up old, unused caches.
+// Activate event: clean up older caches and claim clients immediately
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          // If a cache's name is different from our current one, we delete it.
           if (cacheName !== CACHE_NAME) {
             console.log('Service Worker: Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
-    }).then(() => {
-      // Take control of all open clients (pages) without requiring a reload.
-      console.log('Service Worker: Claiming clients');
-      return self.clients.claim();
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
-// The 'fetch' event is fired for every network request.
-// We intercept this to serve cached assets when available.
+// Fetch event: Network-first for HTML navigation; Cache-first with runtime caching for assets & tiles
 self.addEventListener('fetch', event => {
-  // We only want to cache GET requests.
   if (event.request.method !== 'GET') {
     return;
   }
-  
-  // Use a "Network first, falling back to cache" strategy for HTML
-  // This ensures fresh content when online
-  if (event.request.mode === 'navigate' || event.request.url.endsWith('.html')) {
+
+  const reqUrl = new URL(event.request.url);
+  const isSameOrigin = reqUrl.origin === self.location.origin;
+
+  // IMPORTANT: Only ignore query strings for same-origin static assets (e.g., ?v=8 cache-busters).
+  // Cross-origin URLs like https://fonts.googleapis.com/css2?family=... rely on query parameters!
+  const matchOptions = isSameOrigin ? { ignoreSearch: true } : { ignoreSearch: false };
+
+  // Network-first strategy for HTML documents
+  if (event.request.mode === 'navigate' || reqUrl.pathname.endsWith('.html')) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          // Clone the response before using it
-          const responseToCache = response.clone();
-          
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache).catch(err => {
-                console.warn('Cache put failed for html:', err);
-              });
-            })
-            .catch(err => {
-              console.warn('Cache open failed for html:', err);
+          if (response && response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseToCache).catch(() => {});
             });
-          
+          }
           return response;
         })
         .catch(() => {
-          // If network fails, try the cache
-          return caches.match(event.request, { ignoreSearch: true });
+          return caches.match(event.request, { ignoreSearch: true })
+            .then(cached => cached || caches.match('./index.html', { ignoreSearch: true }));
         })
     );
     return;
   }
-  
-  // For other assets, use cache first for performance
+
+  // Cache-first strategy for static assets, fonts, images, and viewed map tiles
   event.respondWith(
-    caches.match(event.request, { ignoreSearch: true })
+    caches.match(event.request, matchOptions)
       .then(cachedResponse => {
         if (cachedResponse) {
           return cachedResponse;
         }
-        
+
         return fetch(event.request)
           .then(networkResponse => {
-            // Only cache successful responses from our origin
-            if (!networkResponse || networkResponse.status !== 200) {
+            if (!networkResponse || (networkResponse.status !== 200 && networkResponse.type !== 'opaque')) {
               return networkResponse;
             }
-            
+
             const responseToCache = networkResponse.clone();
-            
             caches.open(CACHE_NAME)
               .then(cache => {
-                cache.put(event.request, responseToCache).catch(err => {
-                  console.warn('Cache put failed for asset:', err);
-                });
-              })
-              .catch(err => {
-                console.warn('Cache open failed for asset:', err);
+                cache.put(event.request, responseToCache).catch(() => {});
               });
-            
+
             return networkResponse;
           })
-          .catch(err => {
-            console.warn('Asset fetch failed, falling back to cache if available:', err);
-            return caches.match(event.request, { ignoreSearch: true });
+          .catch(() => {
+            return caches.match(event.request, matchOptions);
           });
       })
   );
