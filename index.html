@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>GrappA — Guest Guide · Kibbutz Yahel</title>
     <meta name="description" content="Your boutique desert sanctuary companion for GrappA in Kibbutz Yahel. Access WiFi, kibbutz schedules, local desert hikes with offline GPS maps, and concierge services.">
-    <meta name="theme-color" content="#F5F0E6" id="theme-color-meta">
+    <meta name="theme-color" content="#F3F4F5" id="theme-color-meta">
     <meta property="og:title" content="GrappA Guest Guide · Kibbutz Yahel">
     <meta property="og:description" content="Your boutique desert sanctuary companion for GrappA in Kibbutz Yahel. Access guides, schedules, and offline desert trail maps.">
     <meta property="og:image" content="https://imgur.com/IHdlwgT.png">
@@ -30,7 +30,7 @@
     <link rel="preconnect" href="https://i.imgur.com">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Frank+Ruhl+Libre:wght@500;600;700;800&family=Heebo:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Secular+One&display=swap" rel="stylesheet">
 
     <!-- Leaflet.js Mapping Library (for the interactive offline hikes map) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -44,9 +44,9 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        serif: ['"Cormorant Garamond"', '"Frank Ruhl Libre"', 'Georgia', 'serif'],
-                        sans: ['"Heebo"', '"Inter"', '"Assistant"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-                        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace']
+                        serif: ['"Secular One"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+                        sans: ['"Secular One"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+                        mono: ['"Secular One"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif']
                     }
                 }
             }
@@ -60,33 +60,35 @@
            Night Mode (20:00 - 07:59): Arava Starlight, Deep Basalt & Warm Terracotta
            ========================================================================== */
         :root {
-            --bg-canvas: #F5F0E6;
-            --bg-gradient-1: #EFE8D8;
-            --bg-gradient-2: #E6DEC8;
-            --bg-gradient-3: #F5F0E6;
+            --bg-canvas: #F3F4F5;
+            --bg-gradient-1: #F3F4F5;
+            --bg-gradient-2: #F3F4F5;
+            --bg-gradient-3: #F3F4F5;
 
-            --surface-card: rgba(255, 252, 246, 0.92);
-            --surface-card-hover: rgba(255, 254, 251, 0.98);
+            --surface-card: #FFFFFF;
+            --surface-card-hover: #FFFFFF;
             --surface-elevated: #FFFFFF;
-            --surface-subtle: #EFEAE0;
-            --surface-glass-header: rgba(245, 240, 230, 0.86);
+            --surface-subtle: #F3F4F5;
+            --surface-glass-header: rgba(255, 255, 255, 0.94);
 
-            --border-hairline: rgba(124, 114, 103, 0.22);
-            --border-strong: rgba(124, 114, 103, 0.36);
+            --border-hairline: rgba(110, 114, 118, 0.20);
+            --border-strong: rgba(110, 114, 118, 0.36);
 
-            --text-primary: #241F1B;
-            --text-secondary: #574E46;
-            --text-tertiary: #7A6F65;
+            --text-primary: #3D4145;
+            --text-secondary: #5C6064;
+            --text-tertiary: #75797E;
 
-            --brand-taupe: #7C7267;
-            --brand-taupe-dark: #5E554C;
+            --brand-taupe: #6E7276;
+            --brand-taupe-dark: #565A5E;
             --brand-champagne: #E2E4A8;
-            --brand-champagne-soft: rgba(226, 228, 168, 0.48);
-            --brand-champagne-border: rgba(168, 171, 104, 0.45);
+            --brand-champagne-soft: #E2E4A8;
+            --brand-champagne-border: rgba(110, 114, 118, 0.24);
 
-            --accent-primary: #B85A3A;
-            --accent-primary-hover: #9E492C;
-            --accent-primary-soft: rgba(184, 90, 58, 0.12);
+            --accent-primary: #6E7276;
+            --accent-primary-hover: #5A5E62;
+            --accent-primary-soft: transparent;
+            --btn-primary-text: #FFFFFF;
+            --badge-champagne-text: #3D4145;
 
             --status-open-text: #1E6B38;
             --status-open-bg: #E6F4EA;
@@ -96,67 +98,69 @@
             --status-closed-bg: #FCEAE6;
             --status-closed-border: rgba(140, 59, 43, 0.22);
 
-            --icon-badge-bg: #F3EFE4;
-            --icon-badge-border: rgba(124, 114, 103, 0.20);
+            --icon-badge-bg: #F3F4F5;
+            --icon-badge-border: rgba(110, 114, 118, 0.20);
 
-            --ripple-color: rgba(184, 90, 58, 0.16);
-            --shadow-light: rgba(36, 31, 27, 0.05);
-            --shadow-medium: rgba(36, 31, 27, 0.10);
-            --shadow-heavy: rgba(36, 31, 27, 0.18);
-            --shadow-xl: rgba(23, 20, 18, 0.32);
+            --ripple-color: rgba(110, 114, 118, 0.16);
+            --shadow-light: rgba(67, 71, 75, 0.06);
+            --shadow-medium: rgba(67, 71, 75, 0.12);
+            --shadow-heavy: rgba(67, 71, 75, 0.18);
+            --shadow-xl: rgba(40, 43, 46, 0.32);
 
-            --scrollbar-thumb: rgba(124, 114, 103, 0.40);
-            --scrollbar-thumb-hover: rgba(124, 114, 103, 0.65);
+            --scrollbar-thumb: rgba(110, 114, 118, 0.40);
+            --scrollbar-thumb-hover: rgba(110, 114, 118, 0.65);
         }
 
         [data-theme="night"] {
-            --bg-canvas: #171412;
-            --bg-gradient-1: #171412;
-            --bg-gradient-2: #211C18;
-            --bg-gradient-3: #29231E;
+            --bg-canvas: #5B5F64;
+            --bg-gradient-1: #5B5F64;
+            --bg-gradient-2: #5B5F64;
+            --bg-gradient-3: #5B5F64;
 
-            --surface-card: rgba(38, 33, 29, 0.92);
-            --surface-card-hover: rgba(46, 40, 35, 0.96);
-            --surface-elevated: #2E2823;
-            --surface-subtle: #221E1A;
-            --surface-glass-header: rgba(23, 20, 18, 0.86);
+            --surface-card: #6E7276;
+            --surface-card-hover: #75797E;
+            --surface-elevated: #64686D;
+            --surface-subtle: #55595E;
+            --surface-glass-header: rgba(91, 95, 100, 0.94);
 
-            --border-hairline: rgba(226, 228, 168, 0.14);
-            --border-strong: rgba(226, 228, 168, 0.28);
+            --border-hairline: rgba(255, 255, 255, 0.20);
+            --border-strong: rgba(226, 228, 168, 0.45);
 
-            --text-primary: #F6F3EC;
-            --text-secondary: #C9C0B5;
-            --text-tertiary: #9E9285;
+            --text-primary: #FFFFFF;
+            --text-secondary: rgba(255, 255, 255, 0.90);
+            --text-tertiary: rgba(255, 255, 255, 0.76);
 
-            --brand-taupe: #9E9285;
-            --brand-taupe-dark: #7C7267;
-            --brand-champagne: rgba(226, 228, 168, 0.18);
-            --brand-champagne-soft: rgba(226, 228, 168, 0.12);
-            --brand-champagne-border: rgba(226, 228, 168, 0.28);
+            --brand-taupe: #4B4F53;
+            --brand-taupe-dark: #484C50;
+            --brand-champagne: #E2E4A8;
+            --brand-champagne-soft: #E2E4A8;
+            --brand-champagne-border: rgba(255, 255, 255, 0.30);
 
-            --accent-primary: #D97757;
-            --accent-primary-hover: #E3886B;
-            --accent-primary-soft: rgba(217, 119, 87, 0.18);
+            --accent-primary: #E2E4A8;
+            --accent-primary-hover: #D6D996;
+            --accent-primary-soft: transparent;
+            --btn-primary-text: #35383C;
+            --badge-champagne-text: #35383C;
 
-            --status-open-text: #4ADE80;
-            --status-open-bg: rgba(34, 197, 94, 0.16);
-            --status-open-border: rgba(74, 222, 128, 0.30);
+            --status-open-text: #E2E4A8;
+            --status-open-bg: rgba(226, 228, 168, 0.16);
+            --status-open-border: rgba(226, 228, 168, 0.38);
 
             --status-closed-text: #FCA5A5;
-            --status-closed-bg: rgba(239, 68, 68, 0.16);
-            --status-closed-border: rgba(252, 165, 165, 0.28);
+            --status-closed-bg: rgba(239, 68, 68, 0.20);
+            --status-closed-border: rgba(252, 165, 165, 0.34);
 
-            --icon-badge-bg: #2B2520;
-            --icon-badge-border: rgba(226, 228, 168, 0.16);
+            --icon-badge-bg: #5B5F64;
+            --icon-badge-border: rgba(255, 255, 255, 0.20);
 
             --ripple-color: rgba(226, 228, 168, 0.18);
-            --shadow-light: rgba(0, 0, 0, 0.22);
-            --shadow-medium: rgba(0, 0, 0, 0.38);
-            --shadow-heavy: rgba(0, 0, 0, 0.55);
-            --shadow-xl: rgba(0, 0, 0, 0.75);
+            --shadow-light: rgba(0, 0, 0, 0.14);
+            --shadow-medium: rgba(0, 0, 0, 0.22);
+            --shadow-heavy: rgba(0, 0, 0, 0.38);
+            --shadow-xl: rgba(0, 0, 0, 0.55);
 
-            --scrollbar-thumb: rgba(226, 228, 168, 0.22);
-            --scrollbar-thumb-hover: rgba(226, 228, 168, 0.42);
+            --scrollbar-thumb: rgba(255, 255, 255, 0.28);
+            --scrollbar-thumb-hover: rgba(255, 255, 255, 0.48);
         }
 
         * {
@@ -169,7 +173,8 @@
             min-height: 100vh;
             background-color: var(--bg-canvas);
             color: var(--text-primary);
-            font-family: 'Heebo', 'Inter', 'Assistant', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Secular One', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-synthesis: none;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -178,20 +183,16 @@
 
         /* Static, battery-friendly desert architectural backdrop (0% idle GPU drain) */
         body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background:
-                radial-gradient(circle at 15% 10%, var(--brand-champagne-soft) 0%, transparent 45%),
-                radial-gradient(circle at 85% 85%, var(--accent-primary-soft) 0%, transparent 50%),
-                linear-gradient(160deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
-            transition: background 0.5s ease;
+            display: none;
         }
 
         /* Typography & Numerals */
         .font-editorial {
-            font-family: 'Cormorant Garamond', 'Frank Ruhl Libre', Georgia, serif;
+            font-family: 'Secular One', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .font-app-icon {
+            font-family: 'Cormorant Garamond', 'Georgia', 'Times New Roman', serif;
+            font-synthesis: weight;
         }
         .tabular-nums {
             font-variant-numeric: tabular-nums;
@@ -241,7 +242,7 @@
 
         .btn-terracotta {
             background-color: var(--accent-primary);
-            color: #FFFFFF;
+            color: var(--btn-primary-text);
             transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
         .btn-terracotta:hover {
@@ -269,7 +270,7 @@
         }
         .badge-champagne {
             background-color: var(--brand-champagne-soft);
-            color: var(--text-primary);
+            color: var(--badge-champagne-text);
             border: 1px solid var(--brand-champagne-border);
         }
 
@@ -408,7 +409,7 @@
         /* Leaflet Custom Desert Theme Styling */
         .leaflet-container {
             font-family: inherit;
-            background-color: #E6DEC8;
+            background-color: #E5E7EB;
         }
         .leaflet-bar {
             border: none !important;
@@ -434,8 +435,8 @@
             background: var(--surface-elevated) !important;
         }
         .offline-map-grid {
-            background-color: #EFE8D8;
-            background-image: radial-gradient(#C8B9A6 1px, transparent 0), radial-gradient(#C8B9A6 1px, transparent 0);
+            background-color: #F3F4F5;
+            background-image: radial-gradient(#9CA3AF 1px, transparent 0), radial-gradient(#9CA3AF 1px, transparent 0);
             background-size: 24px 24px;
             background-position: 0 0, 12px 12px;
         }
@@ -454,8 +455,8 @@
     <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop id="iconGradientStop1" offset="0%" stop-color="#B85A3A" />
-                <stop id="iconGradientStop2" offset="100%" stop-color="#7C7267" />
+                <stop id="iconGradientStop1" offset="0%" stop-color="#6E7276" />
+                <stop id="iconGradientStop2" offset="100%" stop-color="#6E7276" />
             </linearGradient>
         </defs>
     </svg>
@@ -464,7 +465,7 @@
     <div id="loading-screen" class="loading-screen">
         <div class="w-14 h-14 rounded-2xl overflow-hidden shadow-md border border-theme flex flex-col">
             <div class="h-8 bg-[#E2E4A8] flex items-center justify-center">
-                <svg class="w-7 h-7" style="filter: drop-shadow(0 1px 1.5px rgba(94, 85, 76, 0.35));" viewBox="0 0 120 80" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-7 h-7" style="filter: drop-shadow(0 1px 1.5px rgba(90, 82, 72, 0.35));" viewBox="0 0 120 80" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M 64 12 L 88 12"/>
                     <path d="M 24 26 C 22 42, 26 50, 35 50 C 44 50, 48 42, 46 26"/>
                     <path d="M 35 50 L 35 68 C 35 71, 31 72, 22 72 M 35 68 C 35 71, 42 72, 54 72 C 63 72, 67 71, 64 66 C 59 58, 59 45, 71 40 C 73 39, 74 37, 74 34 L 74 12"/>
@@ -472,7 +473,7 @@
                 </svg>
             </div>
             <div class="h-6 bg-[#7C7267] flex items-center justify-center">
-                <span class="font-editorial text-[11px] font-semibold tracking-wider text-white">GrappA</span>
+                <span class="font-app-icon text-[11px] font-semibold tracking-wider text-white">GrappA</span>
             </div>
         </div>
         <div class="loading-spinner"></div>
@@ -488,27 +489,27 @@
     <header class="sticky top-0 z-30 sticky-header-glass">
         <div class="max-w-xl mx-auto px-4 py-2.5 flex items-center justify-between gap-2">
             <!-- Brand Emblem + Wordmark -->
-            <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-10 h-10 rounded-xl overflow-hidden shadow-sm border border-theme flex-shrink-0 flex flex-col" aria-hidden="true">
-                    <div class="h-6 bg-[#E2E4A8] flex items-center justify-center">
-                        <svg class="w-5 h-5" style="filter: drop-shadow(0 1px 1.2px rgba(74, 66, 59, 0.38));" viewBox="0 0 120 80" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+            <div class="flex items-center">
+                <div class="w-[44px] h-[44px] rounded-[13px] overflow-hidden shadow-sm border border-theme flex-shrink-0 flex flex-col" aria-label="GrappA">
+                    <div class="h-[27px] bg-[#E2E4A8] flex items-center justify-center">
+                        <svg class="w-[27px] h-[19px]" style="filter: drop-shadow(0 1px 1.2px rgba(90, 82, 72, 0.35));" viewBox="16 8 88 68" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M 64 12 L 88 12"/>
                             <path d="M 24 26 C 22 42, 26 50, 35 50 C 44 50, 48 42, 46 26"/>
                             <path d="M 35 50 L 35 68 C 35 71, 31 72, 22 72 M 35 68 C 35 71, 42 72, 54 72 C 63 72, 67 71, 64 66 C 59 58, 59 45, 71 40 C 73 39, 74 37, 74 34 L 74 12"/>
                             <path d="M 80 12 L 80 34 C 80 37, 81 39, 83 40 C 95 45, 95 58, 90 66 C 87 71, 91 72, 100 72"/>
                         </svg>
                     </div>
-                    <div class="h-4 bg-[#7C7267] flex items-center justify-center">
-                        <span class="font-editorial text-[8px] font-bold tracking-wider text-white">GrappA</span>
+                    <div class="h-[17px] bg-[#7C7267] flex items-center justify-center">
+                        <span class="font-app-icon text-[9.5px] font-semibold tracking-wider text-white leading-none">GrappA</span>
                     </div>
                 </div>
                 <div class="min-w-0">
-                    <span class="font-editorial text-2xl font-bold tracking-tight text-theme-primary block leading-none" dir="ltr">GrappA</span>
-                    <span id="header-location-tag" class="text-[11px] font-medium text-theme-secondary block truncate mt-0.5">קיבוץ יהל · ערבה דרומית</span>
+
+
                 </div>
             </div>
 
-            <!-- Action Controls: Welcome Info (ℹ️), Theme Toggle (☀️/🌙), Share (🔗), Language (עב/EN) -->
+            <!-- Action Controls: Welcome Info, Theme Toggle, Share, Language (HE/EN) -->
             <div class="flex items-center gap-1.5 flex-shrink-0">
                 <button id="welcome-btn" class="w-10 h-10 rounded-xl surface-elevated flex items-center justify-center haptic text-theme-primary hover:opacity-80" aria-label="Welcome & House Etiquette" title="Welcome & House Rules">
                     <span class="material-symbols-outlined" style="font-size: 20px;">info</span>
@@ -530,7 +531,7 @@
     <!-- Main Container -->
     <main id="app-container" class="max-w-xl mx-auto px-4 pt-5 pb-14 relative">
         <!-- Editorial Hero Card -->
-        <section class="surface-card rounded-3xl p-6 mb-6 relative overflow-hidden">
+        <section class="surface-card rounded-3xl p-3.5 sm:p-4 mb-4 relative overflow-hidden">
             <!-- Subtle Decorative Desert Goblet Watermark -->
             <div class="absolute -bottom-6 -left-6 opacity-[0.06] dark:opacity-[0.08] pointer-events-none" aria-hidden="true">
                 <svg class="w-40 h-40" viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -542,30 +543,30 @@
             </div>
 
             <div class="relative z-10 flex flex-col items-center text-center">
-                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full badge-champagne text-xs font-semibold mb-3">
-                    <span id="hero-greeting-icon">☀️</span>
+                <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full badge-champagne text-base font-bold mb-1.5">
+                    <span id="hero-greeting-icon" class="material-symbols-outlined" style="font-size: 20px;">wb_sunny</span>
                     <span id="hero-greeting-text">שלום וברוכים הבאים</span>
                 </div>
 
-                <h1 class="font-editorial text-4xl sm:text-5xl font-bold tracking-tight text-theme-primary mb-1.5" dir="ltr">
+                <h1 class="font-editorial text-4xl sm:text-5xl font-bold tracking-tight text-theme-primary mb-1" dir="ltr">
                     GrappA
                 </h1>
-                <p class="text-sm sm:text-base font-medium text-theme-secondary max-w-md" id="hero-subtitle">
+                <p class="text-xl sm:text-2xl font-bold text-theme-secondary max-w-md leading-snug" id="hero-subtitle">
                     מדריך האורחים · חופשה מדברית בקיבוץ יהל
                 </p>
 
                 <!-- Install to Home Screen CTA (Visible on Android/Desktop via beforeinstallprompt AND on iOS Safari) -->
-                <button id="install-btn" class="mt-4 px-4 py-2.5 btn-terracotta rounded-xl font-semibold transition-all shadow-sm haptic text-xs sm:text-sm hidden">
+                <button id="install-btn" class="mt-3 px-4 py-2 btn-terracotta rounded-xl font-bold transition-all shadow-sm haptic text-base hidden">
                     <span class="flex items-center gap-2">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">add_to_home_screen</span>
+                        <span class="material-symbols-outlined" style="font-size: 20px;">add_to_home_screen</span>
                         <span id="install-btn-text">הוסף למסך הבית לגישה מהירה</span>
                     </span>
                 </button>
 
                 <!-- Recently Viewed Quick-Access Pills -->
-                <div id="recently-viewed-container" class="mt-4 pt-3.5 border-t border-theme w-full hidden">
+                <div id="recently-viewed-container" class="mt-3 pt-2.5 border-t border-theme w-full hidden">
                     <div class="flex items-center justify-center gap-2 flex-wrap">
-                        <span class="text-xs font-semibold text-theme-tertiary" id="recently-viewed-title">נצפו לאחרונה:</span>
+                        <span class="text-sm sm:text-base font-bold text-theme-tertiary" id="recently-viewed-title">נצפו לאחרונה:</span>
                         <div id="recently-viewed-list" class="flex gap-1.5 justify-center flex-wrap"></div>
                     </div>
                 </div>
@@ -573,13 +574,13 @@
         </section>
 
         <!-- Guest-Journey Bento Sections & Cards Grid -->
-        <div id="cards-grid" class="space-y-7">
+        <div id="cards-grid" class="space-y-4">
             <!-- Sections & Cards injected dynamically by renderUI() -->
         </div>
 
         <!-- Subtle Editorial Footer -->
-        <footer class="mt-10 pt-6 border-t border-theme text-center text-xs text-theme-tertiary space-y-1">
-            <p class="font-editorial text-base font-semibold text-theme-secondary" dir="ltr">GrappA · Kibbutz Yahel</p>
+        <footer class="mt-8 pt-4 border-t border-theme text-center text-base text-theme-tertiary space-y-1">
+            <p class="font-editorial text-lg font-bold text-theme-secondary" dir="ltr">GrappA · Kibbutz Yahel</p>
             <p id="footer-tagline">אירוח מדברי מוקפד מול הרי אדום · ערבה דרומית</p>
         </footer>
     </main>
@@ -595,16 +596,16 @@
             <div class="w-10 h-1.5 rounded-full bg-stone-400/40 mx-auto mt-2.5 mb-0.5 sm:hidden"></div>
 
             <!-- Modal Header -->
-            <div class="border-b border-theme px-5 py-4 flex justify-between items-center gap-3 surface-subtle">
-                <h2 id="dialogTitle" class="font-editorial text-2xl font-bold text-theme-primary leading-tight"></h2>
-                <button id="dialog-close-btn" class="w-9 h-9 rounded-full surface-elevated flex items-center justify-center haptic text-theme-secondary hover:text-theme-primary flex-shrink-0" aria-label="Close dialog">
-                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            <div class="border-b border-theme px-4 py-3 flex justify-between items-center gap-3 surface-subtle">
+                <h2 id="dialogTitle" class="font-editorial text-2xl sm:text-3xl font-bold text-theme-primary leading-tight"></h2>
+                <button id="dialog-close-btn" class="w-10 h-10 rounded-full surface-elevated flex items-center justify-center haptic text-theme-secondary hover:text-theme-primary flex-shrink-0" aria-label="Close dialog">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
                 </button>
             </div>
 
             <!-- Modal Scrollable Body -->
-            <div class="p-5 sm:p-6 overflow-y-auto flex-1">
-                <div id="dialogBody" class="space-y-4"></div>
+            <div class="p-3.5 sm:p-4 overflow-y-auto flex-1">
+                <div id="dialogBody" class="space-y-3"></div>
             </div>
         </div>
     </div>
@@ -616,15 +617,16 @@
             <div id="map-container" class="w-full h-full"></div>
 
             <!-- Offline Banner on Map -->
-            <div id="map-offline-notice" class="absolute top-16 left-1/2 -translate-x-1/2 bg-amber-700/95 text-white px-4 py-1.5 rounded-full shadow-lg z-[1000] text-xs font-semibold hidden whitespace-nowrap">
-                ⚠️ מצב ללא קליטה — מציג מסלול שמור
+            <div id="map-offline-notice" class="absolute top-16 left-1/2 -translate-x-1/2 bg-amber-700/95 text-white px-4 py-1.5 rounded-full shadow-lg z-[1000] text-sm font-bold hidden whitespace-nowrap flex items-center gap-1.5">
+                <span class="material-symbols-outlined" style="font-size: 18px;">wifi_off</span>
+                <span id="map-offline-notice-text">מצב ללא קליטה — מציג מסלול שמור</span>
             </div>
 
             <!-- Map Loading Spinner -->
             <div id="map-spinner" class="absolute inset-0 bg-black/35 backdrop-blur-sm flex items-center justify-center z-[1000]">
                 <div class="surface-elevated px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3">
-                    <div class="w-5 h-5 border-2 border-[#B85A3A] border-t-transparent rounded-full animate-spin"></div>
-                    <span class="text-theme-primary font-semibold text-sm" id="map-loading-text">טוען מסלול...</span>
+                    <div class="w-6 h-6 border-2 border-current border-t-transparent rounded-full animate-spin icon-gradient-text"></div>
+                    <span class="text-theme-primary font-bold text-base" id="map-loading-text">טוען מסלול...</span>
                 </div>
             </div>
 
@@ -649,34 +651,34 @@
             </div>
 
             <!-- Bottom Trail Telemetry & Elevation Sheet -->
-            <div id="map-bottom-panel" class="absolute bottom-4 left-4 right-4 z-[1000] surface-card rounded-3xl p-4 shadow-2xl max-w-md mx-auto transition-all duration-300">
+            <div id="map-bottom-panel" class="absolute bottom-4 left-4 right-4 z-[1000] surface-card rounded-3xl p-3 shadow-2xl max-w-md mx-auto transition-all duration-300">
                 <!-- Clickable Header to Expand/Collapse Elevation Profile -->
-                <div id="map-panel-header" class="flex justify-between items-center gap-3 cursor-pointer select-none">
+                <div id="map-panel-header" class="flex justify-between items-center gap-2.5 cursor-pointer select-none">
                     <div class="min-w-0">
-                        <h3 id="map-trail-title" class="font-bold text-base text-theme-primary tracking-tight leading-snug truncate"></h3>
-                        <p id="map-trail-subtitle" class="text-[11px] font-semibold text-theme-tertiary mt-0.5"></p>
+                        <h3 id="map-trail-title" class="font-bold text-lg sm:text-xl text-theme-primary tracking-tight leading-snug truncate"></h3>
+                        <p id="map-trail-subtitle" class="text-sm font-semibold text-theme-secondary mt-0.5"></p>
                     </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <div id="map-status-badge" class="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full surface-subtle text-theme-secondary">
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <div id="map-status-badge" class="px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-full surface-subtle text-theme-secondary">
                             READY
                         </div>
-                        <span id="map-ele-toggle" class="material-symbols-outlined text-theme-secondary transition-transform duration-300" style="font-size: 22px;">expand_more</span>
+                        <span id="map-ele-toggle" class="material-symbols-outlined text-theme-secondary transition-transform duration-300" style="font-size: 24px;">expand_more</span>
                     </div>
                 </div>
 
                 <!-- Live Trail Telemetry Bar (Distance, Speed, Elevation) -->
-                <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-theme tabular-nums">
-                    <div class="surface-subtle rounded-xl p-2 text-center">
-                        <span class="block text-[10px] font-semibold text-theme-tertiary uppercase" id="map-lbl-distance">מרחק</span>
-                        <span id="map-trail-distance" class="text-xs sm:text-sm font-bold text-theme-primary block mt-0.5" dir="ltr">--</span>
+                <div class="grid grid-cols-3 gap-2 mt-2.5 pt-2.5 border-t border-theme tabular-nums">
+                    <div class="surface-subtle rounded-xl p-1.5 text-center">
+                        <span class="block text-sm font-bold text-theme-secondary uppercase" id="map-lbl-distance">מרחק</span>
+                        <span id="map-trail-distance" class="text-base sm:text-lg font-bold text-theme-primary block mt-0.5" dir="ltr">--</span>
                     </div>
-                    <div class="surface-subtle rounded-xl p-2 text-center">
-                        <span class="block text-[10px] font-semibold text-theme-tertiary uppercase" id="map-lbl-speed">מהירות</span>
-                        <span id="map-trail-speed" class="text-xs sm:text-sm font-bold text-theme-primary block mt-0.5" dir="ltr">--</span>
+                    <div class="surface-subtle rounded-xl p-1.5 text-center">
+                        <span class="block text-sm font-bold text-theme-secondary uppercase" id="map-lbl-speed">מהירות</span>
+                        <span id="map-trail-speed" class="text-base sm:text-lg font-bold text-theme-primary block mt-0.5" dir="ltr">--</span>
                     </div>
-                    <div class="surface-subtle rounded-xl p-2 text-center">
-                        <span class="block text-[10px] font-semibold text-theme-tertiary uppercase" id="map-lbl-elevation">גובה</span>
-                        <span id="map-trail-elevation" class="text-xs sm:text-sm font-bold text-theme-primary block mt-0.5" dir="ltr">--</span>
+                    <div class="surface-subtle rounded-xl p-1.5 text-center">
+                        <span class="block text-sm font-bold text-theme-secondary uppercase" id="map-lbl-elevation">גובה</span>
+                        <span id="map-trail-elevation" class="text-base sm:text-lg font-bold text-theme-primary block mt-0.5" dir="ltr">--</span>
                     </div>
                 </div>
 
@@ -705,14 +707,20 @@
         </div>
     </div>
 
-    <!-- Combined First-Time Onboarding Modal (Language Selection + Warm Welcome Letter, Shown Once per Device) -->
-    <div id="language-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md items-center justify-center p-4 z-[80] hidden animate-fadeIn" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
-        <div class="surface-elevated rounded-3xl max-w-md w-full max-h-[92vh] overflow-y-auto p-6 sm:p-7 shadow-2xl animate-slideUp">
-            <!-- Brand Header -->
-            <div class="flex flex-col items-center text-center mb-5">
-                <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-md border border-theme flex flex-col mb-3">
+    <!-- Combined Welcome & House Rules Notification Modal (Auto-opens until "I Read and Accept" is clicked) -->
+    <div id="language-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md items-center justify-center p-3 sm:p-4 z-[80] hidden animate-fadeIn" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+        <div class="surface-elevated rounded-3xl max-w-md w-full max-h-[95vh] overflow-y-auto p-3.5 sm:p-4 shadow-2xl animate-slideUp relative">
+            <!-- Brand Header + Top Skip Button -->
+            <div class="flex flex-col items-center text-center mb-2 relative">
+                <div class="w-full flex items-center justify-between">
+                    <button id="onboarding-skip-btn" type="button" class="px-3.5 py-1 rounded-xl surface-subtle text-theme-primary font-bold text-base haptic border border-theme">
+                        דלג
+                    </button>
+                    <span></span>
+                </div>
+                <div class="w-16 h-16 rounded-2xl overflow-hidden shadow-md border border-theme flex flex-col mb-1.5 -mt-6">
                     <div class="h-10 bg-[#E2E4A8] flex items-center justify-center">
-                        <svg class="w-8 h-8" style="filter: drop-shadow(0 1px 1.5px rgba(74, 66, 59, 0.35));" viewBox="0 0 120 80" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="w-9 h-9" style="filter: drop-shadow(0 1px 1.5px rgba(90, 82, 72, 0.35));" viewBox="0 0 120 80" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M 64 12 L 88 12"/>
                             <path d="M 24 26 C 22 42, 26 50, 35 50 C 44 50, 48 42, 46 26"/>
                             <path d="M 35 50 L 35 68 C 35 71, 31 72, 22 72 M 35 68 C 35 71, 42 72, 54 72 C 63 72, 67 71, 64 66 C 59 58, 59 45, 71 40 C 73 39, 74 37, 74 34 L 74 12"/>
@@ -720,33 +728,33 @@
                         </svg>
                     </div>
                     <div class="h-6 bg-[#7C7267] flex items-center justify-center">
-                        <span class="font-editorial text-xs font-bold tracking-wider text-white">GrappA</span>
+                        <span class="font-app-icon text-xs font-semibold tracking-wider text-white">GrappA</span>
                     </div>
                 </div>
-                <h2 id="onboarding-title" class="font-editorial text-2xl sm:text-3xl font-bold text-theme-primary">
+                <h2 id="onboarding-title" class="font-editorial text-2xl font-bold text-theme-primary leading-tight">
                     ברוכים הבאים ל-GrappA
                 </h2>
-                <p id="onboarding-subtitle" class="text-xs font-medium text-theme-secondary mt-0.5">
+                <p id="onboarding-subtitle" class="text-sm font-medium text-theme-secondary mt-0.5">
                     Choose your preferred language · בחרו שפה
                 </p>
             </div>
 
             <!-- Language Switcher Pills -->
-            <div class="grid grid-cols-2 gap-2.5 p-1.5 rounded-2xl surface-subtle mb-5" dir="ltr">
-                <button id="lang-opt-he" type="button" class="py-2.5 px-4 rounded-xl font-bold text-sm transition-all haptic flex items-center justify-center gap-1.5">
+            <div class="grid grid-cols-2 gap-2 p-1 rounded-2xl surface-subtle mb-2" dir="ltr">
+                <button id="lang-opt-he" type="button" class="py-1.5 px-4 rounded-xl font-bold text-base transition-all haptic flex items-center justify-center gap-1.5">
                     <span>עברית</span>
                 </button>
-                <button id="lang-opt-en" type="button" class="py-2.5 px-4 rounded-xl font-bold text-sm transition-all haptic flex items-center justify-center gap-1.5">
+                <button id="lang-opt-en" type="button" class="py-1.5 px-4 rounded-xl font-bold text-base transition-all haptic flex items-center justify-center gap-1.5">
                     <span>English</span>
                 </button>
             </div>
 
             <!-- Welcome Letter Body (Updates Live with Selected Language) -->
-            <div id="onboarding-welcome-body" class="mb-5"></div>
+            <div id="onboarding-welcome-body" class="mb-2.5"></div>
 
-            <!-- Primary CTA to Enter Guide -->
-            <button id="onboarding-enter-btn" type="button" class="w-full py-3.5 px-6 rounded-2xl btn-terracotta font-bold text-base shadow-md btn-premium haptic text-center">
-                כניסה למדריך האורחים
+            <!-- Primary CTA to Accept Rules & Enter Guide -->
+            <button id="onboarding-enter-btn" type="button" class="w-full py-2.5 px-5 rounded-2xl btn-terracotta font-bold text-xl shadow-md btn-premium haptic text-center">
+                קראתי ואני מאשר/ת
             </button>
         </div>
     </div>
@@ -775,17 +783,17 @@
 
             const metaThemeColor = document.getElementById('theme-color-meta');
             if (metaThemeColor) {
-                metaThemeColor.content = theme === 'day' ? '#F5F0E6' : '#171412';
+                metaThemeColor.content = theme === 'day' ? '#F3F4F5' : '#5B5F64';
             }
 
             const stop1 = document.getElementById('iconGradientStop1');
             const stop2 = document.getElementById('iconGradientStop2');
             if (stop1 && stop2) {
                 if (theme === 'day') {
-                    stop1.setAttribute('stop-color', '#B85A3A');
-                    stop2.setAttribute('stop-color', '#7C7267');
+                    stop1.setAttribute('stop-color', '#6E7276');
+                    stop2.setAttribute('stop-color', '#6E7276');
                 } else {
-                    stop1.setAttribute('stop-color', '#D97757');
+                    stop1.setAttribute('stop-color', '#E2E4A8');
                     stop2.setAttribute('stop-color', '#E2E4A8');
                 }
             }
@@ -1064,7 +1072,7 @@
                         if (grid[r][c]) d += `M${c + 2},${r + 2}h1v1h-1z`;
                     }
                 }
-                return `<svg viewBox="0 0 33 33" class="w-36 h-36 mx-auto rounded-xl bg-white p-2 shadow-sm border border-stone-200" shape-rendering="crispEdges" role="img" aria-label="WiFi QR Code"><path d="${d}" fill="#241F1B"/></svg>`;
+                return `<svg viewBox="0 0 33 33" class="w-36 h-36 mx-auto rounded-xl bg-white p-2 shadow-sm border border-stone-200" shape-rendering="crispEdges" role="img" aria-label="WiFi QR Code"><path d="${d}" fill="#3D4145"/></svg>`;
             } catch (e) {
                 return '';
             }
@@ -1088,13 +1096,14 @@
                 mapDistance: "Distance",
                 mapSpeed: "Speed",
                 mapElevation: "Elevation",
-                mapOfflineNotice: "⚠️ Offline Mode — Showing Saved Trail Route",
+                mapOfflineNotice: "Offline Mode — Showing Saved Trail Route",
                 mapLocationError: "Unable to retrieve your GPS location.",
                 gpxParseError: "Could not parse trail data.",
                 gpxLoadError: "Error loading trail data. Please check your connection.",
                 welcomeModalTitle: "Welcome to GrappA",
                 onboardingSubtitle: "Choose your preferred language · בחרו שפה",
-                enterGuideBtn: "Enter Guest Guide",
+                enterGuideBtn: "I Read and Accept",
+                skipBtn: "Skip",
                 copiedToast: "Copied to clipboard!"
             },
             he: {
@@ -1111,13 +1120,14 @@
                 mapDistance: "מרחק",
                 mapSpeed: "מהירות",
                 mapElevation: "גובה",
-                mapOfflineNotice: "⚠️ מצב ללא קליטה — מציג מסלול שמור בלבד",
+                mapOfflineNotice: "מצב ללא קליטה — מציג מסלול שמור בלבד",
                 mapLocationError: "לא ניתן לאתר את מיקום ה-GPS שלך.",
                 gpxParseError: "שגיאה בפענוח נתוני המסלול.",
                 gpxLoadError: "שגיאה בטעינת המסלול. אנא בדקו את החיבור.",
                 welcomeModalTitle: "ברוכים הבאים ל-GrappA",
                 onboardingSubtitle: "בחרו שפה · Choose your language",
-                enterGuideBtn: "כניסה למדריך האורחים",
+                enterGuideBtn: "קראתי ואני מאשר/ת",
+                skipBtn: "דלג",
                 copiedToast: "הועתק ללוח!"
             }
         };
@@ -1126,13 +1136,13 @@
             const isHe = lang === 'he';
             const { hour } = getJerusalemTime();
             if (hour >= 5 && hour < 12) {
-                return { icon: '☀️', text: isHe ? 'בוקר טוב במדבר' : 'Good Morning in the Arava' };
+                return { icon: 'wb_sunny', text: isHe ? 'בוקר טוב במדבר' : 'Good Morning in the Arava' };
             } else if (hour >= 12 && hour < 17) {
-                return { icon: '🏜️', text: isHe ? 'צהריים טובים ביהל' : 'Good Afternoon in Yahel' };
+                return { icon: 'light_mode', text: isHe ? 'צהריים טובים ביהל' : 'Good Afternoon in Yahel' };
             } else if (hour >= 17 && hour < 20) {
-                return { icon: '🌅', text: isHe ? 'ערב נעים מול הרי אדום' : 'Good Evening in the Desert' };
+                return { icon: 'wb_twilight', text: isHe ? 'ערב נעים מול הרי אדום' : 'Good Evening in the Desert' };
             } else {
-                return { icon: '✨', text: isHe ? 'לילה שקט תחת כוכבי הערבה' : 'Starry Night at GrappA' };
+                return { icon: 'bedtime', text: isHe ? 'לילה שקט תחת כוכבי הערבה' : 'Starry Night at GrappA' };
             }
         };
 
@@ -1337,8 +1347,8 @@
                 id: 'reviews',
                 titleEn: 'Rate Us & Reviews',
                 titleHe: 'דירוג וביקורות אורחים',
-                subtitleEn: '5.0 ★ Guest Experiences',
-                subtitleHe: 'דירוג 5.0 ★ · שתפו את החוויה',
+                subtitleEn: '5.0 Guest Experiences',
+                subtitleHe: 'דירוג 5.0 · שתפו את החוויה',
                 getIcon: getStarIcon
             },
             {
@@ -1435,7 +1445,7 @@
             }
 
             const isHe = (language || 'he') === 'he';
-            const feedback = successLabel || (isHe ? 'הועתק! ✓' : 'Copied! ✓');
+            const feedback = successLabel || (isHe ? 'הועתק!' : 'Copied!');
             showToast(`${feedback} (${text})`);
 
             if (btnEl) {
@@ -1462,33 +1472,33 @@
                 case 'wifi': {
                     const qrSvg = generateWifiQrSvg('WIFI:T:WPA;S:GrappA Fiber;P:grappA321;;');
                     return `
-                        <div class="${alignClass} space-y-4" dir="${dirAttr}">
-                            <div class="surface-subtle p-5 rounded-2xl space-y-4">
+                        <div class="${alignClass} space-y-3" dir="${dirAttr}">
+                            <div class="surface-subtle p-3 rounded-2xl space-y-2.5">
                                 <!-- Network Name -->
-                                <div class="surface-elevated p-3.5 rounded-xl flex items-center justify-between gap-3">
+                                <div class="surface-elevated p-3 rounded-xl flex items-center justify-between gap-2.5">
                                     <div>
-                                        <span class="text-xs font-semibold text-theme-tertiary block">${isHe ? 'שם הרשת האלחוטית' : 'Network Name (SSID)'}</span>
-                                        <p class="text-lg font-mono font-bold text-theme-primary select-all mt-0.5"><bdi dir="ltr">GrappA Fiber</bdi></p>
+                                        <span class="text-base sm:text-lg font-bold text-theme-secondary block">${isHe ? 'שם הרשת האלחוטית' : 'Network Name (SSID)'}</span>
+                                        <p class="text-2xl sm:text-3xl font-mono font-bold text-theme-primary select-all mt-0.5"><bdi dir="ltr">GrappA Fiber</bdi></p>
                                     </div>
-                                    <span class="material-symbols-outlined text-theme-tertiary" style="font-size: 22px;">wifi</span>
+                                    <span class="material-symbols-outlined text-theme-secondary" style="font-size: 26px;">wifi</span>
                                 </div>
 
                                 <!-- Password + 1-Tap Copy -->
-                                <div class="surface-elevated p-3.5 rounded-xl flex items-center justify-between gap-3">
+                                <div class="surface-elevated p-3 rounded-xl flex items-center justify-between gap-2.5 flex-wrap">
                                     <div>
-                                        <span class="text-xs font-semibold text-theme-tertiary block">${isHe ? 'סיסמה' : 'Password'}</span>
-                                        <p class="text-xl font-mono font-bold text-theme-primary select-all mt-0.5 tabular-nums"><bdi dir="ltr">grappA321</bdi></p>
+                                        <span class="text-base sm:text-lg font-bold text-theme-secondary block">${isHe ? 'סיסמה' : 'Password'}</span>
+                                        <p class="text-2xl sm:text-3xl font-mono font-bold text-theme-primary select-all mt-0.5 tabular-nums"><bdi dir="ltr">grappA321</bdi></p>
                                     </div>
-                                    <button type="button" onclick="copyToClipboard('grappA321', this, '${isHe ? 'הסיסמה הועתקה!' : 'Password Copied!'}')" class="px-4 py-2.5 rounded-xl btn-terracotta text-xs font-bold flex items-center gap-1.5 haptic shadow-sm flex-shrink-0">
-                                        <span class="material-symbols-outlined" style="font-size: 16px;">content_copy</span>
+                                    <button type="button" onclick="copyToClipboard('grappA321', this, '${isHe ? 'הסיסמה הועתקה!' : 'Password Copied!'}')" class="px-3.5 py-2 rounded-xl btn-terracotta text-base sm:text-lg font-bold flex items-center gap-1.5 haptic shadow-sm flex-shrink-0">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
                                         <span>${isHe ? 'העתק סיסמה' : 'Copy Password'}</span>
                                     </button>
                                 </div>
                             </div>
 
                             <!-- Scan to Connect QR Card -->
-                            <div class="surface-subtle p-4 rounded-2xl text-center space-y-2">
-                                <p class="text-xs font-semibold text-theme-secondary">
+                            <div class="surface-subtle p-3 rounded-2xl text-center space-y-2">
+                                <p class="text-base sm:text-lg font-bold text-theme-secondary leading-snug">
                                     ${isHe ? 'או סרקו עם מצלמת הטלפון להתחברות אוטומטית:' : 'Or scan with your phone camera to connect automatically:'}
                                 </p>
                                 ${qrSvg}
@@ -1498,34 +1508,34 @@
                 }
 
                 case 'gate': {
-                    const iosBadge = isIOS ? `<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-white/20 text-white">${isHe ? 'מומלץ למכשירך' : 'Your Device'}</span>` : '';
-                    const androidBadge = isAndroid ? `<span class="px-2 py-0.5 text-[10px] font-bold rounded-full bg-white/20 text-white">${isHe ? 'מומלץ למכשירך' : 'Your Device'}</span>` : '';
+                    const iosBadge = isIOS ? `<span class="px-2 py-0.5 text-xs font-bold rounded-full bg-white/20 text-white">${isHe ? 'מומלץ למכשירך' : 'Your Device'}</span>` : '';
+                    const androidBadge = isAndroid ? `<span class="px-2 py-0.5 text-xs font-bold rounded-full bg-white/20 text-white">${isHe ? 'מומלץ למכשירך' : 'Your Device'}</span>` : '';
                     return `
-                        <div class="${alignClass} space-y-4" dir="${dirAttr}">
-                            <p class="text-sm sm:text-base leading-relaxed text-theme-secondary">
+                        <div class="${alignClass} space-y-3" dir="${dirAttr}">
+                            <p class="text-lg sm:text-xl leading-snug text-theme-primary font-semibold">
                                 ${isHe
                                     ? 'להורדת האפליקציה לפתיחת שער הקיבוץ: יש להתקין את האפליקציה, למלא אחר ההנחיות ואז ניתן לפתוח את השער באופן עצמאי.'
                                     : 'Download the Kibbutz Yahel gate opening app below. Install the app, follow the quick setup instructions, and open the gate directly from your phone.'}
                             </p>
 
                             <!-- Proximity Highlight Box -->
-                            <div class="p-4 rounded-2xl badge-champagne flex items-start gap-3">
-                                <span class="material-symbols-outlined text-theme-primary flex-shrink-0 mt-0.5" style="font-size: 22px;">tips_and_updates</span>
-                                <p class="text-xs sm:text-sm font-semibold text-theme-primary leading-relaxed">
+                            <div class="p-3 rounded-2xl badge-champagne flex items-start gap-2.5">
+                                <span class="material-symbols-outlined flex-shrink-0 mt-0.5" style="font-size: 24px;">tips_and_updates</span>
+                                <p class="text-lg sm:text-xl font-bold leading-snug">
                                     ${isHe
                                         ? 'טיפ חשוב: יש להתקרב ממש אל השער (כמעט להיצמד אליו עם הרכב), ורק אז ללחוץ על כפתור פתיחת השער באפליקציה.'
                                         : 'Important tip: Drive right up to the gate (almost touching it), then tap the gate opening button inside the app.'}
                                 </p>
                             </div>
 
-                            <div class="space-y-3 pt-1">
-                                <a href="https://goo.gl/fZTz4u" target="_blank" rel="noopener noreferrer" class="w-full py-3.5 px-5 rounded-2xl bg-[#241F1B] dark:bg-[#3A322C] text-white font-bold text-sm sm:text-base btn-premium haptic flex items-center justify-center gap-2.5 shadow-md">
-                                    <span class="material-symbols-outlined" style="font-size: 20px;">phone_iphone</span>
+                            <div class="space-y-2.5 pt-0.5">
+                                <a href="https://goo.gl/fZTz4u" target="_blank" rel="noopener noreferrer" class="w-full py-3 px-4 rounded-2xl btn-taupe font-bold text-lg sm:text-xl btn-premium haptic flex items-center justify-center gap-2 shadow-md">
+                                    <span class="material-symbols-outlined" style="font-size: 22px;">phone_iphone</span>
                                     <span>${isHe ? 'אפליקציה לאייפון' : 'iPhone App (App Store)'}</span>
                                     ${iosBadge}
                                 </a>
-                                <a href="https://goo.gl/Giopvd" target="_blank" rel="noopener noreferrer" class="w-full py-3.5 px-5 rounded-2xl btn-terracotta font-bold text-sm sm:text-base btn-premium haptic flex items-center justify-center gap-2.5 shadow-md">
-                                    <span class="material-symbols-outlined" style="font-size: 20px;">android</span>
+                                <a href="https://goo.gl/Giopvd" target="_blank" rel="noopener noreferrer" class="w-full py-3 px-4 rounded-2xl btn-terracotta font-bold text-lg sm:text-xl btn-premium haptic flex items-center justify-center gap-2 shadow-md">
+                                    <span class="material-symbols-outlined" style="font-size: 22px;">android</span>
                                     <span>${isHe ? 'אפליקציה לאנדרואיד' : 'Android App (Google Play)'}</span>
                                     ${androidBadge}
                                 </a>
@@ -1536,28 +1546,28 @@
 
                 case 'tv':
                     return `
-                        <div class="space-y-4 ${alignClass}" dir="${dirAttr}">
+                        <div class="space-y-3 ${alignClass}" dir="${dirAttr}">
                             <!-- Disney+ Card -->
-                            <div class="surface-subtle p-5 rounded-2xl space-y-3">
+                            <div class="surface-subtle p-3.5 rounded-2xl space-y-2.5">
                                 <div class="flex items-center justify-between">
-                                    <h4 class="font-bold text-lg text-theme-primary flex items-center gap-2">
-                                        <span class="text-2xl">🏰</span>
+                                    <h4 class="font-bold text-xl sm:text-2xl text-theme-primary flex items-center gap-2">
+                                        <span class="material-symbols-outlined icon-gradient-text" style="font-size: 26px;">live_tv</span>
                                         <span>${isHe ? 'דיסני+' : 'Disney+'}</span>
                                     </h4>
-                                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full badge-champagne">${isHe ? 'חינם לאורחים' : 'Complimentary'}</span>
+                                    <span class="text-sm sm:text-base font-bold px-2.5 py-0.5 rounded-full badge-champagne">${isHe ? 'חינם לאורחים' : 'Complimentary'}</span>
                                 </div>
-                                <div class="grid grid-cols-1 gap-2.5">
-                                    <div class="surface-elevated p-3 rounded-xl flex justify-between items-center">
-                                        <span class="text-xs font-semibold text-theme-secondary">${isHe ? 'שם פרופיל:' : 'Profile:'}</span>
-                                        <span class="font-mono text-base font-bold text-theme-primary"><bdi dir="ltr">GrappA</bdi></span>
+                                <div class="grid grid-cols-1 gap-2">
+                                    <div class="surface-elevated p-2.5 rounded-xl flex justify-between items-center">
+                                        <span class="text-base sm:text-lg font-bold text-theme-secondary">${isHe ? 'שם פרופיל:' : 'Profile:'}</span>
+                                        <span class="font-mono text-xl sm:text-2xl font-bold text-theme-primary"><bdi dir="ltr">GrappA</bdi></span>
                                     </div>
-                                    <div class="surface-elevated p-3 rounded-xl flex justify-between items-center gap-2">
+                                    <div class="surface-elevated p-2.5 rounded-xl flex justify-between items-center gap-2">
                                         <div>
-                                            <span class="text-xs font-semibold text-theme-secondary block">${isHe ? 'קוד כניסה:' : 'PIN Code:'}</span>
-                                            <span class="font-mono text-lg font-bold text-theme-primary tabular-nums"><bdi dir="ltr">4114</bdi></span>
+                                            <span class="text-base sm:text-lg font-bold text-theme-secondary block">${isHe ? 'קוד כניסה:' : 'PIN Code:'}</span>
+                                            <span class="font-mono text-2xl font-bold text-theme-primary tabular-nums"><bdi dir="ltr">4114</bdi></span>
                                         </div>
-                                        <button type="button" onclick="copyToClipboard('4114', this, '${isHe ? 'קוד הועתק!' : 'PIN Copied!'}')" class="px-3 py-1.5 rounded-lg surface-subtle text-xs font-bold text-theme-primary flex items-center gap-1 haptic">
-                                            <span class="material-symbols-outlined" style="font-size: 15px;">content_copy</span>
+                                        <button type="button" onclick="copyToClipboard('4114', this, '${isHe ? 'קוד הועתק!' : 'PIN Copied!'}')" class="px-3 py-1.5 rounded-xl badge-champagne text-base sm:text-lg font-bold flex items-center gap-1.5 haptic">
+                                            <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
                                             <span>${isHe ? 'העתק קוד' : 'Copy PIN'}</span>
                                         </button>
                                     </div>
@@ -1565,17 +1575,17 @@
                             </div>
 
                             <!-- Netflix Card -->
-                            <div class="surface-subtle p-5 rounded-2xl space-y-3">
+                            <div class="surface-subtle p-3.5 rounded-2xl space-y-2.5">
                                 <div class="flex items-center justify-between">
-                                    <h4 class="font-bold text-lg text-theme-primary flex items-center gap-2">
-                                        <span class="text-2xl">🎬</span>
+                                    <h4 class="font-bold text-xl sm:text-2xl text-theme-primary flex items-center gap-2">
+                                        <span class="material-symbols-outlined icon-gradient-text" style="font-size: 26px;">movie</span>
                                         <span>${isHe ? 'נטפליקס' : 'Netflix'}</span>
                                     </h4>
-                                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full surface-elevated text-theme-secondary">${isHe ? 'ללא קוד' : 'No PIN Required'}</span>
+                                    <span class="text-sm sm:text-base font-bold px-2.5 py-0.5 rounded-full surface-elevated text-theme-secondary">${isHe ? 'ללא קוד' : 'No PIN Required'}</span>
                                 </div>
-                                <div class="surface-elevated p-3 rounded-xl flex justify-between items-center">
-                                    <span class="text-xs font-semibold text-theme-secondary">${isHe ? 'שם פרופיל:' : 'Profile:'}</span>
-                                    <span class="font-mono text-base font-bold text-theme-primary"><bdi dir="ltr">GrappA</bdi></span>
+                                <div class="surface-elevated p-2.5 rounded-xl flex justify-between items-center">
+                                    <span class="text-base sm:text-lg font-bold text-theme-secondary">${isHe ? 'שם פרופיל:' : 'Profile:'}</span>
+                                    <span class="font-mono text-xl sm:text-2xl font-bold text-theme-primary"><bdi dir="ltr">GrappA</bdi></span>
                                 </div>
                             </div>
                         </div>
@@ -1587,47 +1597,47 @@
                     const isFri = gStatus.day === 5;
                     const isSat = gStatus.day === 6;
                     return `
-                        <div class="space-y-4 ${alignClass}" dir="${dirAttr}">
+                        <div class="space-y-3 ${alignClass}" dir="${dirAttr}">
                             <!-- Live Status Banner -->
-                            <div class="p-3.5 rounded-2xl flex items-center justify-between gap-2 ${gStatus.isOpen ? 'badge-open' : 'badge-closed'}">
+                            <div class="p-3 rounded-2xl flex items-center justify-between gap-2 ${gStatus.isOpen ? 'badge-open' : 'badge-closed'}">
                                 <div class="flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full ${gStatus.isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}"></span>
-                                    <span class="font-bold text-sm">${gStatus.statusLabel}</span>
+                                    <span class="w-3 h-3 rounded-full ${gStatus.isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}"></span>
+                                    <span class="font-bold text-lg sm:text-xl">${gStatus.statusLabel}</span>
                                 </div>
-                                <span class="text-xs font-semibold tabular-nums">${gStatus.subLabel}</span>
+                                <span class="text-base sm:text-lg font-bold tabular-nums">${gStatus.subLabel}</span>
                             </div>
 
                             <!-- Structured Schedule Table -->
-                            <div class="surface-subtle p-4 rounded-2xl space-y-2 tabular-nums">
-                                <h4 class="text-xs font-bold uppercase tracking-wider text-theme-tertiary mb-2">
+                            <div class="surface-subtle p-3 rounded-2xl space-y-2 tabular-nums">
+                                <h4 class="text-base font-bold uppercase tracking-wider text-theme-secondary mb-1">
                                     ${isHe ? 'שעות פתיחת המרכולית' : 'Opening Hours'}
                                 </h4>
-                                <div class="p-2.5 rounded-xl flex justify-between items-center text-sm ${isSunThu ? 'surface-elevated font-bold shadow-sm' : 'text-theme-secondary'}">
+                                <div class="p-2.5 rounded-xl flex justify-between items-center text-lg sm:text-xl ${isSunThu ? 'surface-elevated font-bold shadow-sm' : 'text-theme-secondary'}">
                                     <span>${isHe ? 'ראשון – חמישי (א׳–ה׳)' : 'Sunday – Thursday'}</span>
-                                    <div class="text-end font-mono text-xs sm:text-sm">
+                                    <div class="text-end font-mono text-lg sm:text-xl">
                                         <bdi dir="ltr" class="block">07:30 – 14:00</bdi>
                                         <bdi dir="ltr" class="block">16:00 – 19:00</bdi>
                                     </div>
                                 </div>
-                                <div class="p-2.5 rounded-xl flex justify-between items-center text-sm ${isFri ? 'surface-elevated font-bold shadow-sm' : 'text-theme-secondary'}">
+                                <div class="p-2.5 rounded-xl flex justify-between items-center text-lg sm:text-xl ${isFri ? 'surface-elevated font-bold shadow-sm' : 'text-theme-secondary'}">
                                     <span>${isHe ? 'שישי (ו׳)' : 'Friday'}</span>
-                                    <span class="font-mono text-xs sm:text-sm"><bdi dir="ltr">07:30 – 14:00</bdi></span>
+                                    <span class="font-mono text-lg sm:text-xl"><bdi dir="ltr">07:30 – 14:00</bdi></span>
                                 </div>
-                                <div class="p-2.5 rounded-xl flex justify-between items-center text-sm ${isSat ? 'surface-elevated font-bold shadow-sm' : 'text-theme-secondary'}">
+                                <div class="p-2.5 rounded-xl flex justify-between items-center text-lg sm:text-xl ${isSat ? 'surface-elevated font-bold shadow-sm' : 'text-theme-secondary'}">
                                     <span>${isHe ? 'שבת' : 'Saturday'}</span>
-                                    <span class="text-xs font-semibold">${isHe ? 'סגור' : 'Closed'}</span>
+                                    <span class="text-lg font-bold">${isHe ? 'סגור' : 'Closed'}</span>
                                 </div>
                             </div>
 
                             <!-- Signboard Image -->
-                            <div class="surface-subtle p-2.5 rounded-2xl">
+                            <div class="surface-subtle p-2 rounded-2xl">
                                 <img src="./Grocery_hours.jpg" alt="Grocery store hours" class="w-full rounded-xl cursor-pointer hover:opacity-95 transition-opacity" onclick="openZoomImage('./Grocery_hours.jpg')" />
-                                <p class="text-[11px] text-center text-theme-tertiary mt-1.5">${isHe ? 'לחצו על התמונה להגדלה' : 'Tap image to zoom'}</p>
+                                <p class="text-sm font-semibold text-center text-theme-secondary mt-1">${isHe ? 'לחצו על התמונה להגדלה' : 'Tap image to zoom'}</p>
                             </div>
 
                             <!-- Google Maps CTA -->
-                            <a href="https://maps.app.goo.gl/ZQu19jrZTdUjW7pF6" target="_blank" rel="noopener noreferrer" class="w-full py-3.5 px-6 rounded-2xl btn-terracotta font-bold text-sm sm:text-base btn-premium haptic flex items-center justify-center gap-2 shadow-md">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">location_on</span>
+                            <a href="https://maps.app.goo.gl/ZQu19jrZTdUjW7pF6" target="_blank" rel="noopener noreferrer" class="w-full py-3 px-5 rounded-2xl btn-terracotta font-bold text-lg sm:text-xl btn-premium haptic flex items-center justify-center gap-2 shadow-md">
+                                <span class="material-symbols-outlined" style="font-size: 22px;">location_on</span>
                                 <span>${isHe ? 'ניווט למרכולית ב-Google Maps' : 'Navigate with Google Maps'}</span>
                             </a>
                         </div>
@@ -1639,19 +1649,19 @@
                     const rowsHtml = POOL_SCHEDULE.map(row => {
                         const isToday = row.dayIndex === pStatus.day;
                         const dayLabel = isHe ? row.dayHe : row.dayEn;
-                        const todayBadge = isToday ? `<span class="px-1.5 py-0.5 text-[10px] font-bold rounded-md badge-champagne">${isHe ? 'היום' : 'Today'}</span>` : '';
+                        const todayBadge = isToday ? `<span class="px-1.5 py-0.5 text-xs font-bold rounded-md badge-champagne">${isHe ? 'היום' : 'Today'}</span>` : '';
                         const morningStr = row.morning ? `<bdi dir="ltr">${row.morning}</bdi>` : '—';
                         const regStr = row.regular.map(r => `<bdi dir="ltr" class="block">${r}</bdi>`).join('');
                         return `
                             <tr class="border-b border-theme last:border-none ${isToday ? 'surface-elevated font-bold' : 'text-theme-secondary'}">
-                                <td class="py-2 px-2.5 text-xs sm:text-sm">
-                                    <div class="flex items-center gap-1.5">
+                                <td class="py-1.5 px-1.5 text-base sm:text-lg">
+                                    <div class="flex items-center gap-1">
                                         <span>${dayLabel}</span>
                                         ${todayBadge}
                                     </div>
                                 </td>
-                                <td class="py-2 px-2 text-center font-mono text-xs tabular-nums">${morningStr}</td>
-                                <td class="py-2 px-2.5 text-end font-mono text-xs tabular-nums">${regStr}</td>
+                                <td class="py-1.5 px-1.5 text-center font-mono text-base sm:text-lg tabular-nums">${morningStr}</td>
+                                <td class="py-1.5 px-1.5 text-end font-mono text-base sm:text-lg tabular-nums">${regStr}</td>
                             </tr>
                         `;
                     }).join('');
@@ -1679,24 +1689,25 @@
                     ];
 
                     return `
-                        <div class="space-y-4 ${alignClass}" dir="${dirAttr}">
-                            <!-- Seasonal Notice Banner -->
-                            <div class="p-3 rounded-2xl badge-champagne text-center text-xs sm:text-sm font-semibold">
-                                🏊‍♂️ ${isHe ? 'עונת הרחצה מתחילה בפסח ונגמרת אחרי סוכות' : 'Bathing season runs from Passover until after Sukkot'}
+                        <div class="space-y-3 ${alignClass}" dir="${dirAttr}">
+                            <!-- Seasonal Notice Banner (Material Symbol instead of swimmer emoji) -->
+                            <div class="p-2.5 rounded-2xl badge-champagne text-center text-base sm:text-lg font-bold flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined" style="font-size: 22px;">pool</span>
+                                <span>${isHe ? 'עונת הרחצה מתחילה בפסח ונגמרת אחרי סוכות' : 'Bathing season runs from Passover until after Sukkot'}</span>
                             </div>
 
                             <!-- 7-Day Structured Schedule Table -->
-                            <div class="surface-subtle rounded-2xl overflow-hidden p-3">
-                                <h4 class="text-xs font-bold uppercase tracking-wider text-theme-tertiary mb-2 px-1">
+                            <div class="surface-subtle rounded-2xl overflow-hidden p-2.5">
+                                <h4 class="text-base font-bold uppercase tracking-wider text-theme-secondary mb-1.5 px-1">
                                     ${isHe ? 'לוח שעות פעילות שבועי' : 'Weekly Pool Schedule'}
                                 </h4>
                                 <div class="overflow-x-auto">
                                     <table class="w-full border-collapse">
                                         <thead>
-                                            <tr class="border-b border-theme text-[11px] font-bold text-theme-tertiary">
-                                                <th class="py-1.5 px-2.5 text-start">${isHe ? 'יום' : 'Day'}</th>
-                                                <th class="py-1.5 px-2 text-center">${isHe ? 'שחיית בוקר' : 'Morning Swim'}</th>
-                                                <th class="py-1.5 px-2.5 text-end">${isHe ? 'שעות פעילות' : 'Operating Hours'}</th>
+                                            <tr class="border-b border-theme text-base font-bold text-theme-secondary">
+                                                <th class="py-1.5 px-1.5 text-start">${isHe ? 'יום' : 'Day'}</th>
+                                                <th class="py-1.5 px-1.5 text-center">${isHe ? 'שחיית בוקר' : 'Morning Swim'}</th>
+                                                <th class="py-1.5 px-1.5 text-end">${isHe ? 'שעות פעילות' : 'Operating Hours'}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -1707,19 +1718,19 @@
                             </div>
 
                             <!-- Inline Expandable Pool Regulations Accordion + PDF Link -->
-                            <details class="surface-subtle rounded-2xl p-3.5 group">
-                                <summary class="cursor-pointer font-bold text-sm text-theme-primary flex items-center justify-between list-none">
+                            <details class="surface-subtle rounded-2xl p-3 group">
+                                <summary class="cursor-pointer font-bold text-lg text-theme-primary flex items-center justify-between list-none">
                                     <span class="flex items-center gap-2">
-                                        <span class="material-symbols-outlined text-theme-secondary" style="font-size: 20px;">fact_check</span>
+                                        <span class="material-symbols-outlined text-theme-secondary" style="font-size: 22px;">fact_check</span>
                                         <span>${isHe ? 'תקנון והנחיות הבריכה (9 כללים)' : 'Pool Safety & Hygiene Rules (9 Rules)'}</span>
                                     </span>
-                                    <span class="material-symbols-outlined text-theme-secondary transition-transform group-open:rotate-180" style="font-size: 20px;">expand_more</span>
+                                    <span class="material-symbols-outlined text-theme-secondary transition-transform group-open:rotate-180" style="font-size: 22px;">expand_more</span>
                                 </summary>
-                                <div class="mt-3 pt-3 border-t border-theme space-y-2 text-xs sm:text-sm text-theme-secondary leading-relaxed">
+                                <div class="mt-2.5 pt-2.5 border-t border-theme space-y-2 text-lg text-theme-primary leading-snug">
                                     ${rulesList.map(r => `<p>${r}</p>`).join('')}
-                                    <div class="pt-2">
-                                        <a href="${isHe ? './swimming_pool_rules_he-v2.pdf' : './swimming_pool_rules_en-v2.pdf'}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl surface-elevated text-xs font-bold text-theme-primary haptic">
-                                            <span class="material-symbols-outlined" style="font-size: 16px;">picture_as_pdf</span>
+                                    <div class="pt-1.5">
+                                        <a href="${isHe ? './swimming_pool_rules_he-v2.pdf' : './swimming_pool_rules_en-v2.pdf'}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl surface-elevated text-base font-bold text-theme-primary haptic">
+                                            <span class="material-symbols-outlined" style="font-size: 18px;">picture_as_pdf</span>
                                             <span>${isHe ? 'פתיחת התקנון המלא (PDF)' : 'Open Official PDF Document'}</span>
                                         </a>
                                     </div>
@@ -1727,14 +1738,14 @@
                             </details>
 
                             <!-- Original Schedule Image -->
-                            <div class="surface-subtle p-2.5 rounded-2xl">
+                            <div class="surface-subtle p-2 rounded-2xl">
                                 <img src="./swiming_pool_instructions.jpg?v=8" alt="Pool hours" class="w-full rounded-xl cursor-pointer hover:opacity-95 transition-opacity" onclick="openZoomImage('./swiming_pool_instructions.jpg?v=8')" />
-                                <p class="text-[11px] text-center text-theme-tertiary mt-1.5">${isHe ? 'לחצו על התמונה להגדלה' : 'Tap schedule image to zoom'}</p>
+                                <p class="text-sm font-semibold text-center text-theme-secondary mt-1">${isHe ? 'לחצו על התמונה להגדלה' : 'Tap schedule image to zoom'}</p>
                             </div>
 
                             <!-- Google Maps CTA -->
-                            <a href="https://maps.app.goo.gl/2DS7aXFMvxGATqcY8" target="_blank" rel="noopener noreferrer" class="w-full py-3.5 px-6 rounded-2xl btn-terracotta font-bold text-sm sm:text-base btn-premium haptic flex items-center justify-center gap-2 shadow-md">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">location_on</span>
+                            <a href="https://maps.app.goo.gl/2DS7aXFMvxGATqcY8" target="_blank" rel="noopener noreferrer" class="w-full py-3 px-5 rounded-2xl btn-terracotta font-bold text-lg sm:text-xl btn-premium haptic flex items-center justify-center gap-2 shadow-md">
+                                <span class="material-symbols-outlined" style="font-size: 22px;">location_on</span>
                                 <span>${isHe ? 'ניווט לבריכה ב-Google Maps' : 'Navigate to Pool on Google Maps'}</span>
                             </a>
                         </div>
@@ -1743,42 +1754,42 @@
 
                 case 'spa':
                     return `
-                        <div class="space-y-4 ${alignClass}" dir="${dirAttr}">
-                            <div class="surface-subtle p-5 rounded-2xl text-center space-y-3">
-                                <p class="text-sm sm:text-base text-theme-secondary">
+                        <div class="space-y-3 ${alignClass}" dir="${dirAttr}">
+                            <div class="surface-subtle p-3.5 rounded-2xl text-center space-y-2.5">
+                                <p class="text-lg sm:text-xl text-theme-secondary font-semibold leading-snug">
                                     ${isHe ? 'להזמנת טיפולי ספא מפנקים, אנא צרו קשר עם דפנה:' : 'To book relaxing spa treatments, please contact Dafna:'}
                                 </p>
-                                <p class="text-lg font-bold text-theme-primary">
+                                <p class="text-2xl font-bold text-theme-primary">
                                     ${isHe ? 'דפנה · ' : 'Dafna · '}<bdi dir="ltr" class="font-mono">050-555-1383</bdi>
                                 </p>
 
                                 <!-- Call & WhatsApp Action Buttons -->
-                                <div class="grid grid-cols-2 gap-2.5 pt-1">
-                                    <a href="tel:050-555-1383" class="py-3 px-4 rounded-xl btn-terracotta font-bold text-xs sm:text-sm btn-premium haptic flex items-center justify-center gap-1.5 shadow-sm">
-                                        <span class="material-symbols-outlined" style="font-size: 18px;">call</span>
+                                <div class="grid grid-cols-2 gap-2 pt-0.5">
+                                    <a href="tel:050-555-1383" class="py-2.5 px-3 rounded-xl btn-terracotta font-bold text-base sm:text-lg btn-premium haptic flex items-center justify-center gap-1.5 shadow-sm">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">call</span>
                                         <span>${isHe ? 'חיוג לדפנה' : 'Call Dafna'}</span>
                                     </a>
-                                    <a href="https://wa.me/972505551383" target="_blank" rel="noopener noreferrer" class="py-3 px-4 rounded-xl bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold text-xs sm:text-sm btn-premium haptic flex items-center justify-center gap-1.5 shadow-sm">
-                                        <span class="material-symbols-outlined" style="font-size: 18px;">chat</span>
+                                    <a href="https://wa.me/972505551383" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold text-base sm:text-lg btn-premium haptic flex items-center justify-center gap-1.5 shadow-sm">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">chat</span>
                                         <span>WhatsApp</span>
                                     </a>
                                 </div>
                             </div>
 
-                            <div class="surface-subtle p-2.5 rounded-2xl">
+                            <div class="surface-subtle p-2 rounded-2xl">
                                 <img src="https://i.imgur.com/5vg5NXj.png" alt="Spa brochure" class="w-full rounded-xl cursor-pointer hover:opacity-95 transition-opacity" onclick="openZoomImage('https://i.imgur.com/5vg5NXj.png')" />
-                                <p class="text-[11px] text-center text-theme-tertiary mt-1.5">${isHe ? 'לחצו על התמונה להגדלה' : 'Tap brochure to zoom'}</p>
+                                <p class="text-sm font-semibold text-center text-theme-secondary mt-1">${isHe ? 'לחצו על התמונה להגדלה' : 'Tap brochure to zoom'}</p>
                             </div>
                         </div>
                     `;
 
                 case 'sushi':
                     return `
-                        <div class="space-y-4 ${alignClass}" dir="${dirAttr}">
-                            <div class="surface-subtle p-3 rounded-2xl">
+                        <div class="space-y-3 ${alignClass}" dir="${dirAttr}">
+                            <div class="surface-subtle p-2.5 rounded-2xl">
                                 <img src="https://i.imgur.com/ChMRT7d.jpg" alt="Sushi Menu" class="w-full rounded-xl cursor-pointer shadow-sm hover:opacity-95 transition-opacity" onclick="openZoomImage('https://i.imgur.com/ChMRT7d.jpg')" />
-                                <div class="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-theme-secondary">
-                                    <span class="material-symbols-outlined" style="font-size: 16px;">zoom_in</span>
+                                <div class="mt-2.5 flex items-center justify-center gap-1.5 text-base font-bold text-theme-secondary">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">zoom_in</span>
                                     <span>${isHe ? 'תפריט מלא עם מחירים — לחצו להגדלה (1x / 2x)' : 'Full Menu with Prices — Tap to Zoom (1x / 2x)'}</span>
                                 </div>
                             </div>
@@ -1791,21 +1802,21 @@
                         const tag = isHe ? trail.tagHe : trail.tagEn;
                         const escapedTitle = title.replace(/'/g, "\\'");
                         return `
-                            <div class="surface-elevated p-3.5 rounded-2xl space-y-2.5">
+                            <div class="surface-elevated p-2.5 sm:p-3 rounded-2xl space-y-2">
                                 <div class="flex items-start justify-between gap-2">
                                     <div>
-                                        <h5 class="font-bold text-sm text-theme-primary leading-snug">${title}</h5>
-                                        <span class="text-[11px] font-medium text-theme-tertiary block mt-0.5">${tag}</span>
+                                        <h5 class="font-bold text-lg sm:text-xl text-theme-primary leading-tight">${title}</h5>
+                                        <span class="text-base font-medium text-theme-secondary block mt-0.5">${tag}</span>
                                     </div>
-                                    <span class="px-2.5 py-1 rounded-full badge-champagne font-mono text-xs font-bold tabular-nums flex-shrink-0"><bdi dir="ltr">${trail.distance}</bdi></span>
+                                    <span class="px-2.5 py-0.5 rounded-full badge-champagne font-mono text-base font-bold tabular-nums flex-shrink-0"><bdi dir="ltr">${trail.distance}</bdi></span>
                                 </div>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <button type="button" onclick="handleViewTrail('${escapedTitle}', '${trail.gpxUrl}', '${trail.distance}')" class="py-2.5 px-3 rounded-xl btn-terracotta text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm haptic">
-                                        <span class="material-symbols-outlined" style="font-size: 16px;">map</span>
+                                    <button type="button" onclick="handleViewTrail('${escapedTitle}', '${trail.gpxUrl}', '${trail.distance}')" class="py-2 px-2.5 rounded-xl btn-terracotta text-base font-bold flex items-center justify-center gap-1.5 shadow-sm haptic">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">map</span>
                                         <span>${isHe ? 'מפת ניווט חיה' : 'Interactive Map'}</span>
                                     </button>
-                                    <a href="${trail.gpxUrl}" download="${trail.downloadName}" class="py-2.5 px-3 rounded-xl surface-subtle text-theme-primary text-xs font-bold flex items-center justify-center gap-1.5 haptic">
-                                        <span class="material-symbols-outlined" style="font-size: 16px;">download</span>
+                                    <a href="${trail.gpxUrl}" download="${trail.downloadName}" class="py-2 px-2.5 rounded-xl surface-subtle text-theme-primary text-base font-bold flex items-center justify-center gap-1.5 haptic">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
                                         <span>${isHe ? 'קובץ GPX' : 'Download GPX'}</span>
                                     </a>
                                 </div>
@@ -1814,43 +1825,43 @@
                     }).join('');
 
                     return `
-                        <div class="space-y-5 ${alignClass}" dir="${dirAttr}">
+                        <div class="space-y-3 ${alignClass}" dir="${dirAttr}">
                             <!-- 1. Curated Trails First -->
-                            <div class="surface-subtle p-4 rounded-2xl space-y-3">
+                            <div class="surface-subtle p-2.5 sm:p-3 rounded-2xl space-y-2.5">
                                 <div class="flex items-center justify-between">
-                                    <h4 class="font-bold text-base text-theme-primary flex items-center gap-1.5">
-                                        <span class="material-symbols-outlined text-[#B85A3A]" style="font-size: 20px;">hiking</span>
+                                    <h4 class="font-bold text-lg sm:text-xl text-theme-primary flex items-center gap-1.5">
+                                        <span class="material-symbols-outlined icon-gradient-text" style="font-size: 22px;">hiking</span>
                                         <span>${isHe ? 'מסלולי הליכה מומלצים (עובד גם ללא קליטה)' : 'Curated Desert Trails (Offline-Ready)'}</span>
                                     </h4>
                                 </div>
-                                <div class="space-y-2.5">
+                                <div class="space-y-2">
                                     ${trailsHtml}
                                 </div>
                             </div>
 
                             <!-- 2. Trail Gate Location -->
-                            <div class="surface-subtle p-4 rounded-2xl space-y-2.5">
-                                <h4 class="font-bold text-sm text-theme-primary">
+                            <div class="surface-subtle p-2.5 sm:p-3 rounded-2xl space-y-2">
+                                <h4 class="font-bold text-lg text-theme-primary">
                                     ${isHe ? 'מיקום השער ליציאה למסלולים' : 'Trailhead Gate Location'}
                                 </h4>
-                                <a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" class="w-full py-3 px-4 rounded-xl btn-taupe font-bold text-xs sm:text-sm text-center haptic shadow-sm flex items-center justify-center gap-2">
-                                    <span class="material-symbols-outlined" style="font-size: 18px;">location_on</span>
+                                <a href="https://maps.app.goo.gl/Xght4GWp1JN8Botg7" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 rounded-xl btn-taupe font-bold text-base sm:text-lg text-center haptic shadow-sm flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">location_on</span>
                                     <span>${isHe ? 'פתיחת מיקום השער ב-Google Maps' : 'Open Trail Gate in Google Maps'}</span>
                                 </a>
                             </div>
 
                             <!-- 3. AllTrails Mobile Apps (Android & iPhone) -->
-                            <div class="surface-subtle p-4 rounded-2xl space-y-2.5">
-                                <h4 class="font-bold text-sm text-theme-primary">
+                            <div class="surface-subtle p-2.5 sm:p-3 rounded-2xl space-y-2">
+                                <h4 class="font-bold text-lg text-theme-primary">
                                     ${isHe ? 'אפליקציית ניווט חיצונית (AllTrails)' : 'External Trail Navigation App (AllTrails)'}
                                 </h4>
-                                <div class="grid grid-cols-2 gap-2.5">
-                                    <a href="https://play.google.com/store/apps/details?id=com.alltrails.alltrails" target="_blank" rel="noopener noreferrer" class="py-3 px-3 rounded-xl surface-elevated text-theme-primary font-bold text-xs text-center haptic shadow-sm flex items-center justify-center gap-1.5">
-                                        <span class="material-symbols-outlined text-emerald-600" style="font-size: 18px;">android</span>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <a href="https://play.google.com/store/apps/details?id=com.alltrails.alltrails" target="_blank" rel="noopener noreferrer" class="py-2.5 px-2.5 rounded-xl surface-elevated text-theme-primary font-bold text-base text-center haptic shadow-sm flex items-center justify-center gap-1.5">
+                                        <span class="material-symbols-outlined text-emerald-600" style="font-size: 20px;">android</span>
                                         <span>${isHe ? 'AllTrails לאנדרואיד' : 'AllTrails (Android)'}</span>
                                     </a>
-                                    <a href="https://apps.apple.com/us/app/alltrails-hike-bike-run/id405075943" target="_blank" rel="noopener noreferrer" class="py-3 px-3 rounded-xl surface-elevated text-theme-primary font-bold text-xs text-center haptic shadow-sm flex items-center justify-center gap-1.5">
-                                        <span class="material-symbols-outlined" style="font-size: 18px;">phone_iphone</span>
+                                    <a href="https://apps.apple.com/us/app/alltrails-hike-bike-run/id405075943" target="_blank" rel="noopener noreferrer" class="py-2.5 px-2.5 rounded-xl surface-elevated text-theme-primary font-bold text-base text-center haptic shadow-sm flex items-center justify-center gap-1.5">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">phone_iphone</span>
                                         <span>${isHe ? 'AllTrails לאייפון' : 'AllTrails (iPhone)'}</span>
                                     </a>
                                 </div>
@@ -1861,44 +1872,44 @@
 
                 case 'trail_services':
                     return `
-                        <div class="space-y-4 ${alignClass}" dir="${dirAttr}">
-                            <div class="surface-subtle p-5 rounded-2xl space-y-4 text-center">
+                        <div class="space-y-3 ${alignClass}" dir="${dirAttr}">
+                            <div class="surface-subtle p-3.5 rounded-2xl space-y-3 text-center">
                                 <div class="w-12 h-12 rounded-2xl icon-badge mx-auto flex items-center justify-center">
                                     ${getTrailServicesIcon()}
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-xl text-theme-primary">
+                                    <h4 class="font-bold text-2xl text-theme-primary">
                                         ${isHe ? 'טיולי ג׳יפים עם מר מדבר' : 'Jeep Tours with Mr. Desert'}
                                     </h4>
-                                    <p class="text-xs sm:text-sm text-theme-secondary mt-1">
+                                    <p class="text-base sm:text-lg text-theme-secondary mt-1 leading-snug">
                                         ${isHe ? 'סיורי מדבר מרתקים, תצפיות שקיעה והקפצות למטיילים בערבה' : 'Guided desert jeep excursions, sunset tours, and hiker transfers'}
                                     </p>
                                 </div>
 
-                                <div class="surface-elevated p-4 rounded-xl space-y-2 text-sm">
-                                    <p class="font-semibold text-theme-primary">
+                                <div class="surface-elevated p-3 rounded-xl space-y-1.5 text-lg sm:text-xl">
+                                    <p class="font-bold text-theme-primary">
                                         <span>${isHe ? 'טלפון: ' : 'Phone: '}</span>
-                                        <a href="tel:054-4249783" class="text-[#B85A3A] dark:text-[#D97757] hover:underline font-mono font-bold"><bdi dir="ltr">054-4249783</bdi></a>
+                                        <a href="tel:054-4249783" class="icon-gradient-text hover:underline font-mono font-bold"><bdi dir="ltr">054-4249783</bdi></a>
                                     </p>
-                                    <p class="font-semibold text-theme-primary">
+                                    <p class="font-bold text-theme-primary">
                                         <span>${isHe ? 'אימייל: ' : 'Email: '}</span>
-                                        <a href="mailto:marmidbar@gmail.com" class="text-[#B85A3A] dark:text-[#D97757] hover:underline font-mono text-xs sm:text-sm"><bdi dir="ltr">marmidbar@gmail.com</bdi></a>
+                                        <a href="mailto:marmidbar@gmail.com" class="icon-gradient-text hover:underline font-mono text-base sm:text-lg"><bdi dir="ltr">marmidbar@gmail.com</bdi></a>
                                     </p>
                                 </div>
 
                                 <!-- Call & WhatsApp Side-by-Side -->
-                                <div class="grid grid-cols-2 gap-2.5">
-                                    <a href="tel:054-4249783" class="py-3 px-4 rounded-xl btn-terracotta font-bold text-xs sm:text-sm btn-premium haptic flex items-center justify-center gap-1.5 shadow-sm">
-                                        <span class="material-symbols-outlined" style="font-size: 18px;">call</span>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <a href="tel:054-4249783" class="py-2.5 px-3 rounded-xl btn-terracotta font-bold text-base sm:text-lg btn-premium haptic flex items-center justify-center gap-1.5 shadow-sm">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">call</span>
                                         <span>${isHe ? 'חיוג למר מדבר' : 'Call Now'}</span>
                                     </a>
-                                    <a href="https://wa.me/972544249783" target="_blank" rel="noopener noreferrer" class="py-3 px-4 rounded-xl bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold text-xs sm:text-sm btn-premium haptic flex items-center justify-center gap-1.5 shadow-sm">
-                                        <span class="material-symbols-outlined" style="font-size: 18px;">chat</span>
+                                    <a href="https://wa.me/972544249783" target="_blank" rel="noopener noreferrer" class="py-2.5 px-3 rounded-xl bg-[#25D366] hover:bg-[#20BD5A] text-white font-bold text-base sm:text-lg btn-premium haptic flex items-center justify-center gap-1.5 shadow-sm">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">chat</span>
                                         <span>WhatsApp</span>
                                     </a>
                                 </div>
 
-                                <a href="https://aravadesert.co.il/marmaidbar/" target="_blank" rel="noopener noreferrer" class="block w-full py-3 px-5 rounded-xl btn-taupe font-bold text-xs sm:text-sm text-center haptic shadow-sm">
+                                <a href="https://aravadesert.co.il/marmaidbar/" target="_blank" rel="noopener noreferrer" class="block w-full py-2.5 px-4 rounded-xl btn-taupe font-bold text-base sm:text-lg text-center haptic shadow-sm">
                                     ${isHe ? 'לביקור באתר האינטרנט של מר מדבר' : 'Visit Mr. Desert Website'}
                                 </a>
                             </div>
@@ -1907,38 +1918,38 @@
 
                 case 'reviews':
                     return `
-                        <div class="${alignClass} space-y-5" dir="${dirAttr}">
+                        <div class="${alignClass} space-y-3.5" dir="${dirAttr}">
                             <div class="flex flex-col items-center">
-                                <div class="flex gap-1 mb-1.5">
+                                <div class="flex gap-1 mb-1">
                                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 26px; color: #D97706;">star</span>
                                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 26px; color: #D97706;">star</span>
                                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 26px; color: #D97706;">star</span>
                                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 26px; color: #D97706;">star</span>
                                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 26px; color: #D97706;">star</span>
                                 </div>
-                                <p class="text-xs font-bold tracking-wider uppercase text-theme-tertiary">
-                                    ${isHe ? 'דירוג אורחים 5.0 כוכבים' : '5.0 ★ Guest Rating'}
+                                <p class="text-base font-bold tracking-wider uppercase text-theme-secondary">
+                                    ${isHe ? 'דירוג אורחים 5.0 כוכבים' : '5.0 Star Guest Rating'}
                                 </p>
                             </div>
 
                             <!-- Testimonial Carousel -->
-                            <div class="surface-subtle rounded-2xl p-5 min-h-[135px] flex flex-col items-center justify-center text-center relative">
+                            <div class="surface-subtle rounded-2xl p-3.5 min-h-[135px] flex flex-col items-center justify-center text-center relative">
                                 <div id="review-carousel" class="w-full"></div>
                             </div>
 
-                            <div class="space-y-3.5">
-                                <p class="text-sm sm:text-base leading-relaxed text-theme-secondary text-center">
+                            <div class="space-y-3">
+                                <p class="text-lg leading-snug text-theme-secondary text-center">
                                     ${isHe
                                         ? 'אנחנו מקווים שאתם נהנים מהשהות שלכם ב-GrappA! אם חוויתם אירוח נפלא, נשמח מאוד אם תשתפו את החוויה שלכם.'
                                         : 'We hope you are enjoying your stay at GrappA! If you had a wonderful experience, we would be grateful if you shared a review.'}
                                 </p>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <a href="https://www.google.com/travel/hotels/entity/CgkIqtO00Y_AnlgQAQ/reviews?q=grappa%20yahel%20reviews&g2lb=4965990%2C72471280%2C72560029%2C72573224%2C72647020%2C72686036%2C72803964%2C72882230%2C73059275%2C73064764%2C121608706&hl=en-IL&gl=il&cs=1&ssta=1&ts=CAEaRwopEiUyIzB4MTUwMWE5NTMxZmFlZDg4MToweGIwN2EwMGZhMmQyOWFhGgASGhIUCgcI6g8QBRgfEgcI6g8QBhgCGAIyAhAAKgQKABoA&qs=CAE4AkIJCaopLfoAerAAQgkJqikt-gB6sAA&ictx=111&utm_campaign=sharing&utm_medium=link&utm_source=htls" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 btn-terracotta font-bold px-5 py-3.5 rounded-2xl shadow-md btn-premium haptic text-sm">
-                                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 18px;">rate_review</span>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                    <a href="https://www.google.com/travel/hotels/entity/CgkIqtO00Y_AnlgQAQ/reviews?q=grappa%20yahel%20reviews&g2lb=4965990%2C72471280%2C72560029%2C72573224%2C72647020%2C72686036%2C72803964%2C72882230%2C73059275%2C73064764%2C121608706&hl=en-IL&gl=il&cs=1&ssta=1&ts=CAEaRwopEiUyIzB4MTUwMWE5NTMxZmFlZDg4MToweGIwN2EwMGZhMmQyOWFhGgASGhIUCgcI6g8QBRgfEgcI6g8QBhgCGAIyAhAAKgQKABoA&qs=CAE4AkIJCaopLfoAerAAQgkJqikt-gB6sAA&ictx=111&utm_campaign=sharing&utm_medium=link&utm_source=htls" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 btn-terracotta font-bold px-4 py-3 rounded-2xl shadow-md btn-premium haptic text-base sm:text-lg">
+                                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1; font-size: 20px;">rate_review</span>
                                         <span>${isHe ? 'כתיבת ביקורת ב-Google' : 'Write a Google Review'}</span>
                                     </a>
-                                    <a href="https://www.booking.com/hotel/il/tsymr-grph-b-rbh-grappa.html?msockid=2d157861dcf06baf09826f35dd036ab3#tab-reviews" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 btn-taupe font-bold px-5 py-3.5 rounded-2xl shadow-md btn-premium haptic text-sm">
-                                        <span class="material-symbols-outlined" style="font-size: 18px;">menu_book</span>
+                                    <a href="https://www.booking.com/hotel/il/tsymr-grph-b-rbh-grappa.html?msockid=2d157861dcf06baf09826f35dd036ab3#tab-reviews" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 btn-taupe font-bold px-4 py-3 rounded-2xl shadow-md btn-premium haptic text-base sm:text-lg">
+                                        <span class="material-symbols-outlined" style="font-size: 20px;">menu_book</span>
                                         <span>${isHe ? 'ביקורות ב-Booking.com' : 'Booking.com Reviews'}</span>
                                     </a>
                                 </div>
@@ -1948,29 +1959,29 @@
 
                 case 'checkout':
                     return `
-                        <div class="${alignClass} space-y-4" dir="${dirAttr}">
-                            <div class="p-4 rounded-2xl badge-champagne flex items-center justify-between">
-                                <span class="text-sm font-bold text-theme-primary">${isHe ? 'שעת פינוי היחידה (צ׳ק-אאוט):' : 'Check-out Time:'}</span>
-                                <span class="font-mono text-base font-extrabold text-theme-primary tabular-nums">${isHe ? 'עד <bdi dir="ltr">11:00</bdi>' : 'Until <bdi dir="ltr">11:00 AM</bdi>'}</span>
+                        <div class="${alignClass} space-y-3" dir="${dirAttr}">
+                            <div class="p-3 rounded-2xl badge-champagne flex items-center justify-between">
+                                <span class="text-lg sm:text-xl font-bold">${isHe ? 'שעת פינוי היחידה (צ׳ק-אאוט):' : 'Check-out Time:'}</span>
+                                <span class="font-mono text-xl sm:text-2xl font-extrabold tabular-nums">${isHe ? 'עד <bdi dir="ltr">11:00</bdi>' : 'Until <bdi dir="ltr">11:00 AM</bdi>'}</span>
                             </div>
 
-                            <div class="surface-subtle p-5 rounded-2xl space-y-3 text-sm sm:text-base text-theme-secondary">
-                                <p class="font-semibold text-theme-primary text-xs uppercase tracking-wider mb-1">
+                            <div class="surface-subtle p-3 rounded-2xl space-y-2.5 text-lg sm:text-xl text-theme-primary">
+                                <p class="font-bold text-theme-secondary text-base uppercase tracking-wider mb-0.5">
                                     ${isHe ? 'לפני היציאה, אנא ודאו:' : 'Before Departure Checklist:'}
                                 </p>
-                                <div class="surface-elevated p-3.5 rounded-xl flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-[#B85A3A]" style="font-size: 20px;">ac_unit</span>
+                                <div class="surface-elevated p-2.5 rounded-xl flex items-center gap-2.5">
+                                    <span class="material-symbols-outlined icon-gradient-text" style="font-size: 24px;">ac_unit</span>
                                     <span>${isHe ? 'שכל החלונות סגורים והמזגן כבוי.' : 'All windows are closed and the air conditioner is turned off.'}</span>
                                 </div>
-                                <div class="surface-elevated p-3.5 rounded-xl flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-[#B85A3A]" style="font-size: 20px;">key</span>
+                                <div class="surface-elevated p-2.5 rounded-xl flex items-center gap-2.5">
+                                    <span class="material-symbols-outlined icon-gradient-text" style="font-size: 24px;">key</span>
                                     <span>${isHe ? 'השאירו את המפתח על השולחן ביחידה.' : 'Leave the room key on the table inside the unit.'}</span>
                                 </div>
-                                <div class="surface-elevated p-3.5 rounded-xl flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-[#B85A3A]" style="font-size: 20px;">luggage</span>
+                                <div class="surface-elevated p-2.5 rounded-xl flex items-center gap-2.5">
+                                    <span class="material-symbols-outlined icon-gradient-text" style="font-size: 24px;">luggage</span>
                                     <span>${isHe ? 'ודאו שלא שכחתם חפצים אישיים או מטענים.' : 'Double-check that no personal belongings or chargers are left behind.'}</span>
                                 </div>
-                                <p class="pt-3 text-center font-bold text-theme-primary text-base">
+                                <p class="pt-2 text-center font-bold text-theme-primary text-xl">
                                     ${isHe ? 'תודה רבה שהתארחתם אצלנו, נסיעה טובה ובטוחה!' : 'Thank you for staying with us — wishing you a safe journey!'}
                                 </p>
                             </div>
@@ -1982,28 +1993,28 @@
             }
         };
 
-        // iOS Safari Add-to-Home-Screen Instructions
+        // iOS Safari Add-to-Home-Screen Instructions (Material Symbols instead of emojis)
         const getIosInstallContent = (lang) => {
             const isHe = lang === 'he';
             const alignClass = isHe ? 'text-right' : 'text-left';
             const dirAttr = isHe ? 'rtl' : 'ltr';
             return `
-                <div class="${alignClass} space-y-4" dir="${dirAttr}">
-                    <div class="surface-subtle p-5 rounded-2xl space-y-3 text-sm sm:text-base text-theme-secondary">
+                <div class="${alignClass} space-y-3" dir="${dirAttr}">
+                    <div class="surface-subtle p-3.5 rounded-2xl space-y-2.5 text-lg sm:text-xl text-theme-primary">
                         <p class="flex items-start gap-2.5">
-                            <span class="font-bold text-theme-primary">1.</span>
-                            <span>${isHe ? 'לחצו על כפתור השיתוף <span class="inline-block align-middle">⬆️</span> בתחתית דפדפן Safari.' : 'Tap the Share button <span class="inline-block align-middle">⬆️</span> at the bottom of Safari.'}</span>
+                            <span class="font-bold">1.</span>
+                            <span>${isHe ? 'לחצו על כפתור השיתוף <span class="material-symbols-outlined align-middle" style="font-size: 20px;">ios_share</span> בתחתית דפדפן Safari.' : 'Tap the Share button <span class="material-symbols-outlined align-middle" style="font-size: 20px;">ios_share</span> at the bottom of Safari.'}</span>
                         </p>
                         <p class="flex items-start gap-2.5">
-                            <span class="font-bold text-theme-primary">2.</span>
-                            <span>${isHe ? 'גללו מטה ובחרו ב-<strong>״הוסף למסך הבית״</strong> (Add to Home Screen) <span class="inline-block align-middle">➕</span>.' : 'Scroll down and tap <strong>"Add to Home Screen"</strong> <span class="inline-block align-middle">➕</span>.'}</span>
+                            <span class="font-bold">2.</span>
+                            <span>${isHe ? 'גללו מטה ובחרו ב-<strong>״הוסף למסך הבית״</strong> (Add to Home Screen) <span class="material-symbols-outlined align-middle" style="font-size: 20px;">add_box</span>.' : 'Scroll down and tap <strong>"Add to Home Screen"</strong> <span class="material-symbols-outlined align-middle" style="font-size: 20px;">add_box</span>.'}</span>
                         </p>
                         <p class="flex items-start gap-2.5">
-                            <span class="font-bold text-theme-primary">3.</span>
+                            <span class="font-bold">3.</span>
                             <span>${isHe ? 'לחצו על <strong>״הוסף״</strong> (Add) בפינה העליונה.' : 'Tap <strong>"Add"</strong> in the top corner.'}</span>
                         </p>
                     </div>
-                    <p class="text-xs text-center text-theme-tertiary">
+                    <p class="text-base text-center text-theme-secondary">
                         ${isHe ? 'שמירת האפליקציה מאפשרת גישה מהירה למפות המסלולים גם ללא קליטה סלולרית!' : 'Installing enables instant offline access to desert trail maps and resort info!'}
                     </p>
                 </div>
@@ -2016,81 +2027,81 @@
             const alignClass = isHe ? 'text-right' : 'text-left';
             const dirAttr = isHe ? 'rtl' : 'ltr';
             return `
-                <div class="${alignClass} space-y-4" dir="${dirAttr}">
-                    <div class="surface-subtle p-5 rounded-2xl space-y-3 text-sm sm:text-base text-theme-secondary">
+                <div class="${alignClass} space-y-3" dir="${dirAttr}">
+                    <div class="surface-subtle p-3.5 rounded-2xl space-y-2.5 text-lg sm:text-xl text-theme-primary">
                         <p class="flex items-start gap-2.5">
-                            <span class="font-bold text-theme-primary">1.</span>
+                            <span class="font-bold">1.</span>
                             <span>${isHe ? 'פתחו את תפריט הדפדפן (⋮ או •••).' : 'Open your browser menu (⋮ or •••).'}</span>
                         </p>
                         <p class="flex items-start gap-2.5">
-                            <span class="font-bold text-theme-primary">2.</span>
+                            <span class="font-bold">2.</span>
                             <span>${isHe ? 'בחרו ב-<strong>״התקן אפליקציה״</strong> או <strong>״הוסף למסך הבית״</strong>.' : 'Select <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.'}</span>
                         </p>
                     </div>
-                    <p class="text-xs text-center text-theme-tertiary">
+                    <p class="text-base text-center text-theme-secondary">
                         ${isHe ? 'פעולה זו שומרת את המדריך והמפות במכשירכם לשימוש ללא קליטה.' : 'This saves the guide and trail maps on your device for offline use.'}
                     </p>
                 </div>
             `;
         };
 
-        // Warm Welcome Letter & House Etiquette (Used in Onboarding & Header ℹ️ Modal)
-        const getWelcomeLetterHtml = (lang, includeCloseBtn = true) => {
+        // Warm Welcome Letter & House Etiquette (Decorative side column removed, bullet points enlarged)
+        const getWelcomeLetterHtml = (lang, includeAcceptBtn = true) => {
             const isHe = lang === 'he';
             const alignClass = isHe ? 'text-right' : 'text-left';
             const dirAttr = isHe ? 'rtl' : 'ltr';
 
             const bodyHtml = isHe ? `
-                <div class="${alignClass} space-y-3.5" dir="${dirAttr}">
-                    <div class="surface-subtle p-4 sm:p-5 rounded-2xl space-y-3 text-sm sm:text-[15px] leading-relaxed text-theme-primary">
-                        <p class="font-bold">
+                <div class="${alignClass} space-y-2.5" dir="${dirAttr}">
+                    <div class="surface-subtle p-3 rounded-2xl space-y-2 text-theme-primary">
+                        <p class="font-bold text-lg leading-snug">
                             השקענו את כל הלב בעיצוב המקום, ובחרנו כל פרט בקפידה כדי להעניק לכם חופשה יוקרתית ונעימה.
                         </p>
-                        <p class="text-theme-secondary">
-                            כדי לעזור לנו לשמור על היחידות במצב מושלם, כך שיישארו יפהפיות גם בביקור הבא שלכם, ולמען האורחים שיגיעו אחריכם, נודה לכם אם תקפידו על הדברים הבאים:
+                        <p class="text-theme-secondary text-base leading-snug">
+                            כדי לעזור לנו לשמור על היחידות במצב מושלם, גם לביקור הבא שלכם ולמען האורחים הבאים, נודה לכם אם תקפידו על הכללים הבאים:
                         </p>
-                        <div class="space-y-2 border-r-2 border-[#B85A3A] pr-3 my-2 text-xs sm:text-sm text-theme-secondary">
+                        <div class="space-y-1.5 py-1 text-lg font-bold text-theme-primary leading-snug">
                             <p>• התרווחו ותיהנו מכל הפינוקים שהיחידה מציעה (אנא השאירו את מגבות החדר, האביזרים ופריטי העיצוב בתוך היחידה).</p>
                             <p>• התייחסו בעדינות ובאכפתיות לריהוט ולאלמנטים העיצוביים.</p>
                             <p>• שמרו על ניקיון היחידה, כדי שתישאר רעננה ומזמינה.</p>
                         </div>
-                        <p class="font-semibold pt-2 border-t border-theme text-xs sm:text-sm">
+                        <p class="font-semibold pt-1.5 border-t border-theme text-base text-theme-secondary leading-snug">
                             תודה על האכפתיות שלכם כלפי המקום ועל כך שאתם עוזרים לנו לשמור על העסק שלנו.
                         </p>
-                        <p class="font-editorial text-lg font-bold text-center text-[#B85A3A] dark:text-[#D97757] pt-1">
+                        <p class="font-editorial text-xl font-bold text-center icon-gradient-text pt-0.5">
                             שתהיה לכם חופשה נפלאה!
                         </p>
                     </div>
-                    ${includeCloseBtn ? `
-                        <button type="button" onclick="closeDialog()" class="w-full py-3.5 px-6 rounded-2xl btn-terracotta font-bold text-sm sm:text-base shadow-md btn-premium haptic text-center">
-                            חזרה למדריך האורחים
+                    ${includeAcceptBtn ? `
+                        <button type="button" onclick="acceptOnboardingRules()" class="w-full py-2.5 px-5 rounded-2xl btn-terracotta font-bold text-xl shadow-md btn-premium haptic text-center">
+                            קראתי ואני מאשר/ת
                         </button>
                     ` : ''}
                 </div>
             ` : `
-                <div class="${alignClass} space-y-3.5" dir="${dirAttr}">
-                    <div class="surface-subtle p-4 sm:p-5 rounded-2xl space-y-3 text-sm sm:text-[15px] leading-relaxed text-theme-primary">
-                        <p class="font-bold">
+                <div class="${alignClass} space-y-2.5" dir="${dirAttr}">
+                    <div class="surface-subtle p-3 rounded-2xl space-y-2 text-theme-primary">
+                        <p class="font-bold text-lg leading-snug">
                             We have invested our hearts into designing this space, choosing every detail to offer you a serene, unforgettable desert getaway.
                         </p>
-                        <p class="text-theme-secondary">
-                            To help us keep the suites in pristine condition—so they remain just as beautiful when you return and for the travelers who follow—we kindly ask that you:
+                        <p class="text-theme-secondary text-base leading-snug">
+                            To help us keep the suites in pristine condition for your next visit and for future guests, we kindly ask that you follow these house rules:
                         </p>
-                        <div class="space-y-2 border-l-2 border-[#B85A3A] pl-3 my-2 text-xs sm:text-sm text-theme-secondary">
+                        <div class="space-y-1.5 py-1 text-lg font-bold text-theme-primary leading-snug">
                             <p>• Cozy up and enjoy all room amenities inside the unit (please keep indoor towels, accessories, and decor inside).</p>
                             <p>• Treat the suite’s furniture and design elements with gentle care.</p>
                             <p>• Maintain the cleanliness of your unit so it stays fresh and welcoming.</p>
                         </div>
-                        <p class="font-semibold pt-2 border-t border-theme text-xs sm:text-sm">
+                        <p class="font-semibold pt-1.5 border-t border-theme text-base text-theme-secondary leading-snug">
                             Thank you for caring for this space and helping us preserve GrappA.
                         </p>
-                        <p class="font-editorial text-xl font-bold text-center text-[#B85A3A] dark:text-[#D97757] pt-1">
+                        <p class="font-editorial text-xl font-bold text-center icon-gradient-text pt-0.5">
                             Have a wonderful stay!
                         </p>
                     </div>
-                    ${includeCloseBtn ? `
-                        <button type="button" onclick="closeDialog()" class="w-full py-3.5 px-6 rounded-2xl btn-terracotta font-bold text-sm sm:text-base shadow-md btn-premium haptic text-center">
-                            Back to Guest Guide
+                    ${includeAcceptBtn ? `
+                        <button type="button" onclick="acceptOnboardingRules()" class="w-full py-2.5 px-5 rounded-2xl btn-terracotta font-bold text-xl shadow-md btn-premium haptic text-center">
+                            I Read and Accept
                         </button>
                     ` : ''}
                 </div>
@@ -2104,10 +2115,10 @@
         const renderCardExtraPreview = (cardId, isHe) => {
             if (cardId === 'wifi') {
                 return `
-                    <div class="mt-2.5 pt-2.5 border-t border-theme w-full flex items-center justify-between gap-1.5">
-                        <span class="text-[11px] font-mono text-theme-secondary truncate"><bdi dir="ltr">grappA321</bdi></span>
-                        <button type="button" onclick="event.stopPropagation(); copyToClipboard('grappA321', this, '${isHe ? 'הסיסמה הועתקה!' : 'Copied!'}')" class="px-2.5 py-1 rounded-lg badge-champagne text-[11px] font-bold flex items-center gap-1 haptic flex-shrink-0">
-                            <span class="material-symbols-outlined" style="font-size: 13px;">content_copy</span>
+                    <div class="mt-1.5 pt-1.5 border-t border-theme w-full flex items-center justify-between gap-1">
+                        <span class="text-base font-mono font-bold text-theme-primary whitespace-nowrap"><bdi dir="ltr">grappA321</bdi></span>
+                        <button type="button" onclick="event.stopPropagation(); copyToClipboard('grappA321', this, '${isHe ? 'הסיסמה הועתקה!' : 'Copied!'}')" class="px-2 py-0.5 rounded-lg badge-champagne text-sm font-bold flex items-center gap-1 haptic flex-shrink-0">
+                            <span class="material-symbols-outlined" style="font-size: 15px;">content_copy</span>
                             <span>${isHe ? 'העתק' : 'Copy'}</span>
                         </button>
                     </div>
@@ -2116,32 +2127,38 @@
             if (cardId === 'grocery') {
                 const g = getGroceryStatus(isHe ? 'he' : 'en');
                 return `
-                    <div class="mt-2.5 pt-2.5 border-t border-theme w-full flex items-center justify-between gap-1">
-                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${g.isOpen ? 'badge-open' : 'badge-closed'}">
-                            <span class="w-1.5 h-1.5 rounded-full ${g.isOpen ? 'bg-emerald-500' : 'bg-rose-500'}"></span>
+                    <div class="mt-1.5 pt-1.5 border-t border-theme w-full flex flex-col gap-1">
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-sm font-bold w-max ${g.isOpen ? 'badge-open' : 'badge-closed'}">
+                            <span class="w-2 h-2 rounded-full ${g.isOpen ? 'bg-emerald-500' : 'bg-rose-500'}"></span>
                             <span>${g.statusLabel}</span>
                         </span>
-                        <span class="text-[10px] font-medium text-theme-tertiary tabular-nums">${g.subLabel}</span>
+                        <span class="text-base font-bold text-theme-primary tabular-nums">${g.subLabel}</span>
                     </div>
                 `;
             }
             if (cardId === 'pool') {
                 const p = getPoolStatus(isHe ? 'he' : 'en');
                 return `
-                    <div class="mt-2.5 pt-2.5 border-t border-theme w-full flex items-center justify-between gap-1">
-                        <span class="text-[10px] font-semibold text-theme-secondary truncate tabular-nums">${p.cardPreview}</span>
+                    <div class="mt-1.5 pt-1.5 border-t border-theme w-full flex items-center justify-between gap-1">
+                        <span class="text-[15px] font-bold text-theme-primary leading-tight tabular-nums">${p.cardPreview}</span>
                     </div>
                 `;
             }
             if (cardId === 'tv') {
                 return `
-                    <div class="mt-3 pt-2.5 border-t border-theme w-full flex items-center justify-between flex-wrap gap-2">
-                        <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-1 rounded-lg surface-subtle text-xs font-semibold">🏰 <bdi dir="ltr">Disney+ (4114)</bdi></span>
-                            <span class="px-2.5 py-1 rounded-lg surface-subtle text-xs font-semibold">🎬 <bdi dir="ltr">Netflix (GrappA)</bdi></span>
+                    <div class="mt-1.5 pt-1.5 border-t border-theme w-full flex items-center justify-between flex-wrap gap-1.5">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="px-2 py-0.5 rounded-lg surface-subtle text-base font-bold flex items-center gap-1">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">live_tv</span>
+                                <bdi dir="ltr">Disney+ (4114)</bdi>
+                            </span>
+                            <span class="px-2 py-0.5 rounded-lg surface-subtle text-base font-bold flex items-center gap-1">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">movie</span>
+                                <bdi dir="ltr">Netflix (GrappA)</bdi>
+                            </span>
                         </div>
-                        <button type="button" onclick="event.stopPropagation(); copyToClipboard('4114', this, '${isHe ? 'קוד הועתק!' : 'PIN Copied!'}')" class="px-2.5 py-1 rounded-lg badge-champagne text-xs font-bold flex items-center gap-1 haptic">
-                            <span class="material-symbols-outlined" style="font-size: 14px;">content_copy</span>
+                        <button type="button" onclick="event.stopPropagation(); copyToClipboard('4114', this, '${isHe ? 'קוד הועתק!' : 'PIN Copied!'}')" class="px-2.5 py-0.5 rounded-lg badge-champagne text-base font-bold flex items-center gap-1 haptic">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">content_copy</span>
                             <span>${isHe ? 'העתק קוד 4114' : 'Copy PIN 4114'}</span>
                         </button>
                     </div>
@@ -2152,20 +2169,20 @@
                     const tName = (isHe ? t.titleHe : t.titleEn).replace(/'/g, "\\'");
                     const shortLabel = isHe ? `<bdi dir="ltr">${t.distance.replace(' km', '')}</bdi> ק״מ` : `<bdi dir="ltr">${t.distance}</bdi>`;
                     return `
-                        <button type="button" onclick="event.stopPropagation(); handleViewTrail('${tName}', '${t.gpxUrl}', '${t.distance}')" class="px-2.5 py-1.5 rounded-xl surface-subtle hover:opacity-85 text-xs font-bold text-theme-primary flex items-center gap-1 haptic tabular-nums">
-                            <span class="material-symbols-outlined text-[#B85A3A]" style="font-size: 14px;">route</span>
+                        <button type="button" onclick="event.stopPropagation(); handleViewTrail('${tName}', '${t.gpxUrl}', '${t.distance}')" class="px-2.5 py-1 rounded-xl surface-subtle hover:opacity-85 text-base font-bold text-theme-primary flex items-center gap-1 haptic tabular-nums">
+                            <span class="material-symbols-outlined icon-gradient-text" style="font-size: 17px;">route</span>
                             <span>${shortLabel}</span>
                         </button>
                     `;
                 }).join('');
                 return `
-                    <div class="mt-3 pt-3 border-t border-theme w-full flex items-center justify-between flex-wrap gap-2">
+                    <div class="mt-2 pt-2 border-t border-theme w-full flex items-center justify-between flex-wrap gap-2">
                         <div class="flex items-center gap-1.5 flex-wrap">
                             ${trailPills}
                         </div>
-                        <span class="text-xs font-bold text-[#B85A3A] dark:text-[#D97757] flex items-center gap-0.5">
+                        <span class="text-base font-bold icon-gradient-text flex items-center gap-0.5">
                             <span>${isHe ? 'לכל המסלולים' : 'All Trails'}</span>
-                            <span class="material-symbols-outlined" style="font-size: 16px;">${isHe ? 'chevron_left' : 'chevron_right'}</span>
+                            <span class="material-symbols-outlined" style="font-size: 18px;">${isHe ? 'chevron_left' : 'chevron_right'}</span>
                         </span>
                     </div>
                 `;
@@ -2184,7 +2201,7 @@
 
             // Update Header & Hero Texts
             document.getElementById('lang-btn-text').textContent = isHe ? 'EN' : 'עב';
-            document.getElementById('header-location-tag').textContent = t.headerLocation;
+            const hdrLocEl = document.getElementById('header-location-tag'); if (hdrLocEl) hdrLocEl.textContent = t.headerLocation;
             document.getElementById('hero-subtitle').textContent = t.heroSubtitle;
             document.getElementById('install-btn-text').textContent = t.installBtnText;
             document.getElementById('recently-viewed-title').textContent = t.recentlyViewedTitle;
@@ -2233,18 +2250,18 @@
             let globalCardIdx = 0;
             JOURNEY_SECTIONS.forEach(section => {
                 const sectionEl = document.createElement('section');
-                sectionEl.className = 'space-y-3';
+                sectionEl.className = 'space-y-2';
 
                 const sectionTitle = isHe ? section.titleHe : section.titleEn;
                 sectionEl.innerHTML = `
                     <div class="flex items-center gap-2 px-1">
-                        <span class="material-symbols-outlined text-[#B85A3A] dark:text-[#D97757]" style="font-size: 18px;">${section.icon}</span>
-                        <h2 class="font-editorial text-xl sm:text-2xl font-bold text-theme-primary tracking-tight">${sectionTitle}</h2>
+                        <span class="material-symbols-outlined icon-gradient-text" style="font-size: 22px;">${section.icon}</span>
+                        <h2 class="font-editorial text-2xl font-bold text-theme-primary tracking-tight">${sectionTitle}</h2>
                     </div>
                 `;
 
                 const gridEl = document.createElement('div');
-                gridEl.className = 'grid grid-cols-2 gap-3.5 sm:gap-4';
+                gridEl.className = 'grid grid-cols-2 gap-3';
 
                 section.cardIds.forEach(cardId => {
                     const card = CARDS_CONFIG.find(c => c.id === cardId);
@@ -2256,7 +2273,7 @@
                     cardEl.setAttribute('tabindex', '0');
                     const colSpan = card.fullWidth ? 'col-span-2' : 'col-span-1';
                     const animClass = isSilentRefresh ? '' : 'animate-scaleIn';
-                    cardEl.className = `${colSpan} surface-card rounded-2xl p-4 sm:p-5 cursor-pointer card-hover haptic ${animClass} flex flex-col justify-between`;
+                    cardEl.className = `${colSpan} surface-card rounded-2xl p-2.5 sm:p-3 cursor-pointer card-hover haptic ${animClass} flex flex-col justify-between`;
                     if (!isSilentRefresh) {
                         cardEl.style.animationDelay = `${globalCardIdx * 0.04}s`;
                     }
@@ -2268,31 +2285,31 @@
 
                     if (card.fullWidth) {
                         cardEl.innerHTML = `
-                            <div class="flex items-center justify-between gap-3.5">
-                                <div class="flex items-center gap-3.5 min-w-0">
-                                    <div class="w-12 h-12 rounded-2xl icon-badge flex items-center justify-center flex-shrink-0">
+                            <div class="flex items-center justify-between gap-2.5">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <div class="w-11 h-11 rounded-2xl icon-badge flex items-center justify-center flex-shrink-0">
                                         ${card.getIcon()}
                                     </div>
                                     <div class="min-w-0">
-                                        <h3 class="font-bold text-base sm:text-lg text-theme-primary leading-snug">${title}</h3>
-                                        <p class="text-xs text-theme-secondary truncate mt-0.5">${subtitle}</p>
+                                        <h3 class="font-bold text-xl sm:text-2xl text-theme-primary leading-tight">${title}</h3>
+                                        <p class="text-base text-theme-secondary leading-snug mt-0.5">${subtitle}</p>
                                     </div>
                                 </div>
-                                <span class="material-symbols-outlined text-theme-tertiary flex-shrink-0" style="font-size: 20px;">${isHe ? 'chevron_left' : 'chevron_right'}</span>
+                                <span class="material-symbols-outlined text-theme-tertiary flex-shrink-0" style="font-size: 22px;">${isHe ? 'chevron_left' : 'chevron_right'}</span>
                             </div>
                             ${extraHtml}
                         `;
                     } else {
                         cardEl.innerHTML = `
                             <div>
-                                <div class="flex items-start justify-between gap-2 mb-3">
+                                <div class="flex items-start justify-between gap-1.5 mb-1">
                                     <div class="w-11 h-11 rounded-2xl icon-badge flex items-center justify-center">
                                         ${card.getIcon()}
                                     </div>
                                     <span class="material-symbols-outlined text-theme-tertiary" style="font-size: 18px;">${isHe ? 'north_west' : 'north_east'}</span>
                                 </div>
-                                <h3 class="font-bold text-sm sm:text-base text-theme-primary leading-snug">${title}</h3>
-                                <p class="text-[11px] text-theme-secondary line-clamp-1 mt-0.5">${subtitle}</p>
+                                <h3 class="font-bold text-xl sm:text-2xl text-theme-primary leading-tight">${title}</h3>
+                                <p class="text-base text-theme-secondary leading-snug mt-0.5">${subtitle}</p>
                             </div>
                             ${extraHtml}
                         `;
@@ -2334,7 +2351,7 @@
 
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'px-3 py-1 surface-subtle rounded-full text-theme-primary text-xs font-semibold hover:opacity-80 transition-all haptic';
+                btn.className = 'px-3 py-1 surface-subtle rounded-full text-theme-primary text-sm sm:text-base font-bold hover:opacity-80 transition-all haptic';
                 btn.textContent = getCardTitle(config, activeLang);
                 btn.addEventListener('click', () => openDialogHandler(id));
                 list.appendChild(btn);
@@ -2355,36 +2372,62 @@
             const btnEn = document.getElementById('lang-opt-en');
             if (btnHe && btnEn) {
                 if (isHe) {
-                    btnHe.className = 'py-2.5 px-4 rounded-xl font-bold text-sm transition-all haptic flex items-center justify-center gap-1.5 btn-terracotta shadow-sm';
-                    btnEn.className = 'py-2.5 px-4 rounded-xl font-bold text-sm transition-all haptic flex items-center justify-center gap-1.5 text-theme-secondary hover:text-theme-primary';
+                    btnHe.className = 'py-1.5 px-4 rounded-xl font-bold text-base transition-all haptic flex items-center justify-center gap-1.5 btn-terracotta shadow-sm';
+                    btnEn.className = 'py-1.5 px-4 rounded-xl font-bold text-base transition-all haptic flex items-center justify-center gap-1.5 text-theme-secondary hover:text-theme-primary';
                 } else {
-                    btnEn.className = 'py-2.5 px-4 rounded-xl font-bold text-sm transition-all haptic flex items-center justify-center gap-1.5 btn-terracotta shadow-sm';
-                    btnHe.className = 'py-2.5 px-4 rounded-xl font-bold text-sm transition-all haptic flex items-center justify-center gap-1.5 text-theme-secondary hover:text-theme-primary';
+                    btnEn.className = 'py-1.5 px-4 rounded-xl font-bold text-base transition-all haptic flex items-center justify-center gap-1.5 btn-terracotta shadow-sm';
+                    btnHe.className = 'py-1.5 px-4 rounded-xl font-bold text-base transition-all haptic flex items-center justify-center gap-1.5 text-theme-secondary hover:text-theme-primary';
                 }
             }
 
             const titleEl = document.getElementById('onboarding-title');
             const subtitleEl = document.getElementById('onboarding-subtitle');
             const enterBtn = document.getElementById('onboarding-enter-btn');
+            const skipBtn = document.getElementById('onboarding-skip-btn');
             const bodyEl = document.getElementById('onboarding-welcome-body');
 
             if (titleEl) titleEl.textContent = TRANSLATIONS[lang].welcomeModalTitle;
             if (subtitleEl) subtitleEl.textContent = TRANSLATIONS[lang].onboardingSubtitle;
             if (enterBtn) enterBtn.textContent = TRANSLATIONS[lang].enterGuideBtn;
+            if (skipBtn) skipBtn.textContent = TRANSLATIONS[lang].skipBtn;
             if (bodyEl) bodyEl.innerHTML = getWelcomeLetterHtml(lang, false);
 
             renderUI();
         };
 
-        const completeOnboarding = () => {
+        const openWelcomeModal = () => {
+            const initialLang = language || 'he';
+            updateOnboardingLanguage(initialLang);
+            const langModal = document.getElementById('language-modal');
+            langModal.classList.remove('hidden');
+            langModal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        };
+
+        // Clicking "Skip / דלג" closes the modal for now WITHOUT disabling future auto-open
+        const skipOnboarding = () => {
             if (!language) {
                 language = 'he';
                 localStorage.setItem('preferredLanguage', 'he');
             }
-            localStorage.setItem('grappa_welcome_seen', 'true');
             const langModal = document.getElementById('language-modal');
             langModal.classList.add('hidden');
             langModal.classList.remove('flex');
+            document.body.style.overflow = '';
+            renderUI();
+        };
+
+        // Clicking "I Read and Accept / קראתי ואני מאשר/ת" permanently disables auto-open on future visits
+        const acceptOnboardingRules = () => {
+            if (!language) {
+                language = 'he';
+                localStorage.setItem('preferredLanguage', 'he');
+            }
+            localStorage.setItem('grappa_rules_accepted', 'true');
+            const langModal = document.getElementById('language-modal');
+            langModal.classList.add('hidden');
+            langModal.classList.remove('flex');
+            closeDialog();
             document.body.style.overflow = '';
             renderUI();
         };
@@ -2406,8 +2449,8 @@
             let content = '';
 
             if (id === 'welcome') {
-                title = TRANSLATIONS[activeLang].welcomeModalTitle;
-                content = getWelcomeLetterHtml(activeLang, true);
+                openWelcomeModal();
+                return;
             } else if (id === 'ios-install') {
                 title = isHe ? 'הוספה למסך הבית (iPhone)' : 'Add to Home Screen (iPhone)';
                 content = getIosInstallContent(activeLang);
@@ -2545,11 +2588,11 @@
                 className: 'custom-user-marker',
                 html: `
                     <div class="relative w-8 h-8 flex items-center justify-center">
-                        <div class="absolute w-6 h-6 bg-[#B85A3A]/35 rounded-full animate-ping"></div>
+                        <div class="absolute w-6 h-6 bg-[#6E7276]/35 rounded-full animate-ping"></div>
                         <svg class="absolute w-8 h-8 transition-transform duration-200" style="${rotation} top: 0; left: 0;" viewBox="0 0 32 32">
-                            <path d="M 16 2 L 24 12 L 18 10 L 18 30 L 14 30 L 14 10 L 8 12 Z" fill="#B85A3A" opacity="0.95" />
+                            <path d="M 16 2 L 24 12 L 18 10 L 18 30 L 14 30 L 14 10 L 8 12 Z" fill="#6E7276" opacity="0.95" />
                         </svg>
-                        <div class="absolute w-4 h-4 bg-[#B85A3A] border-2 border-white rounded-full shadow-md z-10"></div>
+                        <div class="absolute w-4 h-4 bg-[#6E7276] border-2 border-white rounded-full shadow-md z-10"></div>
                     </div>
                 `,
                 iconSize: [32, 32],
@@ -2582,8 +2625,8 @@
                     <svg class="w-full h-14 overflow-visible" viewBox="0 0 400 60" preserveAspectRatio="none">
                         <defs>
                             <linearGradient id="eleGrad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#B85A3A" stop-opacity="0.38"></stop>
-                                <stop offset="100%" stop-color="#B85A3A" stop-opacity="0.0"></stop>
+                                <stop offset="0%" stop-color="#6E7276" stop-opacity="0.38"></stop>
+                                <stop offset="100%" stop-color="#6E7276" stop-opacity="0.0"></stop>
                             </linearGradient>
                         </defs>
                         <line x1="0" y1="5" x2="400" y2="5" stroke="currentColor" stroke-opacity="0.1" stroke-dasharray="2,2" />
@@ -2591,7 +2634,7 @@
                         <line x1="0" y1="55" x2="400" y2="55" stroke="currentColor" stroke-opacity="0.1" stroke-dasharray="2,2" />
 
                         <path d="${pathData}" fill="url(#eleGrad)" />
-                        <path d="${lineData}" fill="none" stroke="#B85A3A" stroke-width="2.4" stroke-linecap="round" />
+                        <path d="${lineData}" fill="none" stroke="#6E7276" stroke-width="2.4" stroke-linecap="round" />
 
                         <circle id="ele-user-dot" cx="-10" cy="-10" r="5" fill="#10b981" stroke="#ffffff" stroke-width="1.5" class="hidden animate-pulse" />
                     </svg>
@@ -2692,8 +2735,9 @@
             bottomPanel.setAttribute('dir', isHe ? 'rtl' : 'ltr');
 
             const offlineBanner = document.getElementById('map-offline-notice');
+            const offlineBannerText = document.getElementById('map-offline-notice-text');
             if (!navigator.onLine) {
-                offlineBanner.textContent = TRANSLATIONS[activeLang].mapOfflineNotice;
+                if (offlineBannerText) offlineBannerText.textContent = TRANSLATIONS[activeLang].mapOfflineNotice;
                 offlineBanner.classList.remove('hidden');
             } else {
                 offlineBanner.classList.add('hidden');
@@ -2777,7 +2821,7 @@
                         }).addTo(map);
 
                         currentPolyline = L.polyline(latlngs, {
-                            color: '#C26343',
+                            color: '#6E7276',
                             weight: 5,
                             opacity: 0.98,
                             lineCap: 'round',
@@ -2797,7 +2841,7 @@
 
                         endMarker = L.circleMarker(endPoint, {
                             radius: 8,
-                            fillColor: '#B85A3A',
+                            fillColor: '#6E7276',
                             color: '#ffffff',
                             weight: 2.5,
                             fillOpacity: 1
@@ -2960,9 +3004,9 @@
 
                         userLocCircle = L.circle(latlng, {
                             radius: accuracy,
-                            color: '#B85A3A',
+                            color: '#6E7276',
                             weight: 1,
-                            fillColor: '#B85A3A',
+                            fillColor: '#6E7276',
                             fillOpacity: 0.14
                         }).addTo(map);
                     } else {
@@ -3134,10 +3178,10 @@
             el.style.opacity = 0;
             setTimeout(() => {
                 el.innerHTML = `
-                    <p class="font-editorial text-lg sm:text-xl italic font-semibold text-theme-primary mb-2 leading-relaxed">
+                    <p class="font-editorial text-xl sm:text-2xl font-bold text-theme-primary mb-2 leading-snug">
                         ${review.text}
                     </p>
-                    <p class="text-xs font-bold text-theme-tertiary tracking-wider uppercase">
+                    <p class="text-base font-bold text-theme-secondary tracking-wider uppercase">
                         — ${review.author}
                     </p>
                 `;
@@ -3245,15 +3289,10 @@
                     setTimeout(() => { ls.style.display = 'none'; }, 350);
                 }
 
-                // Combined First-Time Onboarding (Shown Once per Device via localStorage)
-                const hasSeenWelcome = localStorage.getItem('grappa_welcome_seen') === 'true';
-                if (!language || !hasSeenWelcome) {
-                    const initialLang = language || 'he';
-                    updateOnboardingLanguage(initialLang);
-                    const langModal = document.getElementById('language-modal');
-                    langModal.classList.remove('hidden');
-                    langModal.classList.add('flex');
-                    document.body.style.overflow = 'hidden';
+                // Welcome & House Rules Notification (Auto-opens on every visit until "I Read and Accept" is clicked)
+                const hasAcceptedRules = localStorage.getItem('grappa_rules_accepted') === 'true';
+                if (!hasAcceptedRules) {
+                    openWelcomeModal();
                 }
             }, 350);
 
@@ -3264,14 +3303,15 @@
             window.addEventListener('offline', handleOffline);
             if (!navigator.onLine) handleOffline();
 
-            // Onboarding Language Switcher & Enter Button
+            // Onboarding Language Switcher, Skip Button & "I Read and Accept" Button
             document.getElementById('lang-opt-he').addEventListener('click', () => {
                 updateOnboardingLanguage('he');
             });
             document.getElementById('lang-opt-en').addEventListener('click', () => {
                 updateOnboardingLanguage('en');
             });
-            document.getElementById('onboarding-enter-btn').addEventListener('click', completeOnboarding);
+            document.getElementById('onboarding-skip-btn').addEventListener('click', skipOnboarding);
+            document.getElementById('onboarding-enter-btn').addEventListener('click', acceptOnboardingRules);
 
             // Header Controls: Language Toggle, Theme Toggle, Welcome Info (ℹ️), Share
             document.getElementById('lang-btn').addEventListener('click', () => {
@@ -3339,7 +3379,7 @@
                     } else if (dlgModal && !dlgModal.classList.contains('hidden')) {
                         closeDialog();
                     } else if (langModal && !langModal.classList.contains('hidden')) {
-                        completeOnboarding();
+                        skipOnboarding();
                     }
                 }
             });
