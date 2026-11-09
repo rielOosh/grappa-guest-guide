@@ -1,4 +1,4 @@
-const CACHE_NAME = 'grappa-guest-guide-v38';
+const CACHE_NAME = 'grappa-guest-guide-v39';
 
 // Comprehensive list of App Shell assets to pre-cache for a reliable offline experience.
 // Note: Pre-parsed trail coordinates for all 4 hikes live in ./gpx_data.js (143 KB),
@@ -41,7 +41,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Service Worker: Caching App Shell (v38)');
+        console.log('Service Worker: Caching App Shell (v39)');
         return Promise.all(
           URLS_TO_CACHE.map(url => {
             return cache.add(url).catch(err => {

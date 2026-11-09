@@ -666,8 +666,17 @@
                     </div>
                 </div>
 
+                <!-- Live In-Field Guidance & Turn/Bearing Cue Bar -->
+                <div id="map-guidance-bar" class="mt-2 px-3 py-2 rounded-2xl surface-subtle border border-theme flex items-center justify-between gap-2 transition-colors duration-200">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span id="map-guidance-icon" class="material-symbols-outlined icon-gradient-text flex-shrink-0" style="font-size: 24px;">assistant_navigation</span>
+                        <span id="map-guidance-text" class="text-base sm:text-lg font-bold text-theme-primary leading-snug truncate">מוכן לניווט במסלול</span>
+                    </div>
+                    <span id="map-guidance-eta" class="text-sm font-bold px-2.5 py-0.5 rounded-lg badge-champagne flex-shrink-0 whitespace-nowrap">--</span>
+                </div>
+
                 <!-- Live Trail Telemetry Bar (Distance, Speed, Elevation) -->
-                <div class="grid grid-cols-3 gap-2 mt-2.5 pt-2.5 border-t border-theme tabular-nums">
+                <div class="grid grid-cols-3 gap-2 mt-2 pt-2 border-t border-theme tabular-nums">
                     <div class="surface-subtle rounded-xl p-1.5 text-center">
                         <span class="block text-sm font-bold text-theme-secondary uppercase" id="map-lbl-distance">מרחק</span>
                         <span id="map-trail-distance" class="text-base sm:text-lg font-bold text-theme-primary block mt-0.5" dir="ltr">--</span>
@@ -683,8 +692,8 @@
                 </div>
 
                 <!-- Collapsible Elevation Profile Chart -->
-                <div id="map-elevation-section" class="hidden mt-3 pt-3 border-t border-theme transition-all duration-300">
-                    <div id="map-elevation-chart" class="w-full"></div>
+                <div id="map-elevation-section" class="hidden mt-2.5 pt-2.5 border-t border-theme transition-all duration-300">
+                    <div id="map-elevation-chart" class="w-full select-none touch-none"></div>
                 </div>
             </div>
         </div>
@@ -2520,27 +2529,65 @@
         };
 
         // =========================================================================
-        // 9. INTERACTIVE OFFLINE GPX TRAIL MAP ENGINE (Leaflet)
+        // 9. INTERACTIVE OFFLINE GPX TRAIL MAP ENGINE (Sub-Segment Map-Matcher & Guidance)
         // =========================================================================
         let map = null;
+        let mapCanvasRenderer = null;
         let mapLayer = null;
         let currentPolyline = null;
         let currentPolylineCasing = null;
+        let walkedPolyline = null;
+        let offTrailConnectorLine = null;
+        let directionChevronsLayer = null;
+        let scrubPreviewMarker = null;
         let startMarker = null;
         let endMarker = null;
         let locationWatcher = null;
         let userLocMarker = null;
         let userLocCircle = null;
+        let userMarkerSvgEl = null;
 
         let deviceHeading = null;
+        let continuousHeading = null;
+        let lastRenderedHeading = null;
+        let headingRafPending = false;
         let wakeLock = null;
+
         let activePoints = [];
         let cumulativeDistances = [];
         let totalTrackDistance = 0;
+        let totalTrackAscent = 0;
         let minElevation = 0;
         let maxElevation = 0;
         let activeMapType = 'satellite';
         let userRequestedCenter = false;
+        let isFollowingUser = false;
+
+        // Pre-computed planar spatial model for O(1) local window projection
+        let trackModel = null;
+
+        // Stateful navigation & sensor fusion state
+        const createInitialNavState = () => ({
+            lastMatchedSegIdx: -1,
+            lastMatchedDistKm: null,
+            lastMatchTimeMs: null,
+            travelDirection: 0, // 0 = undecided, 1 = forward, -1 = reverse
+            dirAccumulatorM: 0,
+            renderedChevronDir: 1,
+            hasWalkedFarFromStart: false,
+            offTrailCount: 0,
+            isConfirmedOffTrail: false,
+            filtLat: null,
+            filtLon: null,
+            filtAcc: null,
+            lastRawLat: null,
+            lastRawLon: null,
+            lastFixTimeMs: null,
+            outlierStrikeCount: 0,
+            smoothedSpeedKmh: 0,
+            gpsCogDeg: null
+        });
+        let navState = createInitialNavState();
 
         const requestWakeLock = async () => {
             try {
@@ -2558,6 +2605,14 @@
             }
         };
 
+        // Re-acquire wake lock automatically when returning to foreground while map is open
+        document.addEventListener('visibilitychange', () => {
+            const mapModal = document.getElementById('map-modal');
+            if (document.visibilityState === 'visible' && mapModal && !mapModal.classList.contains('hidden')) {
+                requestWakeLock();
+            }
+        });
+
         const getDistance = (lat1, lon1, lat2, lon2) => {
             const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -2569,17 +2624,405 @@
             return R * c;
         };
 
-        const findClosestPoint = (userLat, userLon) => {
-            let minD = Infinity;
-            let closestIdx = -1;
-            for (let i = 0; i < activePoints.length; i++) {
-                const d = getDistance(userLat, userLon, activePoints[i][0], activePoints[i][1]);
-                if (d < minD) {
-                    minD = d;
-                    closestIdx = i;
+        // Shortest signed angular delta in [-180, +180]
+        const shortestAngleDelta = (fromDeg, toDeg) => {
+            return ((toDeg - fromDeg + 540) % 360) - 180;
+        };
+
+        // Format bearing in degrees [0, 360) into localized cardinal direction
+        const getCardinalLabel = (bearingDeg, isHe) => {
+            const dirsHe = ['צפון', 'צפון-מזרח', 'מזרח', 'דרום-מזרח', 'דרום', 'דרום-מערב', 'מערב', 'צפון-מערב'];
+            const dirsEn = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+            const idx = Math.round(((bearingDeg % 360) + 360) % 360 / 45) % 8;
+            return isHe ? dirsHe[idx] : dirsEn[idx];
+        };
+
+        // O(N) One-Time Pre-Computation of Local Flat-Earth Planar Vectors, Smoothed Altitude & Turn Waypoints
+        const buildTrackSpatialModel = (points) => {
+            if (!points || points.length < 2) return null;
+            const N = points.length;
+            const lat0 = points[0][0];
+            const lon0 = points[0][1];
+            const cosLat0 = Math.cos(lat0 * Math.PI / 180);
+            const mPerDegLat = 111132.954;
+            const mPerDegLon = 111319.491 * cosLat0;
+
+            const toPlanar = (lat, lon) => ({
+                x: (lon - lon0) * mPerDegLon,
+                y: (lat - lat0) * mPerDegLat
+            });
+            const toLatLon = (x, y) => [
+                lat0 + y / mPerDegLat,
+                lon0 + x / mPerDegLon
+            ];
+
+            // 5-point moving average on elevation to remove +-1m barometric sawtooth
+            const smoothEle = new Float64Array(N);
+            for (let i = 0; i < N; i++) {
+                let sum = 0;
+                let cnt = 0;
+                for (let k = Math.max(0, i - 2); k <= Math.min(N - 1, i + 2); k++) {
+                    sum += (points[k][2] || 0);
+                    cnt++;
+                }
+                smoothEle[i] = sum / cnt;
+            }
+
+            const planarPts = new Array(N);
+            const cumDistKm = new Float64Array(N);
+            const cumAscentM = new Float64Array(N);
+            const cumDescentM = new Float64Array(N);
+
+            let totalDistM = 0;
+            let totalAscM = 0;
+            let totalDescM = 0;
+            let minEle = points[0][2] || 0;
+            let maxEle = points[0][2] || 0;
+
+            const p0 = toPlanar(points[0][0], points[0][1]);
+            planarPts[0] = { x: p0.x, y: p0.y, lat: points[0][0], lon: points[0][1], ele: points[0][2] || 0, smoothEle: smoothEle[0] };
+
+            const segments = [];
+            for (let i = 1; i < N; i++) {
+                const lat = points[i][0];
+                const lon = points[i][1];
+                const ele = points[i][2] || 0;
+                if (ele < minEle) minEle = ele;
+                if (ele > maxEle) maxEle = ele;
+
+                const pt = toPlanar(lat, lon);
+                const prev = planarPts[i - 1];
+                const dx = pt.x - prev.x;
+                const dy = pt.y - prev.y;
+                const lenSq = dx * dx + dy * dy;
+                const lenMeters = Math.sqrt(lenSq);
+
+                const startDistKm = totalDistM / 1000;
+                totalDistM += lenMeters;
+                const endDistKm = totalDistM / 1000;
+                cumDistKm[i] = endDistKm;
+
+                const dEle = smoothEle[i] - smoothEle[i - 1];
+                if (dEle > 0.25) totalAscM += dEle;
+                else if (dEle < -0.25) totalDescM += Math.abs(dEle);
+                cumAscentM[i] = totalAscM;
+                cumDescentM[i] = totalDescM;
+
+                planarPts[i] = { x: pt.x, y: pt.y, lat, lon, ele, smoothEle: smoothEle[i] };
+
+                const bearing = lenMeters > 0.05
+                    ? ((Math.atan2(dx, dy) * 180 / Math.PI) + 360) % 360
+                    : (segments.length > 0 ? segments[segments.length - 1].bearing : 0);
+
+                segments.push({
+                    idx: i - 1,
+                    ax: prev.x,
+                    ay: prev.y,
+                    bx: pt.x,
+                    by: pt.y,
+                    dx,
+                    dy,
+                    lenSq,
+                    lenMeters,
+                    midX: (prev.x + pt.x) * 0.5,
+                    midY: (prev.y + pt.y) * 0.5,
+                    halfW: Math.abs(dx) * 0.5,
+                    halfH: Math.abs(dy) * 0.5,
+                    bearing,
+                    startDistKm,
+                    endDistKm,
+                    eleA: prev.ele,
+                    eleB: ele
+                });
+            }
+
+            // Detect significant trail turns (> 35 deg over ~30m lookbehind/lookahead window)
+            const turns = [];
+            let lastTurnDistM = -100;
+            for (let i = 3; i < N - 3; i++) {
+                const curDistM = cumDistKm[i] * 1000;
+                if (curDistM - lastTurnDistM < 65) continue;
+
+                // Find point ~28m behind and ~28m ahead
+                let backIdx = i - 1;
+                while (backIdx > 0 && (curDistM - cumDistKm[backIdx] * 1000) < 28) backIdx--;
+                let fwdIdx = i + 1;
+                while (fwdIdx < N - 1 && (cumDistKm[fwdIdx] * 1000 - curDistM) < 28) fwdIdx++;
+
+                const inDx = planarPts[i].x - planarPts[backIdx].x;
+                const inDy = planarPts[i].y - planarPts[backIdx].y;
+                const outDx = planarPts[fwdIdx].x - planarPts[i].x;
+                const outDy = planarPts[fwdIdx].y - planarPts[i].y;
+
+                if (Math.hypot(inDx, inDy) < 12 || Math.hypot(outDx, outDy) < 12) continue;
+
+                const inBearing = ((Math.atan2(inDx, inDy) * 180 / Math.PI) + 360) % 360;
+                const outBearing = ((Math.atan2(outDx, outDy) * 180 / Math.PI) + 360) % 360;
+                const delta = shortestAngleDelta(inBearing, outBearing);
+
+                if (Math.abs(delta) >= 36) {
+                    turns.push({
+                        ptIdx: i,
+                        distKm: cumDistKm[i],
+                        angleDelta: delta,
+                        lat: planarPts[i].lat,
+                        lon: planarPts[i].lon
+                    });
+                    lastTurnDistM = curDistM;
                 }
             }
-            return { index: closestIdx, distance: minD };
+
+            const startEndMeters = Math.hypot(planarPts[N - 1].x - planarPts[0].x, planarPts[N - 1].y - planarPts[0].y);
+
+            return {
+                lat0,
+                lon0,
+                mPerDegLat,
+                mPerDegLon,
+                toPlanar,
+                toLatLon,
+                planarPts,
+                segments,
+                cumDistKm,
+                cumAscentM,
+                cumDescentM,
+                totalDistKm: totalDistM / 1000,
+                totalAscentM: totalAscM,
+                totalDescentM: totalDescM,
+                minEle,
+                maxEle,
+                isLoop: startEndMeters < 200,
+                turns
+            };
+        };
+
+        // Continuous Orthogonal Projection of planar point (px, py) onto segment seg
+        const projectPointToSegment = (px, py, seg, model) => {
+            let t = 0;
+            if (seg.lenSq > 1e-6) {
+                t = ((px - seg.ax) * seg.dx + (py - seg.ay) * seg.dy) / seg.lenSq;
+                if (t < 0) t = 0;
+                else if (t > 1) t = 1;
+            }
+            const projX = seg.ax + t * seg.dx;
+            const projY = seg.ay + t * seg.dy;
+            const perpDistM = Math.hypot(px - projX, py - projY);
+            const [projLat, projLon] = model.toLatLon(projX, projY);
+            const alongDistKm = seg.startDistKm + (t * seg.lenMeters) / 1000;
+            const projEle = seg.eleA + t * (seg.eleB - seg.eleA);
+            const bearingToTrail = perpDistM > 0.5
+                ? ((Math.atan2(projX - px, projY - py) * 180 / Math.PI) + 360) % 360
+                : seg.bearing;
+
+            return {
+                segIdx: seg.idx,
+                t,
+                perpDistM,
+                projLat,
+                projLon,
+                alongDistKm,
+                projEle,
+                segBearing: seg.bearing,
+                bearingToTrail
+            };
+        };
+
+        // Stateful Sub-Segment Map-Matcher with Continuity, Loop Disambiguation & O(1) Local Window Search
+        const matchUserToTrack = (userLat, userLon, headingDeg = null, dtSec = 2) => {
+            if (!trackModel || trackModel.segments.length === 0) {
+                return { index: -1, distance: Infinity, perpDistM: Infinity };
+            }
+
+            const { x: px, y: py } = trackModel.toPlanar(userLat, userLon);
+            const segs = trackModel.segments;
+            const numSegs = segs.length;
+            const totalKm = trackModel.totalDistKm;
+
+            const scoreSegment = (seg) => {
+                const proj = projectPointToSegment(px, py, seg, trackModel);
+                let cost = proj.perpDistM;
+
+                // 1. Temporal Continuity Penalty (prevents outbound <-> inbound loop jumping at Kibbutz gate)
+                if (navState.lastMatchedDistKm !== null) {
+                    let alongDeltaKm = Math.abs(proj.alongDistKm - navState.lastMatchedDistKm);
+                    if (trackModel.isLoop && navState.hasWalkedFarFromStart) {
+                        alongDeltaKm = Math.min(alongDeltaKm, totalKm - alongDeltaKm);
+                    }
+                    const alongDeltaM = alongDeltaKm * 1000;
+                    const maxAllowedStepM = Math.max(40, Math.min(dtSec || 2, 30) * 6.5);
+                    const excessJumpM = Math.max(0, alongDeltaM - maxAllowedStepM);
+                    cost += Math.min(240, excessJumpM * 0.45);
+                } else if (trackModel.isLoop && proj.alongDistKm > totalKm - 0.65) {
+                    // On initial acquisition near the Kibbutz gate, gently favor the start leg (0.0 km) over the return leg
+                    // unless the user's heading strongly aligns with reverse loop traversal
+                    let revBias = 22;
+                    if (headingDeg !== null) {
+                        const revSegBearing = (seg.bearing + 180) % 360;
+                        const diffRev = Math.abs(shortestAngleDelta(headingDeg, revSegBearing));
+                        if (diffRev < 35) revBias = 0;
+                    }
+                    cost += revBias;
+                }
+
+                // 2. Heading Alignment Cost
+                if (headingDeg !== null) {
+                    const diffFwd = Math.abs(shortestAngleDelta(headingDeg, seg.bearing));
+                    const diffRev = 180 - diffFwd;
+                    if (navState.travelDirection === 1) {
+                        cost += (diffFwd / 180) * 18;
+                    } else if (navState.travelDirection === -1) {
+                        cost += (diffRev / 180) * 18;
+                    } else {
+                        cost += (Math.min(diffFwd, diffRev) / 180) * 10;
+                    }
+                }
+
+                proj.score = cost;
+                return proj;
+            };
+
+            let best = null;
+
+            // Stage 1: O(1) Local Window Search around lastMatchedSegIdx
+            if (navState.lastMatchedSegIdx >= 0) {
+                const winBack = 35;
+                const winFwd = 45;
+                for (let offset = -winBack; offset <= winFwd; offset++) {
+                    let idx = navState.lastMatchedSegIdx + offset;
+                    if (idx < 0 || idx >= numSegs) {
+                        if (trackModel.isLoop && navState.hasWalkedFarFromStart) {
+                            idx = (idx + numSegs) % numSegs;
+                        } else {
+                            continue;
+                        }
+                    }
+                    const cand = scoreSegment(segs[idx]);
+                    if (!best || cand.score < best.score) {
+                        best = cand;
+                    }
+                }
+            }
+
+            // Stage 2: Global Fallback with Fast Axis-Aligned Bounding Box Pre-Filter
+            if (!best || best.perpDistM > 50 || best.score > 68) {
+                let bestGlobalScore = best ? best.score : Infinity;
+                for (let i = 0; i < numSegs; i++) {
+                    const seg = segs[i];
+                    // Fast BBox rejection using pure addition/subtraction
+                    if (Math.abs(px - seg.midX) - seg.halfW > bestGlobalScore ||
+                        Math.abs(py - seg.midY) - seg.halfH > bestGlobalScore) {
+                        continue;
+                    }
+                    const cand = scoreSegment(seg);
+                    if (cand.score < bestGlobalScore) {
+                        bestGlobalScore = cand.score;
+                        best = cand;
+                    }
+                }
+            }
+
+            best.index = best.segIdx;
+            best.distance = best.perpDistM / 1000;
+            return best;
+        };
+
+        // Backwards-compatible wrapper for any external callers
+        const findClosestPoint = (userLat, userLon) => {
+            if (!trackModel && activePoints.length >= 2) {
+                trackModel = buildTrackSpatialModel(activePoints);
+            }
+            return matchUserToTrack(userLat, userLon, deviceHeading, 2);
+        };
+
+        // Adaptive GPS Position & EMA Speed Filter
+        const filterGpsFix = (rawLat, rawLon, rawAcc, rawSpeed, rawHeading, nowMs) => {
+            const acc = Math.max(4, rawAcc || 15);
+            if (navState.filtLat === null || navState.filtLon === null || !trackModel) {
+                navState.filtLat = rawLat;
+                navState.filtLon = rawLon;
+                navState.filtAcc = acc;
+                navState.lastRawLat = rawLat;
+                navState.lastRawLon = rawLon;
+                navState.lastFixTimeMs = nowMs;
+                navState.smoothedSpeedKmh = (rawSpeed !== null && rawSpeed >= 0.2) ? rawSpeed * 3.6 : 0;
+                if (rawHeading !== null && rawHeading !== undefined && !isNaN(rawHeading) && rawSpeed >= 0.5) {
+                    navState.gpsCogDeg = rawHeading;
+                }
+                return {
+                    lat: rawLat,
+                    lon: rawLon,
+                    accuracy: acc,
+                    speedKmh: navState.smoothedSpeedKmh,
+                    cogDeg: navState.gpsCogDeg,
+                    dtSec: 2
+                };
+            }
+
+            const dtSec = Math.max(0.25, (nowMs - navState.lastFixTimeMs) / 1000);
+            const rawDistKm = getDistance(navState.filtLat, navState.filtLon, rawLat, rawLon);
+            const rawDistM = rawDistKm * 1000;
+            const impliedSpeedMs = rawDistM / dtSec;
+
+            // Reject single-tick impossible GPS teleports (> 14 m/s for a hiker) unless confirmed twice
+            if (impliedSpeedMs > 14 && dtSec < 12 && navState.outlierStrikeCount < 2) {
+                navState.outlierStrikeCount++;
+                return {
+                    lat: navState.filtLat,
+                    lon: navState.filtLon,
+                    accuracy: navState.filtAcc,
+                    speedKmh: navState.smoothedSpeedKmh,
+                    cogDeg: navState.gpsCogDeg,
+                    dtSec
+                };
+            }
+            navState.outlierStrikeCount = 0;
+
+            // Accuracy-weighted Kalman-lite planar blend
+            const prevVar = navState.filtAcc * navState.filtAcc + (1.8 * dtSec) * (1.8 * dtSec);
+            const measVar = acc * acc;
+            const alpha = Math.max(0.22, Math.min(0.88, prevVar / (prevVar + measVar)));
+
+            const prevLat = navState.filtLat;
+            const prevLon = navState.filtLon;
+            navState.filtLat = prevLat + alpha * (rawLat - prevLat);
+            navState.filtLon = prevLon + alpha * (rawLon - prevLon);
+            navState.filtAcc = Math.sqrt((1 - alpha) * prevVar);
+
+            // Compute instantaneous walking speed & smooth via EMA
+            const stepDistM = getDistance(prevLat, prevLon, navState.filtLat, navState.filtLon) * 1000;
+            let instSpeedKmh = 0;
+            if (rawSpeed !== null && rawSpeed !== undefined && rawSpeed >= 0) {
+                instSpeedKmh = rawSpeed * 3.6;
+            } else if (dtSec > 0 && stepDistM < 80) {
+                instSpeedKmh = (stepDistM / dtSec) * 3.6;
+            }
+
+            navState.smoothedSpeedKmh = navState.smoothedSpeedKmh * 0.65 + instSpeedKmh * 0.35;
+            if (navState.smoothedSpeedKmh < 0.55) {
+                navState.smoothedSpeedKmh = 0;
+            }
+
+            // Compute GPS Course-Over-Ground (COG) when moving
+            if (rawHeading !== null && rawHeading !== undefined && !isNaN(rawHeading) && navState.smoothedSpeedKmh >= 1.6) {
+                navState.gpsCogDeg = ((rawHeading % 360) + 360) % 360;
+            } else if (stepDistM >= 2.8 && navState.smoothedSpeedKmh >= 1.6) {
+                const dLon = (navState.filtLon - prevLon) * Math.cos(prevLat * Math.PI / 180);
+                const dLat = navState.filtLat - prevLat;
+                navState.gpsCogDeg = ((Math.atan2(dLon, dLat) * 180 / Math.PI) + 360) % 360;
+            }
+
+            navState.lastRawLat = rawLat;
+            navState.lastRawLon = rawLon;
+            navState.lastFixTimeMs = nowMs;
+
+            return {
+                lat: navState.filtLat,
+                lon: navState.filtLon,
+                accuracy: acc,
+                speedKmh: navState.smoothedSpeedKmh,
+                cogDeg: navState.gpsCogDeg,
+                dtSec
+            };
         };
 
         const getDirectionalIcon = (heading) => {
@@ -2589,7 +3032,7 @@
                 html: `
                     <div class="relative w-8 h-8 flex items-center justify-center">
                         <div class="absolute w-6 h-6 bg-[#6E7276]/35 rounded-full animate-ping"></div>
-                        <svg class="absolute w-8 h-8 transition-transform duration-200" style="${rotation} top: 0; left: 0;" viewBox="0 0 32 32">
+                        <svg class="user-heading-cone absolute w-8 h-8" style="${rotation} top: 0; left: 0; will-change: transform;" viewBox="0 0 32 32">
                             <path d="M 16 2 L 24 12 L 18 10 L 18 30 L 14 30 L 14 10 L 8 12 Z" fill="#6E7276" opacity="0.95" />
                         </svg>
                         <div class="absolute w-4 h-4 bg-[#6E7276] border-2 border-white rounded-full shadow-md z-10"></div>
@@ -2600,6 +3043,51 @@
             });
         };
 
+        // Shortest-Arc Circular Compass Smoothing + rAF 1.5° Deadband + GPS COG Fusion
+        const scheduleMarkerHeadingRender = () => {
+            if (headingRafPending) return;
+            headingRafPending = true;
+            requestAnimationFrame(() => {
+                headingRafPending = false;
+                if (deviceHeading === null || !userLocMarker) return;
+                if (lastRenderedHeading !== null && Math.abs(shortestAngleDelta(lastRenderedHeading, deviceHeading)) < 1.5) {
+                    return;
+                }
+                if (!userMarkerSvgEl) {
+                    const el = userLocMarker.getElement();
+                    if (el) userMarkerSvgEl = el.querySelector('svg');
+                }
+                if (userMarkerSvgEl) {
+                    userMarkerSvgEl.style.display = 'block';
+                    userMarkerSvgEl.style.transform = `rotate(${deviceHeading.toFixed(1)}deg)`;
+                    lastRenderedHeading = deviceHeading;
+                }
+            });
+        };
+
+        const updateFusedHeading = (compassDeg, gpsCogDeg, speedKmh) => {
+            let targetDeg = compassDeg;
+            if (speedKmh >= 1.8 && gpsCogDeg !== null && gpsCogDeg !== undefined) {
+                if (compassDeg !== null && compassDeg !== undefined) {
+                    // Fuse 65% GPS Course-Over-Ground + 35% Magnetic Compass via shortest angle
+                    const delta = shortestAngleDelta(compassDeg, gpsCogDeg);
+                    targetDeg = ((compassDeg + 0.65 * delta) % 360 + 360) % 360;
+                } else {
+                    targetDeg = gpsCogDeg;
+                }
+            }
+            if (targetDeg === null || targetDeg === undefined || isNaN(targetDeg)) return;
+
+            if (continuousHeading === null) {
+                continuousHeading = targetDeg;
+            } else {
+                const delta = shortestAngleDelta(continuousHeading, targetDeg);
+                continuousHeading = continuousHeading + 0.22 * delta;
+            }
+            deviceHeading = ((continuousHeading % 360) + 360) % 360;
+            scheduleMarkerHeadingRender();
+        };
+
         const generateElevationSvg = () => {
             if (activePoints.length < 2) return '';
             const isHe = (language || 'he') === 'he';
@@ -2607,7 +3095,7 @@
             let pathData = `M 0 60 L 0 ${55 - ((activePoints[0][2] - minElevation) / (maxElevation - minElevation || 1)) * 50}`;
             let lineData = `M 0 ${55 - ((activePoints[0][2] - minElevation) / (maxElevation - minElevation || 1)) * 50}`;
 
-            const svgStep = Math.max(1, Math.floor(activePoints.length / 100));
+            const svgStep = Math.max(1, Math.floor(activePoints.length / 120));
             for (let i = 1; i < activePoints.length; i += svgStep) {
                 const x = (cumulativeDistances[i] / totalTrackDistance) * 400;
                 const y = 55 - ((activePoints[i][2] - minElevation) / (maxElevation - minElevation || 1)) * 50;
@@ -2622,7 +3110,7 @@
 
             return `
                 <div class="relative" dir="ltr">
-                    <svg class="w-full h-14 overflow-visible" viewBox="0 0 400 60" preserveAspectRatio="none">
+                    <svg id="ele-svg-el" class="w-full h-16 overflow-visible cursor-crosshair" viewBox="0 0 400 60" preserveAspectRatio="none">
                         <defs>
                             <linearGradient id="eleGrad" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="0%" stop-color="#6E7276" stop-opacity="0.38"></stop>
@@ -2636,15 +3124,297 @@
                         <path d="${pathData}" fill="url(#eleGrad)" />
                         <path d="${lineData}" fill="none" stroke="#6E7276" stroke-width="2.4" stroke-linecap="round" />
 
+                        <line id="ele-scrub-line" x1="-10" y1="0" x2="-10" y2="60" stroke="#3D4145" stroke-width="1.5" stroke-dasharray="2,2" class="hidden" />
+                        <circle id="ele-scrub-dot" cx="-10" cy="-10" r="4.5" fill="#E2E4A8" stroke="#3D4145" stroke-width="1.8" class="hidden" />
                         <circle id="ele-user-dot" cx="-10" cy="-10" r="5" fill="#10b981" stroke="#ffffff" stroke-width="1.5" class="hidden animate-pulse" />
                     </svg>
-                    <div class="flex justify-between text-[10px] text-theme-tertiary mt-1 font-bold tabular-nums">
-                        <span>${minElevation.toFixed(0)}m (${isHe ? 'מינימום' : 'Min'})</span>
-                        <span id="ele-progress-label">${isHe ? 'התקדמות' : 'Progress'}: 0%</span>
-                        <span>${maxElevation.toFixed(0)}m (${isHe ? 'מקסימום' : 'Max'})</span>
+                    <div class="flex justify-between text-xs text-theme-secondary mt-1 font-bold tabular-nums">
+                        <span>${minElevation.toFixed(0)}m (${isHe ? 'מינ׳' : 'Min'})</span>
+                        <span id="ele-progress-label">${isHe ? 'געו בגרף לבדיקת גובה' : 'Touch chart to inspect'}</span>
+                        <span>${maxElevation.toFixed(0)}m (${isHe ? 'מקס׳' : 'Max'})</span>
                     </div>
                 </div>
             `;
+        };
+
+        // Interactive Elevation Profile Scrubbing (Touch / Pointer)
+        const bindElevationScrubbing = () => {
+            const chartEl = document.getElementById('map-elevation-chart');
+            if (!chartEl) return;
+
+            const handleScrub = (clientX) => {
+                const svgEl = document.getElementById('ele-svg-el');
+                if (!svgEl || !trackModel || trackModel.segments.length === 0) return;
+                const rect = svgEl.getBoundingClientRect();
+                if (rect.width <= 0) return;
+
+                const frac = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+                const targetKm = frac * totalTrackDistance;
+
+                // Binary search in cumulativeDistances
+                let lo = 0;
+                let hi = cumulativeDistances.length - 1;
+                while (lo < hi) {
+                    const mid = (lo + hi) >> 1;
+                    if (cumulativeDistances[mid] < targetKm) lo = mid + 1;
+                    else hi = mid;
+                }
+                const pt = activePoints[lo];
+                const ele = pt[2] || 0;
+                const x = frac * 400;
+                const y = 55 - ((ele - minElevation) / (maxElevation - minElevation || 1)) * 50;
+
+                const scrubLine = document.getElementById('ele-scrub-line');
+                const scrubDot = document.getElementById('ele-scrub-dot');
+                const label = document.getElementById('ele-progress-label');
+                const isHe = (language || 'he') === 'he';
+
+                if (scrubLine && scrubDot) {
+                    scrubLine.setAttribute('x1', x.toFixed(1));
+                    scrubLine.setAttribute('x2', x.toFixed(1));
+                    scrubLine.classList.remove('hidden');
+                    scrubDot.setAttribute('cx', x.toFixed(1));
+                    scrubDot.setAttribute('cy', y.toFixed(1));
+                    scrubDot.classList.remove('hidden');
+                }
+                if (label) {
+                    label.textContent = isHe
+                        ? `נקודה: ${targetKm.toFixed(1)} ק״מ · גובה ${ele.toFixed(0)} מ׳`
+                        : `At ${targetKm.toFixed(1)} km · ${ele.toFixed(0)}m`;
+                }
+
+                if (map) {
+                    if (!scrubPreviewMarker) {
+                        scrubPreviewMarker = L.circleMarker([pt[0], pt[1]], {
+                            radius: 7,
+                            fillColor: '#E2E4A8',
+                            color: '#3D4145',
+                            weight: 2.5,
+                            fillOpacity: 1
+                        }).addTo(map);
+                    } else {
+                        scrubPreviewMarker.setLatLng([pt[0], pt[1]]);
+                    }
+                }
+            };
+
+            chartEl.onpointerdown = (e) => {
+                handleScrub(e.clientX);
+                chartEl.setPointerCapture(e.pointerId);
+            };
+            chartEl.onpointermove = (e) => {
+                if (e.buttons > 0 || e.pointerType === 'touch') {
+                    handleScrub(e.clientX);
+                }
+            };
+        };
+
+        // Render Directional Flow Chevrons along the trail every ~450m
+        const renderDirectionChevrons = (dir = 1) => {
+            if (!map || !trackModel) return;
+            if (directionChevronsLayer) {
+                map.removeLayer(directionChevronsLayer);
+                directionChevronsLayer = null;
+            }
+            directionChevronsLayer = L.layerGroup().addTo(map);
+            navState.renderedChevronDir = dir;
+
+            const stepKm = Math.max(0.35, totalTrackDistance / 18);
+            let nextKm = stepKm * 0.6;
+
+            for (let i = 0; i < trackModel.segments.length; i++) {
+                const seg = trackModel.segments[i];
+                if (seg.endDistKm >= nextKm && seg.endDistKm <= totalTrackDistance - 0.15) {
+                    const [lat, lon] = trackModel.toLatLon(seg.midX, seg.midY);
+                    const angle = dir === -1 ? (seg.bearing + 180) % 360 : seg.bearing;
+                    const icon = L.divIcon({
+                        className: 'trail-direction-chevron',
+                        html: `<div style="transform: rotate(${angle.toFixed(0)}deg); width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; pointer-events: none;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="filter: drop-shadow(0 1px 2px rgba(0,0,0,0.65));">
+                                <path d="M6 15l6-6 6 6"/>
+                            </svg>
+                        </div>`,
+                        iconSize: [18, 18],
+                        iconAnchor: [9, 9]
+                    });
+                    L.marker([lat, lon], { icon, interactive: false }).addTo(directionChevronsLayer);
+                    nextKm = seg.endDistKm + stepKm;
+                }
+            }
+        };
+
+        // Dynamically split trail polyline into Walked (dashed) and Remaining (cased solid)
+        const updateSplitTrailPolylines = (match) => {
+            if (!map || !currentPolyline || !activePoints.length) return;
+            const segIdx = match.segIdx;
+            const snappedPt = [match.projLat, match.projLon];
+            const isRev = navState.travelDirection === -1;
+
+            let walkedCoords = [];
+            let remainingCoords = [];
+
+            if (!isRev) {
+                walkedCoords = activePoints.slice(0, segIdx + 1).map(p => [p[0], p[1]]);
+                walkedCoords.push(snappedPt);
+                remainingCoords = [snappedPt, ...activePoints.slice(segIdx + 1).map(p => [p[0], p[1]])];
+            } else {
+                walkedCoords = activePoints.slice(segIdx + 1).map(p => [p[0], p[1]]);
+                walkedCoords.unshift(snappedPt);
+                remainingCoords = [...activePoints.slice(0, segIdx + 1).map(p => [p[0], p[1]]), snappedPt];
+            }
+
+            currentPolylineCasing.setLatLngs(remainingCoords);
+            currentPolyline.setLatLngs(remainingCoords);
+
+            if (!walkedPolyline) {
+                walkedPolyline = L.polyline(walkedCoords, {
+                    color: '#9CA3AF',
+                    weight: 4,
+                    opacity: 0.65,
+                    dashArray: '6, 8',
+                    renderer: mapCanvasRenderer
+                }).addTo(map);
+            } else {
+                walkedPolyline.setLatLngs(walkedCoords);
+            }
+        };
+
+        // Draw or hide dashed off-trail return line (or trailhead approach connector)
+        const updateOffTrailConnector = (userLatLng, targetLatLng, mode) => {
+            if (!map) return;
+            if (!mode) {
+                if (offTrailConnectorLine) {
+                    map.removeLayer(offTrailConnectorLine);
+                    offTrailConnectorLine = null;
+                }
+                return;
+            }
+            const strokeColor = mode === 'off-trail' ? '#EF4444' : '#E2E4A8';
+            if (!offTrailConnectorLine) {
+                offTrailConnectorLine = L.polyline([userLatLng, targetLatLng], {
+                    color: strokeColor,
+                    weight: 3.5,
+                    opacity: 0.95,
+                    dashArray: '6, 6',
+                    renderer: mapCanvasRenderer
+                }).addTo(map);
+            } else {
+                offTrailConnectorLine.setStyle({ color: strokeColor });
+                offTrailConnectorLine.setLatLngs([userLatLng, targetLatLng]);
+            }
+        };
+
+        // Calculate Estimated Time Remaining (ETA) using Naismith's Rule blended with live walking speed
+        const computeEtaLabel = (remainingKm, remainingAscentM, speedKmh, isHe) => {
+            const baseSpeedKmh = (speedKmh >= 1.8 && speedKmh <= 8.5)
+                ? (0.55 * speedKmh + 0.45 * 4.2)
+                : 4.2;
+            const flatMinutes = (remainingKm / baseSpeedKmh) * 60;
+            const climbMinutes = Math.max(0, remainingAscentM) / 10; // Naismith: +1 min per 10m ascent
+            const totalMin = Math.max(1, Math.round(flatMinutes + climbMinutes));
+
+            if (totalMin < 60) {
+                return isHe ? `כ-${totalMin} דק׳` : `~${totalMin}m`;
+            }
+            const hrs = Math.floor(totalMin / 60);
+            const mins = totalMin % 60;
+            if (mins === 0) {
+                return isHe ? `כ-${hrs} ש׳` : `~${hrs}h`;
+            }
+            return isHe ? `כ-${hrs}ש׳ ו-${mins}ד׳` : `~${hrs}h ${mins}m`;
+        };
+
+        // Update Live In-Field Guidance Bar (Next Turn / Off-Trail Rejoin Vector / ETA)
+        const updateGuidanceBanner = (stateMode, match, effCompletedKm, effRemainingKm, remAscentM, speedKmh) => {
+            const barEl = document.getElementById('map-guidance-bar');
+            const iconEl = document.getElementById('map-guidance-icon');
+            const textEl = document.getElementById('map-guidance-text');
+            const etaEl = document.getElementById('map-guidance-eta');
+            if (!barEl || !iconEl || !textEl || !etaEl) return;
+
+            const isHe = (language || 'he') === 'he';
+            const etaStr = computeEtaLabel(effRemainingKm, remAscentM, speedKmh, isHe);
+            etaEl.textContent = etaStr;
+
+            if (stateMode === 'off-trail') {
+                const distM = Math.round(match.perpDistM);
+                const dirLabel = getCardinalLabel(match.bearingToTrail, isHe);
+                barEl.className = 'mt-2 px-3 py-2 rounded-2xl badge-closed border border-theme flex items-center justify-between gap-2 transition-colors duration-200';
+                iconEl.textContent = 'near_me';
+                iconEl.className = 'material-symbols-outlined flex-shrink-0';
+                textEl.className = 'text-base sm:text-lg font-bold leading-snug truncate';
+                textEl.textContent = isHe
+                    ? `סטייה (${distM} מ׳) · חזרו לכיוון ${dirLabel}`
+                    : `Off trail (${distM}m) · Head ${dirLabel}`;
+                return;
+            }
+
+            if (stateMode === 'approaching') {
+                const distM = Math.round(match.perpDistM);
+                const dirLabel = getCardinalLabel(match.bearingToTrail, isHe);
+                barEl.className = 'mt-2 px-3 py-2 rounded-2xl surface-subtle border border-theme flex items-center justify-between gap-2 transition-colors duration-200';
+                iconEl.textContent = 'directions_walk';
+                iconEl.className = 'material-symbols-outlined icon-gradient-text flex-shrink-0';
+                textEl.className = 'text-base sm:text-lg font-bold text-theme-primary leading-snug truncate';
+                textEl.textContent = isHe
+                    ? `${distM} מ׳ למסלול (${dirLabel})`
+                    : `${distM}m to trail (${dirLabel})`;
+                return;
+            }
+
+            if (stateMode === 'far') {
+                barEl.className = 'mt-2 px-3 py-2 rounded-2xl surface-subtle border border-theme flex items-center justify-between gap-2 transition-colors duration-200';
+                iconEl.textContent = 'map';
+                iconEl.className = 'material-symbols-outlined icon-gradient-text flex-shrink-0';
+                textEl.className = 'text-base sm:text-lg font-bold text-theme-primary leading-snug truncate';
+                textEl.textContent = isHe
+                    ? `תצוגת מסלול · ${totalTrackDistance.toFixed(1)} ק״מ סה״כ`
+                    : `Route Preview · ${totalTrackDistance.toFixed(1)} km total`;
+                return;
+            }
+
+            // On-Trail: Check for upcoming turn within 160m
+            barEl.className = 'mt-2 px-3 py-2 rounded-2xl surface-subtle border border-theme flex items-center justify-between gap-2 transition-colors duration-200';
+            iconEl.className = 'material-symbols-outlined icon-gradient-text flex-shrink-0';
+            textEl.className = 'text-base sm:text-lg font-bold text-theme-primary leading-snug truncate';
+
+            if (effRemainingKm <= 0.08) {
+                iconEl.textContent = 'flag';
+                textEl.textContent = isHe ? 'הגעתם לסיום המסלול!' : 'Trail Finish Reached!';
+                return;
+            }
+
+            const isRev = navState.travelDirection === -1;
+            let nextTurn = null;
+            let turnDistM = Infinity;
+
+            if (trackModel && trackModel.turns) {
+                for (const t of trackModel.turns) {
+                    const dKm = isRev ? (match.alongDistKm - t.distKm) : (t.distKm - match.alongDistKm);
+                    const dM = dKm * 1000;
+                    if (dM >= 12 && dM <= 160 && dM < turnDistM) {
+                        turnDistM = dM;
+                        nextTurn = t;
+                    }
+                }
+            }
+
+            if (nextTurn) {
+                const effectiveAngle = isRev ? -nextTurn.angleDelta : nextTurn.angleDelta;
+                const isRight = effectiveAngle > 0;
+                iconEl.textContent = isRight ? 'turn_right' : 'turn_left';
+                const turnWordHe = isRight ? 'פנייה ימינה' : 'פנייה שמאלה';
+                const turnWordEn = isRight ? 'Turn right' : 'Turn left';
+                const roundedM = Math.round(turnDistM / 5) * 5;
+                textEl.textContent = isHe
+                    ? `${turnWordHe} בעוד ${roundedM} מ׳`
+                    : `${turnWordEn} in ${roundedM}m`;
+            } else {
+                iconEl.textContent = 'straight';
+                textEl.textContent = isHe
+                    ? `המשיכו על המסלול · נותר ${effRemainingKm.toFixed(1)} ק״מ`
+                    : `Continue on trail · ${effRemainingKm.toFixed(1)} km left`;
+            }
         };
 
         const toggleMapLayer = () => {
@@ -2672,7 +3442,9 @@
 
         const fitTrailBounds = () => {
             if (map && currentPolyline) {
-                map.fitBounds(currentPolyline.getBounds(), { padding: [45, 45] });
+                isFollowingUser = false;
+                const fullBounds = L.latLngBounds(activePoints.map(p => [p[0], p[1]]));
+                map.fitBounds(fullBounds, { padding: [45, 45] });
             }
         };
 
@@ -2712,7 +3484,6 @@
             const activeLang = language || 'he';
             const isHe = activeLang === 'he';
 
-            // Resolve localized trail title from HIKING_TRAILS if available
             const cleanKey = gpxUrl.replace(/^\.\//, '');
             const trailMeta = HIKING_TRAILS.find(t => t.gpxUrl.replace(/^\.\//, '') === cleanKey);
             const localizedTrailTitle = trailMeta ? (isHe ? trailMeta.titleHe : trailMeta.titleEn) : trailName;
@@ -2748,11 +3519,19 @@
             setTimeout(() => {
                 try {
                     if (!map) {
+                        mapCanvasRenderer = L.canvas({ padding: 0.5 });
                         map = L.map('map-container', {
                             zoomControl: false,
-                            attributionControl: false
+                            attributionControl: false,
+                            preferCanvas: true,
+                            renderer: mapCanvasRenderer
                         });
                         L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+                        // Automatically disengage camera auto-follow if the guest drags the map manually
+                        map.on('dragstart', () => {
+                            isFollowingUser = false;
+                        });
                     } else {
                         map.invalidateSize();
                     }
@@ -2778,22 +3557,18 @@
 
                     const renderPolyline = (points) => {
                         activePoints = points;
-                        cumulativeDistances = [0];
-                        let totalDist = 0;
-                        minElevation = points[0][2] || 0;
-                        maxElevation = points[0][2] || 0;
+                        navState = createInitialNavState();
+                        trackModel = buildTrackSpatialModel(points);
 
-                        for (let i = 1; i < points.length; i++) {
-                            const d = getDistance(points[i - 1][0], points[i - 1][1], points[i][0], points[i][1]);
-                            totalDist += d;
-                            cumulativeDistances.push(totalDist);
-                            const ele = points[i][2] || 0;
-                            if (ele < minElevation) minElevation = ele;
-                            if (ele > maxElevation) maxElevation = ele;
-                        }
-                        totalTrackDistance = totalDist;
+                        cumulativeDistances = Array.from(trackModel.cumDistKm);
+                        totalTrackDistance = trackModel.totalDistKm;
+                        totalTrackAscent = trackModel.totalAscentM;
+                        minElevation = trackModel.minEle;
+                        maxElevation = trackModel.maxEle;
 
                         document.getElementById('map-elevation-chart').innerHTML = generateElevationSvg();
+                        bindElevationScrubbing();
+
                         document.getElementById('map-trail-distance').textContent = `${totalTrackDistance.toFixed(1)} km`;
                         document.getElementById('map-trail-speed').textContent = '--';
                         document.getElementById('map-trail-elevation').textContent = `${minElevation.toFixed(0)}–${maxElevation.toFixed(0)}m`;
@@ -2804,20 +3579,25 @@
                             badge.textContent = isHe ? 'מוכן לניווט' : 'TRAIL READY';
                         }
 
+                        updateGuidanceBanner('far', null, 0, totalTrackDistance, totalTrackAscent, 0);
+
                         const latlngs = points.map(p => [p[0], p[1]]);
 
+                        if (walkedPolyline) { map.removeLayer(walkedPolyline); walkedPolyline = null; }
+                        if (offTrailConnectorLine) { map.removeLayer(offTrailConnectorLine); offTrailConnectorLine = null; }
+                        if (scrubPreviewMarker) { map.removeLayer(scrubPreviewMarker); scrubPreviewMarker = null; }
                         if (currentPolylineCasing) map.removeLayer(currentPolylineCasing);
                         if (currentPolyline) map.removeLayer(currentPolyline);
                         if (startMarker) map.removeLayer(startMarker);
                         if (endMarker) map.removeLayer(endMarker);
 
-                        // High-visibility white casing + Edom Terracotta trail line
                         currentPolylineCasing = L.polyline(latlngs, {
                             color: '#FFFFFF',
                             weight: 8,
                             opacity: 0.85,
                             lineCap: 'round',
-                            lineJoin: 'round'
+                            lineJoin: 'round',
+                            renderer: mapCanvasRenderer
                         }).addTo(map);
 
                         currentPolyline = L.polyline(latlngs, {
@@ -2825,8 +3605,11 @@
                             weight: 5,
                             opacity: 0.98,
                             lineCap: 'round',
-                            lineJoin: 'round'
+                            lineJoin: 'round',
+                            renderer: mapCanvasRenderer
                         }).addTo(map);
+
+                        renderDirectionChevrons(1);
 
                         const startPoint = latlngs[0];
                         const endPoint = latlngs[latlngs.length - 1];
@@ -2840,7 +3623,7 @@
                         }).addTo(map).bindPopup(isHe ? 'נקודת התחלה' : 'Start Point');
 
                         endMarker = L.circleMarker(endPoint, {
-                            radius: 8,
+                            radius: 7,
                             fillColor: '#6E7276',
                             color: '#ffffff',
                             weight: 2.5,
@@ -2851,7 +3634,6 @@
                         map.fitBounds(currentPolyline.getBounds(), { padding: [45, 45] });
                         document.getElementById('map-spinner').classList.add('hidden');
 
-                        // Start passive GPS watch without hijacking camera if user is far from trail
                         if (!locationWatcher) {
                             userRequestedCenter = false;
                             startGpsWatch(false);
@@ -2904,6 +3686,10 @@
             window.removeEventListener('deviceorientation', handleOrientation, true);
             window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
             deviceHeading = null;
+            continuousHeading = null;
+            lastRenderedHeading = null;
+            userMarkerSvgEl = null;
+            isFollowingUser = false;
 
             if (locationWatcher) {
                 navigator.geolocation.clearWatch(locationWatcher);
@@ -2917,6 +3703,10 @@
             if (map) {
                 if (userLocMarker) { map.removeLayer(userLocMarker); userLocMarker = null; }
                 if (userLocCircle) { map.removeLayer(userLocCircle); userLocCircle = null; }
+                if (walkedPolyline) { map.removeLayer(walkedPolyline); walkedPolyline = null; }
+                if (offTrailConnectorLine) { map.removeLayer(offTrailConnectorLine); offTrailConnectorLine = null; }
+                if (directionChevronsLayer) { map.removeLayer(directionChevronsLayer); directionChevronsLayer = null; }
+                if (scrubPreviewMarker) { map.removeLayer(scrubPreviewMarker); scrubPreviewMarker = null; }
                 if (currentPolylineCasing) { map.removeLayer(currentPolylineCasing); currentPolylineCasing = null; }
                 if (currentPolyline) { map.removeLayer(currentPolyline); currentPolyline = null; }
                 if (startMarker) { map.removeLayer(startMarker); startMarker = null; }
@@ -2942,20 +3732,172 @@
                     screenAdjustment = window.orientation;
                 }
                 heading = (heading + screenAdjustment + 360) % 360;
-                deviceHeading = Math.round(heading);
-
-                if (userLocMarker) {
-                    const markerElement = userLocMarker.getElement();
-                    if (markerElement) {
-                        const svg = markerElement.querySelector('svg');
-                        if (svg) {
-                            svg.style.display = 'block';
-                            svg.style.transform = `rotate(${deviceHeading}deg)`;
-                        }
-                    }
-                }
+                updateFusedHeading(heading, navState.gpsCogDeg, navState.smoothedSpeedKmh);
             }
         };
+
+        // Core GPS Fix Processor (callable by navigator.geolocation.watchPosition and automated tests)
+        const processGpsPosition = (position) => {
+            if (!map) return;
+            const isHe = (language || 'he') === 'he';
+            const rawLat = position.coords.latitude;
+            const rawLon = position.coords.longitude;
+            const rawAcc = position.coords.accuracy || 12;
+            const rawSpeed = position.coords.speed !== undefined ? position.coords.speed : null;
+            const rawHeading = position.coords.heading !== undefined ? position.coords.heading : null;
+            const nowMs = position.timestamp || Date.now();
+
+            const filtered = filterGpsFix(rawLat, rawLon, rawAcc, rawSpeed, rawHeading, nowMs);
+            const lat = filtered.lat;
+            const lon = filtered.lon;
+            const accuracy = filtered.accuracy;
+            const speedKmh = filtered.speedKmh;
+            const latlng = [lat, lon];
+
+            if (filtered.cogDeg !== null) {
+                updateFusedHeading(deviceHeading, filtered.cogDeg, speedKmh);
+            }
+
+            if (!userLocMarker) {
+                userLocMarker = L.marker(latlng, {
+                    icon: getDirectionalIcon(deviceHeading)
+                }).addTo(map);
+
+                userLocCircle = L.circle(latlng, {
+                    radius: accuracy,
+                    color: '#6E7276',
+                    weight: 1,
+                    fillColor: '#6E7276',
+                    fillOpacity: 0.14
+                }).addTo(map);
+            } else {
+                userLocMarker.setLatLng(latlng);
+                userLocCircle.setLatLng(latlng).setRadius(accuracy);
+            }
+
+            document.getElementById('map-trail-speed').textContent = speedKmh >= 0.55 ? `${speedKmh.toFixed(1)} km/h` : '0.0 km/h';
+
+            const match = (trackModel && trackModel.segments.length > 0)
+                ? matchUserToTrack(lat, lon, deviceHeading, filtered.dtSec)
+                : { index: -1, distance: Infinity, perpDistM: Infinity };
+
+            const isNearTrail = match.distance <= 0.5; // within 500m of trail
+
+            // Camera management: pan on initial near-trail fix or while Follow Mode is engaged
+            if (isFollowingUser || (userRequestedCenter && isNearTrail)) {
+                map.setView(latlng, Math.max(map.getZoom(), 15), { animate: true });
+                userRequestedCenter = false;
+            }
+
+            const badge = document.getElementById('map-status-badge');
+            const userDot = document.getElementById('ele-user-dot');
+            const progressLabel = document.getElementById('ele-progress-label');
+
+            if (match.index < 0) return;
+
+            if (isNearTrail) {
+                // Update directional continuity state when reasonably close to the trail
+                if (match.perpDistM <= 55) {
+                    if (navState.lastMatchedDistKm !== null) {
+                        const signedStepM = (match.alongDistKm - navState.lastMatchedDistKm) * 1000;
+                        if (Math.abs(signedStepM) >= 2.5 && Math.abs(signedStepM) <= 130) {
+                            navState.dirAccumulatorM = Math.max(-140, Math.min(140, navState.dirAccumulatorM * 0.9 + signedStepM));
+                            if (navState.dirAccumulatorM <= -50 && navState.travelDirection !== -1) {
+                                navState.travelDirection = -1;
+                                renderDirectionChevrons(-1);
+                            } else if (navState.dirAccumulatorM >= 35 && navState.travelDirection !== 1) {
+                                navState.travelDirection = 1;
+                                if (navState.renderedChevronDir !== 1) renderDirectionChevrons(1);
+                            }
+                        }
+                    }
+                    navState.lastMatchedSegIdx = match.segIdx;
+                    navState.lastMatchedDistKm = match.alongDistKm;
+                    navState.lastMatchTimeMs = nowMs;
+
+                    if (match.alongDistKm > totalTrackDistance * 0.22 && match.alongDistKm < totalTrackDistance * 0.78) {
+                        navState.hasWalkedFarFromStart = true;
+                    }
+                }
+
+                // Bidirectional progress & remaining climb calculation
+                const isRev = navState.travelDirection === -1;
+                const effCompletedKm = isRev
+                    ? Math.max(0, totalTrackDistance - match.alongDistKm)
+                    : match.alongDistKm;
+                const effRemainingKm = Math.max(0, totalTrackDistance - effCompletedKm);
+
+                const segClimbIdx = Math.min(trackModel.cumAscentM.length - 1, match.segIdx + 1);
+                const remAscentM = isRev
+                    ? Math.max(0, trackModel.cumDescentM[segClimbIdx])
+                    : Math.max(0, totalTrackAscent - trackModel.cumAscentM[segClimbIdx]);
+
+                document.getElementById('map-trail-elevation').textContent = `${match.projEle.toFixed(0)}m`;
+                document.getElementById('map-trail-distance').textContent = `${effCompletedKm.toFixed(1)} / ${totalTrackDistance.toFixed(1)} km`;
+
+                // Accuracy-Aware Off-Trail Detection with Hysteresis
+                const effectiveOffDistM = Math.max(0, match.perpDistM - 0.5 * Math.min(accuracy, 50));
+                if (effectiveOffDistM > 45) {
+                    navState.offTrailCount++;
+                    if (navState.offTrailCount >= 2 || effectiveOffDistM > 75) {
+                        navState.isConfirmedOffTrail = true;
+                    }
+                } else if (match.perpDistM <= 34) {
+                    navState.offTrailCount = 0;
+                    navState.isConfirmedOffTrail = false;
+                }
+
+                if (accuracy > 90 && !navState.isConfirmedOffTrail) {
+                    if (badge) {
+                        badge.className = 'px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full badge-champagne animate-pulse';
+                        badge.textContent = isHe ? 'מדייק GPS...' : 'CALIBRATING...';
+                    }
+                } else if (navState.isConfirmedOffTrail) {
+                    if (badge) {
+                        badge.className = 'px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full badge-closed animate-pulse';
+                        badge.textContent = isHe ? `מחוץ למסלול (${match.perpDistM.toFixed(0)}מ׳)` : `OFF TRAIL (${match.perpDistM.toFixed(0)}m)`;
+                    }
+                    updateOffTrailConnector(latlng, [match.projLat, match.projLon], 'off-trail');
+                    updateGuidanceBanner('off-trail', match, effCompletedKm, effRemainingKm, remAscentM, speedKmh);
+                } else {
+                    if (badge) {
+                        badge.className = 'px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full badge-open';
+                        badge.textContent = isHe ? 'על המסלול' : 'ON TRAIL';
+                    }
+                    updateOffTrailConnector(null, null, null);
+                    updateSplitTrailPolylines(match);
+                    updateGuidanceBanner('on-trail', match, effCompletedKm, effRemainingKm, remAscentM, speedKmh);
+                }
+
+                const progressPercent = (effCompletedKm / (totalTrackDistance || 1)) * 100;
+                const chartX = (match.alongDistKm / (totalTrackDistance || 1)) * 400;
+                const chartY = 55 - ((match.projEle - minElevation) / (maxElevation - minElevation || 1)) * 50;
+
+                if (userDot) {
+                    userDot.setAttribute('cx', chartX.toFixed(1));
+                    userDot.setAttribute('cy', chartY.toFixed(1));
+                    userDot.classList.remove('hidden');
+                }
+                if (progressLabel) {
+                    progressLabel.textContent = `${isHe ? 'התקדמות' : 'Progress'}: ${progressPercent.toFixed(0)}% (${isHe ? 'נותר' : 'Left'} ${effRemainingKm.toFixed(1)} km)`;
+                }
+            } else {
+                // User is >500m away from trail: preserve full trail summary stats & hide on-trail dot
+                document.getElementById('map-trail-distance').textContent = `${totalTrackDistance.toFixed(1)} km`;
+                if (minElevation !== Infinity && maxElevation !== -Infinity) {
+                    document.getElementById('map-trail-elevation').textContent = `${minElevation.toFixed(0)}–${maxElevation.toFixed(0)}m`;
+                }
+                if (badge) {
+                    badge.className = 'px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full surface-subtle text-theme-secondary';
+                    badge.textContent = isHe ? `${match.distance.toFixed(1)} ק״מ מהמסלול` : `${match.distance.toFixed(1)} km away`;
+                }
+                if (userDot) userDot.classList.add('hidden');
+                if (progressLabel) progressLabel.textContent = isHe ? 'התקדמות: 0%' : 'Progress: 0%';
+                updateOffTrailConnector(null, null, null);
+                updateGuidanceBanner('far', match, 0, totalTrackDistance, totalTrackAscent, speedKmh);
+            }
+        };
+        window.processGpsPosition = processGpsPosition;
 
         const startGpsWatch = (fromUserGesture = false) => {
             const btn = document.getElementById('map-location-btn');
@@ -2966,7 +3908,6 @@
                 return;
             }
 
-            // Only request iOS 13+ DeviceOrientation permission on an explicit synchronous user gesture
             if (fromUserGesture && typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
                     .then(state => {
@@ -2986,130 +3927,15 @@
             btn.classList.remove('surface-elevated');
             btn.classList.add('btn-terracotta');
 
-            let lastCoords = null;
-            let lastTime = null;
-            let hasCenteredOnce = false;
-
             locationWatcher = navigator.geolocation.watchPosition(
-                position => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    const accuracy = position.coords.accuracy;
-                    const latlng = [lat, lon];
-
-                    if (!userLocMarker) {
-                        userLocMarker = L.marker(latlng, {
-                            icon: getDirectionalIcon(deviceHeading)
-                        }).addTo(map);
-
-                        userLocCircle = L.circle(latlng, {
-                            radius: accuracy,
-                            color: '#6E7276',
-                            weight: 1,
-                            fillColor: '#6E7276',
-                            fillOpacity: 0.14
-                        }).addTo(map);
-                    } else {
-                        userLocMarker.setLatLng(latlng);
-                        userLocCircle.setLatLng(latlng).setRadius(accuracy);
-                    }
-
-                    const closest = activePoints.length > 0 ? findClosestPoint(lat, lon) : { index: -1, distance: Infinity };
-                    const isNearTrail = closest.distance <= 0.5; // within 500m of the trail
-
-                    // Only pan camera to user if they are actually near the trail OR explicitly tapped My Location
-                    if (!hasCenteredOnce && (isNearTrail || userRequestedCenter)) {
-                        map.setView(latlng, Math.max(map.getZoom(), 15));
-                        hasCenteredOnce = true;
-                        userRequestedCenter = false;
-                    }
-
-                    if (accuracy > 80) {
-                        const badge = document.getElementById('map-status-badge');
-                        if (badge && (isNearTrail || userRequestedCenter)) {
-                            badge.className = 'px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full badge-champagne animate-pulse';
-                            badge.textContent = isHe ? 'מדייק GPS...' : 'CALIBRATING...';
-                        } else if (badge && closest.index >= 0) {
-                            badge.className = 'px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full surface-subtle text-theme-secondary';
-                            badge.textContent = isHe ? `${closest.distance.toFixed(1)} ק״מ מהמסלול` : `${closest.distance.toFixed(1)} km away`;
-                        }
-                        return;
-                    }
-
-                    // Compute speed
-                    let speedKmh = 0;
-                    const now = Date.now();
-                    if (position.coords.speed !== null && position.coords.speed >= 0) {
-                        speedKmh = position.coords.speed * 3.6;
-                    } else if (lastCoords && lastTime) {
-                        const d = getDistance(lastCoords[0], lastCoords[1], lat, lon);
-                        const dT = (now - lastTime) / 3600000;
-                        if (dT > 0 && d < 0.05) speedKmh = d / dT;
-                    }
-                    lastCoords = latlng;
-                    lastTime = now;
-
-                    document.getElementById('map-trail-speed').textContent = speedKmh > 0.5 ? `${speedKmh.toFixed(1)} km/h` : '0.0 km/h';
-
-                    if (activePoints.length > 0 && closest.index >= 0) {
-                        const distMeters = closest.distance * 1000;
-                        const badge = document.getElementById('map-status-badge');
-                        const userDot = document.getElementById('ele-user-dot');
-                        const progressLabel = document.getElementById('ele-progress-label');
-
-                        if (isNearTrail) {
-                            const closestPoint = activePoints[closest.index];
-                            const currentEle = closestPoint[2] || 0;
-                            document.getElementById('map-trail-elevation').textContent = `${currentEle.toFixed(0)}m`;
-
-                            const completedDist = cumulativeDistances[closest.index];
-                            document.getElementById('map-trail-distance').textContent = `${completedDist.toFixed(1)} / ${totalTrackDistance.toFixed(1)} km`;
-
-                            if (badge) {
-                                if (distMeters <= 60) {
-                                    badge.className = 'px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full badge-open';
-                                    badge.textContent = isHe ? 'על המסלול' : 'ON TRAIL';
-                                } else {
-                                    badge.className = 'px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full badge-closed animate-pulse';
-                                    badge.textContent = isHe ? `מחוץ למסלול (${distMeters.toFixed(0)}מ׳)` : `OFF TRAIL (${distMeters.toFixed(0)}m)`;
-                                }
-                            }
-
-                            const progressPercent = (completedDist / totalTrackDistance) * 100;
-                            const x = (completedDist / totalTrackDistance) * 400;
-                            const y = 55 - ((currentEle - minElevation) / (maxElevation - minElevation || 1)) * 50;
-
-                            if (userDot) {
-                                userDot.setAttribute('cx', x);
-                                userDot.setAttribute('cy', y);
-                                userDot.classList.remove('hidden');
-                            }
-
-                            if (progressLabel) {
-                                progressLabel.textContent = `${isHe ? 'התקדמות' : 'Progress'}: ${progressPercent.toFixed(0)}%`;
-                            }
-                        } else {
-                            // User is >500m away from trail: preserve full trail summary stats & hide on-trail dot
-                            document.getElementById('map-trail-distance').textContent = `${totalTrackDistance.toFixed(1)} km`;
-                            if (minElevation !== Infinity && maxElevation !== -Infinity) {
-                                document.getElementById('map-trail-elevation').textContent = `${minElevation.toFixed(0)}–${maxElevation.toFixed(0)}m`;
-                            }
-                            if (badge) {
-                                badge.className = 'px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full surface-subtle text-theme-secondary';
-                                badge.textContent = isHe ? `${closest.distance.toFixed(1)} ק״מ מהמסלול` : `${closest.distance.toFixed(1)} km away`;
-                            }
-                            if (userDot) userDot.classList.add('hidden');
-                            if (progressLabel) progressLabel.textContent = isHe ? 'התקדמות: 0%' : 'Progress: 0%';
-                        }
-                    }
-                },
+                processGpsPosition,
                 err => {
                     console.warn('Geolocation watch warning:', err);
                     const badge = document.getElementById('map-status-badge');
-                    // Do NOT kill locationWatcher on a temporary timeout (code === 3); only stop on permission denied (code === 1)
                     if (err && err.code === 1) {
                         navigator.geolocation.clearWatch(locationWatcher);
                         locationWatcher = null;
+                        isFollowingUser = false;
                         btn.classList.remove('btn-terracotta');
                         btn.classList.add('surface-elevated');
                         if (badge) {
@@ -3121,12 +3947,11 @@
                         badge.textContent = isHe ? 'ממתין ל-GPS...' : 'WAITING GPS...';
                     }
                 },
-                { enableHighAccuracy: true, timeout: 20000, maximumAge: 5000 }
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 3000 }
             );
         };
 
         const toggleLocationTracking = () => {
-            // Request iOS 13+ DeviceOrientation compass permission on explicit user tap
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
                     .then(state => {
@@ -3137,14 +3962,14 @@
                     .catch(() => {});
             }
 
+            isFollowingUser = true;
+
             if (locationWatcher && userLocMarker) {
-                // If already watching and marker exists, pan to user location on tap
-                map.setView(userLocMarker.getLatLng(), Math.max(map.getZoom(), 15));
+                map.setView(userLocMarker.getLatLng(), Math.max(map.getZoom(), 16), { animate: true });
                 return;
             }
 
             if (locationWatcher && !userLocMarker) {
-                // Watcher is already acquiring initial fix; mark userRequestedCenter so it pans as soon as fix arrives
                 userRequestedCenter = true;
                 return;
             }
