@@ -74,7 +74,9 @@ self.addEventListener('install', event => {
           URLS_TO_CACHE.map(url => {
             const req = url.includes('i.imgur.com')
               ? new Request(url, { mode: 'cors', referrerPolicy: 'no-referrer' })
-              : url;
+              : (url === './' || url === './index.html')
+                ? new Request(url, { cache: 'no-cache' })
+                : url;
             return cache.add(req).catch(err => {
               console.warn('Failed to pre-cache:', url, err);
             });
@@ -169,7 +171,7 @@ self.addEventListener('fetch', event => {
   // Network-first strategy for HTML documents
   if (event.request.mode === 'navigate' || reqUrl.pathname.endsWith('.html')) {
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, { cache: 'no-cache' })
         .then(response => {
           if (response && response.status === 200) {
             const responseToCache = response.clone();

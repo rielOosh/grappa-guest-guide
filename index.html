@@ -3368,6 +3368,7 @@
         let lastAutoZoomChangeMs = 0;
         let autoFollowPendingFirstFix = false;
         let explicitLocateRequested = false;
+        const activePtrIds = new Set();
 
         let trackModel = null;
         let markerAnimRaf = null;
@@ -3404,7 +3405,10 @@
             outlierStrikeCount: 0,
             smoothedSpeedKmh: 0,
             gpsCogDeg: null,
-            recentPositions: []
+            movingStreak: 0,
+            isStationary: true,
+            recentPositions: [],
+            recentRawPositions: []
         });
         let navState = createInitialNavState();
 
@@ -5103,7 +5107,7 @@
             return navState.filtAltM;
         };
 
-        // Hardened Adaptive GPS Kalman Filter, Teleport Guard & Stationary Speed/COG Suppression
+        // Hardened Adaptive GPS Kalman Filter, Teleport Guard, Stationary ZUPT Anchor & Doppler Suppression
         const filterGpsFix = (rawLat, rawLon, rawAcc, rawSpeed, rawHeading, nowMs, rawAlt = null, rawAltAcc = null) => {
             const acc = Math.max(4, rawAcc || 15);
             const filtAlt = updateFilteredAltitude(rawAlt, rawAltAcc);
@@ -5120,26 +5124,25 @@
                 navState.lastRawLon = rawLon;
                 navState.lastFixTimeMs = nowMs;
                 navState.recentPositions = [{ t: nowMs, lat: rawLat, lon: rawLon }];
-                navState.smoothedSpeedKmh = (rawSpeed !== null && rawSpeed !== undefined && rawSpeed >= 0.25 && acc <= 30) ? rawSpeed * 3.6 : 0;
-                if (acc <= 25 && rawHeading !== null && rawHeading !== undefined && !isNaN(rawHeading) && rawSpeed !== null && rawSpeed >= 0.72) {
-                    navState.gpsCogDeg = ((rawHeading % 360) + 360) % 360;
-                } else {
-                    navState.gpsCogDeg = null;
-                }
+                navState.recentRawPositions = [{ t: nowMs, lat: rawLat, lon: rawLon }];
+                navState.smoothedSpeedKmh = 0;
+                navState.gpsCogDeg = null;
+                navState.movingStreak = 0;
+                navState.isStationary = true;
                 return {
                     lat: rawLat,
                     lon: rawLon,
                     accuracy: acc,
                     altitudeM: filtAlt,
-                    speedKmh: navState.smoothedSpeedKmh,
-                    cogDeg: navState.gpsCogDeg,
+                    speedKmh: 0,
+                    cogDeg: null,
+                    isStationary: true,
                     dtSec: 2
                 };
             }
 
             const dtSec = Math.max(0.25, (nowMs - navState.lastFixTimeMs) / 1000);
             const rawDistM = getDistance(navState.filtLat, navState.filtLon, rawLat, rawLon) * 1000;
-            const impliedSpeedMs = rawDistM / dtSec;
 
             // Reject impossible GPS teleports using accuracy-scaled kinematic gate OR coarse cell jumps over good lock
             const maxPlausibleM = dtSec < 60
@@ -5156,13 +5159,77 @@
                     altitudeM: navState.filtAltM,
                     speedKmh: navState.smoothedSpeedKmh,
                     cogDeg: navState.gpsCogDeg,
+                    isStationary: navState.isStationary,
                     dtSec
                 };
             }
             const isRecoveryLock = navState.outlierStrikeCount >= 2;
             navState.outlierStrikeCount = 0;
 
-            // Accuracy-weighted Kalman planar update (dt capped at 30s so coarse gaps never blow up filtAcc)
+            // Track 12s window of raw accepted coordinates to distinguish indoor multipath from genuine movement
+            navState.recentRawPositions.push({ t: nowMs, lat: rawLat, lon: rawLon });
+            while (navState.recentRawPositions.length > 2 && (nowMs - navState.recentRawPositions[0].t) > 12000) {
+                navState.recentRawPositions.shift();
+            }
+            if (navState.recentRawPositions.length > 10) {
+                navState.recentRawPositions = navState.recentRawPositions.slice(-10);
+            }
+
+            let rawRef = navState.recentRawPositions[0];
+            for (let i = navState.recentRawPositions.length - 1; i >= 0; i--) {
+                if ((nowMs - navState.recentRawPositions[i].t) >= 2800) {
+                    rawRef = navState.recentRawPositions[i];
+                    break;
+                }
+            }
+            const rawNetDistM = rawRef ? getDistance(rawRef.lat, rawRef.lon, rawLat, rawLon) * 1000 : rawDistM;
+
+            // Detect tight coherent cluster shifts (3+ raw fixes within 4m settled >= 5m away while stationary, or 2+ fixes within 2.5m settling >= 1.5m while moving)
+            let isTightClusterShift = false;
+            const tightMinDistM = navState.isStationary ? 5.0 : 1.5;
+            if (navState.recentRawPositions.length >= 3 && acc <= 15 && rawDistM >= tightMinDistM) {
+                const tail = navState.recentRawPositions.slice(-3);
+                const d01 = getDistance(tail[0].lat, tail[0].lon, tail[1].lat, tail[1].lon) * 1000;
+                const d12 = getDistance(tail[1].lat, tail[1].lon, tail[2].lat, tail[2].lon) * 1000;
+                const d02 = getDistance(tail[0].lat, tail[0].lon, tail[2].lat, tail[2].lon) * 1000;
+                if (Math.max(d01, d12, d02) <= 4.0) {
+                    isTightClusterShift = true;
+                }
+            } else if (!navState.isStationary && navState.recentRawPositions.length >= 2 && acc <= 10 && rawDistM >= 3.0) {
+                const tail2 = navState.recentRawPositions.slice(-2);
+                const dLast = getDistance(tail2[0].lat, tail2[0].lon, tail2[1].lat, tail2[1].lon) * 1000;
+                if (dLast <= 2.5) {
+                    isTightClusterShift = true;
+                }
+            }
+
+            const cosLatRad = Math.cos(navState.filtLat * Math.PI / 180);
+            const vPrevX = ((navState.lastRawLon ?? navState.filtLon) - navState.filtLon) * cosLatRad;
+            const vPrevY = (navState.lastRawLat ?? navState.filtLat) - navState.filtLat;
+            const vCurX = (rawLon - navState.filtLon) * cosLatRad;
+            const vCurY = rawLat - navState.filtLat;
+            const normPrev = Math.hypot(vPrevX, vPrevY);
+            const normCur = Math.hypot(vCurX, vCurY);
+            const sameQuadrantOutward = (normPrev > 0 && normCur > 0)
+                ? ((vPrevX * vCurX + vPrevY * vCurY) / (normPrev * normCur)) >= 0.25
+                : true;
+
+            const stationaryRadiusM = Math.max(15.0, 1.0 * Math.min(Math.max(acc, navState.filtAcc), 35));
+            const exceedsStationaryRadius = rawDistM > stationaryRadiusM && (sameQuadrantOutward || rawDistM > stationaryRadiusM * 1.45);
+            if ((rawDistM > Math.max(24, 1.55 * acc) && dtSec >= 8) || isTightClusterShift) {
+                navState.movingStreak = Math.max(2, navState.movingStreak + 1);
+            } else if (exceedsStationaryRadius && (rawSpeed === null || rawSpeed === undefined || rawSpeed >= 0.45)) {
+                navState.movingStreak++;
+            } else if (!exceedsStationaryRadius && rawDistM <= stationaryRadiusM) {
+                navState.movingStreak = 0;
+            }
+            const isMovingNow = (navState.movingStreak >= 2) ||
+                isTightClusterShift ||
+                (rawDistM >= Math.max(28, 1.7 * acc) && dtSec >= 1) ||
+                (rawSpeed !== null && rawSpeed !== undefined && rawSpeed >= 1.55 && acc <= 12 && rawDistM >= 3.5);
+            navState.isStationary = !isMovingNow;
+
+            // Accuracy-weighted Kalman planar update with ZUPT stationary lock
             const isVeryPoorFix = acc > Math.max(35, 2.5 * navState.filtAcc);
             const cappedDtSec = Math.min(dtSec, 30);
             const prevVar = navState.filtAcc * navState.filtAcc + (1.8 * cappedDtSec) * (1.8 * cappedDtSec);
@@ -5173,22 +5240,29 @@
                 alpha = Math.min(0.02, rawGain);
             } else if ((dtSec >= 45 || isRecoveryLock) && acc <= 25) {
                 alpha = 1.0;
+            } else if (navState.isStationary) {
+                alpha = 0.015;
             } else {
-                const innovationFloor = (acc <= 20 && rawDistM > Math.max(10, 1.3 * acc)) ? 0.38 : 0.22;
-                alpha = Math.max(innovationFloor, Math.min(0.88, rawGain));
+                const innovationFloor = (acc <= 20 && rawDistM > Math.max(10, 1.3 * acc)) ? 0.42 : 0.28;
+                const maxGain = (acc <= 10 && rawDistM >= 30) ? 0.95 : 0.88;
+                alpha = Math.max(innovationFloor, Math.min(maxGain, rawGain));
             }
 
             const prevLat = navState.filtLat;
             const prevLon = navState.filtLon;
-            navState.filtLat = prevLat + alpha * (rawLat - prevLat);
-            navState.filtLon = prevLon + alpha * (rawLon - prevLon);
-            const postVar = (1 - alpha) * (1 - alpha) * prevVar + alpha * alpha * measVar;
+            let stepAlpha = alpha;
+            if (navState.isStationary && rawDistM > 0 && rawDistM <= stationaryRadiusM * 1.15 && (stepAlpha * rawDistM) > 0.25) {
+                stepAlpha = 0.25 / rawDistM;
+            }
+            navState.filtLat = prevLat + stepAlpha * (rawLat - prevLat);
+            navState.filtLon = prevLon + stepAlpha * (rawLon - prevLon);
+            const postVar = (1 - stepAlpha) * (1 - stepAlpha) * prevVar + stepAlpha * stepAlpha * measVar;
             const rawPostAcc = Math.max(4, Math.sqrt(postVar));
             navState.filtAcc = isVeryPoorFix ? Math.min(Math.max(navState.filtAcc, 35), rawPostAcc) : rawPostAcc;
 
-            // Maintain >= 3s sliding window for stationary drift & random indoor COG suppression
+            // Maintain >= 3s sliding window of filtered positions for speed & COG estimation
             navState.recentPositions.push({ t: nowMs, lat: navState.filtLat, lon: navState.filtLon });
-            while (navState.recentPositions.length > 2 && (nowMs - navState.recentPositions[0].t) > 7000) {
+            while (navState.recentPositions.length > 2 && (nowMs - navState.recentPositions[0].t) > 10000) {
                 navState.recentPositions.shift();
             }
             let winRef = null;
@@ -5202,43 +5276,37 @@
             const winDistM = winRef
                 ? getDistance(winRef.lat, winRef.lon, navState.filtLat, navState.filtLon) * 1000
                 : stepDistM;
-            const moveThreshM = Math.max(8.5, 0.85 * Math.min(acc, 35));
-            const isActuallyMoving = winRef
-                ? (winDistM > moveThreshM)
-                : (stepDistM > moveThreshM && dtSec >= 1.8);
 
+            const hasExplicitZeroSpeed = (rawSpeed !== null && rawSpeed !== undefined && !isNaN(rawSpeed) && rawSpeed >= 0 && rawSpeed < 0.28);
+            const isStationaryDopplerNoise = navState.isStationary && !(rawSpeed !== null && rawSpeed !== undefined && rawSpeed >= 1.55 && acc <= 12 && rawDistM >= 3.5);
             let instSpeedKmh = 0;
-            const hasExplicitZeroSpeed = (rawSpeed !== null && rawSpeed !== undefined && !isNaN(rawSpeed) && rawSpeed >= 0 && rawSpeed < 0.25);
-            const hasNoisyIndoorDoppler = (rawSpeed !== null && rawSpeed !== undefined && !isNaN(rawSpeed) && rawSpeed < 0.65 && acc > 12 && !isActuallyMoving);
-            if (hasExplicitZeroSpeed || hasNoisyIndoorDoppler) {
-                instSpeedKmh = 0;
-            } else if (rawSpeed !== null && rawSpeed !== undefined && rawSpeed >= 0) {
-                instSpeedKmh = rawSpeed * 3.6;
-            } else if (dtSec > 0 && stepDistM < 80 && isActuallyMoving) {
-                const refDt = winRef ? ((nowMs - winRef.t) / 1000) : dtSec;
-                instSpeedKmh = ((winRef ? winDistM : stepDistM) / Math.max(0.5, refDt)) * 3.6;
-            }
 
-            if (hasExplicitZeroSpeed) {
+            if (hasExplicitZeroSpeed || isStationaryDopplerNoise) {
                 navState.smoothedSpeedKmh = 0;
+                navState.gpsCogDeg = null;
             } else {
+                if (rawSpeed !== null && rawSpeed !== undefined && !isNaN(rawSpeed) && rawSpeed >= 0) {
+                    instSpeedKmh = rawSpeed * 3.6;
+                } else if (dtSec > 0 && stepDistM < 80 && winDistM > 8.5) {
+                    const refDt = winRef ? ((nowMs - winRef.t) / 1000) : dtSec;
+                    instSpeedKmh = ((winRef ? winDistM : stepDistM) / Math.max(0.5, refDt)) * 3.6;
+                }
                 navState.smoothedSpeedKmh = navState.smoothedSpeedKmh * 0.65 + instSpeedKmh * 0.35;
-                if (navState.smoothedSpeedKmh < 0.65 || ((rawSpeed === null || rawSpeed < 0.65) && !isActuallyMoving && navState.smoothedSpeedKmh < 1.35)) {
+                if (navState.smoothedSpeedKmh < 0.85 || (instSpeedKmh === 0 && navState.smoothedSpeedKmh < 1.5)) {
                     navState.smoothedSpeedKmh = 0;
                 }
-            }
 
-            // Clear COG whenever stopped/noisy indoors so random bounces never spin the compass
-            if (navState.smoothedSpeedKmh < 1.5 || hasExplicitZeroSpeed || hasNoisyIndoorDoppler) {
-                navState.gpsCogDeg = null;
-            } else if (acc <= 30 && rawHeading !== null && rawHeading !== undefined && !isNaN(rawHeading) && navState.smoothedSpeedKmh >= 2.2) {
-                navState.gpsCogDeg = ((rawHeading % 360) + 360) % 360;
-            } else if (acc <= 30 && isActuallyMoving && winDistM >= 7.5 && navState.smoothedSpeedKmh >= 2.2) {
-                const refLat = winRef ? winRef.lat : prevLat;
-                const refLon = winRef ? winRef.lon : prevLon;
-                const dLon = (navState.filtLon - refLon) * Math.cos(refLat * Math.PI / 180);
-                const dLat = navState.filtLat - refLat;
-                navState.gpsCogDeg = ((Math.atan2(dLon, dLat) * 180 / Math.PI) + 360) % 360;
+                if (navState.smoothedSpeedKmh < 2.2) {
+                    navState.gpsCogDeg = null;
+                } else if (acc <= 28 && rawHeading !== null && rawHeading !== undefined && !isNaN(rawHeading)) {
+                    navState.gpsCogDeg = ((rawHeading % 360) + 360) % 360;
+                } else if (acc <= 28 && winDistM >= 10.0) {
+                    const refLat = winRef ? winRef.lat : prevLat;
+                    const refLon = winRef ? winRef.lon : prevLon;
+                    const dLon = (navState.filtLon - refLon) * Math.cos(refLat * Math.PI / 180);
+                    const dLat = navState.filtLat - refLat;
+                    navState.gpsCogDeg = ((Math.atan2(dLon, dLat) * 180 / Math.PI) + 360) % 360;
+                }
             }
 
             navState.lastRawLat = rawLat;
@@ -5252,6 +5320,7 @@
                 altitudeM: filtAlt,
                 speedKmh: navState.smoothedSpeedKmh,
                 cogDeg: navState.gpsCogDeg,
+                isStationary: navState.isStationary,
                 dtSec
             };
         };
@@ -5413,13 +5482,13 @@
             const nowMs = Date.now();
             const dtSec = lastHeadingUpdateMs ? Math.min(1.0, Math.max(0.016, (nowMs - lastHeadingUpdateMs) / 1000)) : 0.2;
             lastHeadingUpdateMs = nowMs;
-            const blend = 1 - Math.exp(-dtSec / 0.34);
+            const blend = 1 - Math.exp(-dtSec / 0.42);
 
             if (continuousHeading === null) {
                 continuousHeading = targetDeg;
             } else {
                 const delta = shortestAngleDelta(continuousHeading, targetDeg);
-                if (speedKmh < 1.2 && Math.abs(delta) < 1.5) {
+                if (speedKmh < 1.2 && Math.abs(delta) < 2.5) {
                     return;
                 }
                 continuousHeading = continuousHeading + blend * delta;
@@ -6717,20 +6786,35 @@
 
                         L.control.zoom({ position: 'topleft' }).addTo(map);
 
-                        // Mark manual zoom immediately on user zoom gestures so GPS fixes never snap zoom back
+                        // Mark manual zoom immediately (capture phase) so user pinch/wheel/button zoom never snaps back
                         const mapEl = map.getContainer();
-                        mapEl.addEventListener('wheel', () => { manualZoomActive = true; }, { passive: true });
-                        mapEl.addEventListener('dblclick', () => { manualZoomActive = true; }, { passive: true });
+                        const clearPtr = (e) => activePtrIds.delete(e.pointerId);
+                        window.addEventListener('pointerup', clearPtr, { passive: true });
+                        window.addEventListener('pointercancel', clearPtr, { passive: true });
+                        map.on('unload', () => {
+                            window.removeEventListener('pointerup', clearPtr);
+                            window.removeEventListener('pointercancel', clearPtr);
+                            activePtrIds.clear();
+                        });
+                        mapEl.addEventListener('wheel', () => { manualZoomActive = true; }, { capture: true, passive: true });
+                        mapEl.addEventListener('dblclick', () => { manualZoomActive = true; }, { capture: true, passive: true });
+                        mapEl.addEventListener('gesturestart', () => { manualZoomActive = true; }, { capture: true, passive: true });
                         mapEl.addEventListener('touchstart', (e) => {
                             if (e.touches && e.touches.length >= 2) {
                                 manualZoomActive = true;
                             }
-                        }, { passive: true });
+                        }, { capture: true, passive: true });
+                        mapEl.addEventListener('pointerdown', (e) => {
+                            activePtrIds.add(e.pointerId);
+                            if (activePtrIds.size >= 2 || (e.target && e.target.closest('.leaflet-control-zoom-in, .leaflet-control-zoom-out'))) {
+                                manualZoomActive = true;
+                            }
+                        }, { capture: true, passive: true });
                         mapEl.addEventListener('click', (e) => {
                             if (e.target && e.target.closest('.leaflet-control-zoom-in, .leaflet-control-zoom-out')) {
                                 manualZoomActive = true;
                             }
-                        });
+                        }, { capture: true });
                         map.on('boxzoomstart', () => { manualZoomActive = true; });
 
                         // Automatically pause auto-follow if hiker pans map manually
@@ -6991,6 +7075,7 @@
             followMode = 'off';
             isFollowingUser = false;
             manualZoomActive = false;
+            activePtrIds.clear();
             isAutoZoomBoosted = false;
             lastAutoZoomChangeMs = 0;
             autoFollowPendingFirstFix = false;
@@ -7061,6 +7146,10 @@
 
             let heading = null;
             if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null && Number.isFinite(e.webkitCompassHeading)) {
+                const wcAcc = e.webkitCompassAccuracy;
+                if (wcAcc !== undefined && wcAcc !== null && Number.isFinite(wcAcc) && (wcAcc < 0 || wcAcc > 50)) {
+                    return;
+                }
                 compassAbsoluteUnavailable = false;
                 heading = ((e.webkitCompassHeading + screenAdjustment) % 360 + 360) % 360;
             } else if ((e.absolute === true || e.type === 'deviceorientationabsolute') && e.alpha !== null && e.alpha !== undefined && Number.isFinite(e.alpha)) {
@@ -7135,11 +7224,18 @@
                 }).addTo(map);
                 updateRangeRings(lat, lon);
             } else {
-                animateUserMarkerTo(latlng, 280);
-                userLocCircle.setRadius(accuracy);
+                const markerShiftM = markerCurrentLatLon
+                    ? getDistance(markerCurrentLatLon[0], markerCurrentLatLon[1], lat, lon) * 1000
+                    : Infinity;
+                if (!filtered.isStationary || markerShiftM >= 2.0) {
+                    animateUserMarkerTo(latlng, 280);
+                }
+                if (Math.abs((userLocCircle.getRadius() || 0) - accuracy) >= 2) {
+                    userLocCircle.setRadius(accuracy);
+                }
             }
 
-            document.getElementById('map-trail-speed').textContent = speedKmh >= 0.65 ? `${speedKmh.toFixed(1)} km/h` : '0.0 km/h';
+            document.getElementById('map-trail-speed').textContent = (!filtered.isStationary && speedKmh >= 0.65) ? `${speedKmh.toFixed(1)} km/h` : '0.0 km/h';
 
             const match = (trackModel && trackModel.segments.length > 0)
                 ? matchUserToTrack(lat, lon, deviceHeading, filtered.dtSec)
@@ -7189,8 +7285,14 @@
             }
 
             // Forward Look-Ahead Follow Camera (75% Ahead / 25% Behind) & Hysteresis Auto-Zoom
-            const isUserInteracting = Boolean(map._animatingZoom || (map.dragging && map.dragging._draggable && map.dragging._draggable._moving));
-            if (!isUserInteracting && (followMode === 'follow' || (userRequestedCenter && isNearTrail))) {
+            const isUserInteracting = Boolean(
+                map._animatingZoom ||
+                (map.touchZoom && map.touchZoom._zooming) ||
+                activePtrIds.size >= 2 ||
+                (map.dragging && map.dragging._draggable && map.dragging._draggable._moving)
+            );
+            const skipStationaryRemoteCamera = !isNearTrail && filtered.isStationary && !userRequestedCenter;
+            if (!isUserInteracting && !skipStationaryRemoteCamera && (followMode === 'follow' || (userRequestedCenter && isNearTrail))) {
                 let targetZoom = map.getZoom();
                 if (!manualZoomActive && isNearTrail) {
                     const canAutoZoom = navState.hasEnteredTrailCorridor && !navState.isConfirmedOffTrail && match.index >= 0;
@@ -7228,7 +7330,8 @@
                 const zoomDiff = Math.abs(map.getZoom() - targetZoom);
                 const needsZoomAdjust = !manualZoomActive && zoomDiff >= 0.45 && (isNearTrail || userRequestedCenter);
                 if (userRequestedCenter || needsZoomAdjust) {
-                    map.setView(targetCenter, targetZoom, { animate: false });
+                    const applyZoom = (userRequestedCenter && manualZoomActive) ? map.getZoom() : targetZoom;
+                    map.setView(targetCenter, applyZoom, { animate: false });
                     userRequestedCenter = false;
                     lastLookAheadCenter = targetCenter;
                 } else {
@@ -7238,7 +7341,7 @@
                     const driftPx = Math.hypot(desiredPt.x - curPt.x, desiredPt.y - curPt.y);
                     const panDriftThresh = speedKmh < 1.2 ? 58 : 42;
                     if (driftPx > panDriftThresh) {
-                        map.setView(targetCenter, targetZoom, { animate: false });
+                        map.panTo(targetCenter, { animate: false });
                         lastLookAheadCenter = targetCenter;
                     }
                 }
