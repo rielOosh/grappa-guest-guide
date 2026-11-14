@@ -27,7 +27,6 @@ const URLS_TO_CACHE = [
   './icon-512.svg',
 
   // Local Schedules, Menus & Pool Regulations
-  './Grocery_hours.jpg',
   './swimming_pool_rules_en-v2.pdf',
   './swimming_pool_rules_he-v2.pdf',
   'https://i.imgur.com/ChMRT7d.jpg', // Sushi menu

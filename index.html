@@ -2347,8 +2347,6 @@
                 }
 
                 case 'gate': {
-                    const iosBadge = isIOS ? `<span class="px-2 py-0.5 text-xs font-bold rounded-full bg-white/20 text-white">${isHe ? 'מומלץ למכשירך' : 'Your Device'}</span>` : '';
-                    const androidBadge = isAndroid ? `<span class="px-2 py-0.5 text-xs font-bold rounded-full bg-white/20 text-white">${isHe ? 'מומלץ למכשירך' : 'Your Device'}</span>` : '';
                     return `
                         <div class="${alignClass} space-y-3" dir="${dirAttr}">
                             <p class="text-lg sm:text-xl leading-snug text-theme-primary font-semibold">
@@ -2371,12 +2369,10 @@
                                 <a href="https://goo.gl/fZTz4u" target="_blank" rel="noopener noreferrer" class="w-full py-3 px-4 rounded-2xl btn-taupe font-bold text-lg sm:text-xl btn-premium haptic flex items-center justify-center gap-2 shadow-md">
                                     <span class="material-symbols-outlined" style="font-size: 22px;">phone_iphone</span>
                                     <span>${isHe ? 'אפליקציה לאייפון' : 'iPhone App (App Store)'}</span>
-                                    ${iosBadge}
                                 </a>
                                 <a href="https://goo.gl/Giopvd" target="_blank" rel="noopener noreferrer" class="w-full py-3 px-4 rounded-2xl btn-terracotta font-bold text-lg sm:text-xl btn-premium haptic flex items-center justify-center gap-2 shadow-md">
                                     <span class="material-symbols-outlined" style="font-size: 22px;">android</span>
                                     <span>${isHe ? 'אפליקציה לאנדרואיד' : 'Android App (Google Play)'}</span>
-                                    ${androidBadge}
                                 </a>
                             </div>
                         </div>
@@ -2466,12 +2462,6 @@
                                     <span>${isHe ? 'שבת' : 'Saturday'}</span>
                                     <span class="text-lg font-bold">${isHe ? 'סגור' : 'Closed'}</span>
                                 </div>
-                            </div>
-
-                            <!-- Signboard Image -->
-                            <div class="surface-subtle p-2 rounded-2xl">
-                                <img src="./Grocery_hours.jpg" alt="Grocery store hours" class="w-full rounded-xl cursor-pointer hover:opacity-95 transition-opacity" onclick="openZoomImage('./Grocery_hours.jpg')" />
-                                <p class="text-sm font-semibold text-center text-theme-secondary mt-1">${isHe ? 'לחצו על התמונה להגדלה' : 'Tap image to zoom'}</p>
                             </div>
 
                             <!-- Google Maps CTA -->
