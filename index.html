@@ -1390,10 +1390,6 @@
                             <p id="map-trail-subtitle" class="text-[11px] font-semibold text-theme-secondary leading-none truncate mt-0.5"></p>
                         </div>
                         <div class="flex items-center gap-1 flex-shrink-0">
-                            <button id="map-dir-toggle-btn" type="button" class="px-1.5 py-0.5 text-[10px] font-bold rounded-full surface-subtle text-theme-primary border border-theme flex items-center gap-0.5 haptic" aria-label="Flip Trail Direction" title="Flip Trail Direction">
-                                <svg class="w-3 h-3 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
-                                <span id="map-dir-label">הלוך</span>
-                            </button>
                             <div id="map-status-badge" class="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full surface-subtle text-theme-secondary">
                                 READY
                             </div>
@@ -3840,12 +3836,10 @@
             if (walkedMaskPolyline) walkedMaskPolyline.setStyle({ weight: weights.trail + 1.5 });
             if (walkedPolyline) walkedPolyline.setStyle({ weight: weights.walked });
             if (returnPolyline) {
-                const retWeight = navState.passedLoopMidpoint ? weights.trail : Math.max(2.5, weights.trail - 1.5);
-                returnPolyline.setStyle({ weight: retWeight });
+                returnPolyline.setStyle({ weight: weights.trail });
             }
             if (returnPolylineCasing) {
-                const retCasingWeight = navState.passedLoopMidpoint ? weights.casing : Math.max(3, weights.casing - 2);
-                returnPolylineCasing.setStyle({ weight: retCasingWeight });
+                returnPolylineCasing.setStyle({ weight: weights.casing });
             }
             if (steepGradeLayer) {
                 if (steepGradeLayer.options) steepGradeLayer.options.weight = weights.casing + 4.5;
@@ -3955,17 +3949,17 @@
             if (returnPolylineCasing) {
                 returnPolylineCasing.setStyle({
                     color: c.casing,
-                    weight: navState.passedLoopMidpoint ? weights.casing : Math.max(3, weights.casing - 2),
-                    opacity: navState.passedLoopMidpoint ? (isHighContrast ? 0.96 : 0.88) : (isHighContrast ? 0.60 : 0.45),
-                    dashArray: navState.passedLoopMidpoint ? undefined : '6, 8'
+                    weight: weights.casing,
+                    opacity: isHighContrast ? 0.96 : 0.88,
+                    dashArray: undefined
                 });
             }
             if (returnPolyline) {
                 returnPolyline.setStyle({
                     color: c.trail,
-                    weight: navState.passedLoopMidpoint ? weights.trail : Math.max(2.5, weights.trail - 1.5),
-                    opacity: navState.passedLoopMidpoint ? 0.98 : (isHighContrast ? 0.65 : 0.50),
-                    dashArray: navState.passedLoopMidpoint ? undefined : '6, 8'
+                    weight: weights.trail,
+                    opacity: 0.98,
+                    dashArray: undefined
                 });
             }
             if (sightlineRay) {
@@ -4109,16 +4103,16 @@
                     : (this._samplesOverview && this._samplesOverview.length > 0 ? this._samplesOverview : this._samples);
 
                 const colors = getActiveMapThemeColors();
-                const midDistKm = (trackModel && trackModel.totalDistKm) ? trackModel.totalDistKm * 0.5 : Infinity;
                 const isLoop = trackModel ? trackModel.isLoop : false;
                 const passedMid = navState ? navState.passedLoopMidpoint : false;
+                const sf = trackModel ? trackModel.stemFork : null;
 
                 for (let i = 0; i < activeSamples.length; i++) {
                     const s = activeSamples[i];
-                    // On loop routes before midpoint, draw chevrons ONLY along upcoming leg
-                    if (isLoop && !passedMid && s.distKm !== undefined) {
-                        if (this._dir === 1 && s.distKm > midDistKm) continue;
-                        if (this._dir === -1 && s.distKm < midDistKm) continue;
+                    // Avoid head-to-head chevrons on shared out-and-back stem before loop midpoint
+                    if (isLoop && !passedMid && sf && s.distKm !== undefined) {
+                        if (this._dir === 1 && s.distKm > sf.rejoinDistKm) continue;
+                        if (this._dir === -1 && s.distKm < sf.distKm) continue;
                     }
                     // Skip chevrons already behind the hiker's current matched progress
                     if (navState && navState.hasEnteredTrailCorridor && navState.lastMatchedDistKm !== null && s.distKm !== undefined) {
@@ -6461,17 +6455,17 @@
             if (returnPolyline) {
                 const weights = getTrailStrokeWeights();
                 returnPolyline.setStyle({
-                    weight: Math.max(2.5, weights.trail - 1.5),
-                    opacity: isHighContrast ? 0.65 : 0.50,
-                    dashArray: '6, 8'
+                    weight: weights.trail,
+                    opacity: 0.98,
+                    dashArray: undefined
                 });
             }
             if (returnPolylineCasing) {
                 const weights = getTrailStrokeWeights();
                 returnPolylineCasing.setStyle({
-                    weight: Math.max(3, weights.casing - 2),
-                    opacity: isHighContrast ? 0.60 : 0.45,
-                    dashArray: '6, 8'
+                    weight: weights.casing,
+                    opacity: isHighContrast ? 0.96 : 0.88,
+                    dashArray: undefined
                 });
             }
 
@@ -6928,30 +6922,18 @@
 
                         const { upcomingLatLngs, returnLatLngs } = getLoopLegPartitions(navState.travelDirection === -1 ? -1 : 1);
 
-                        // 2. Render return leg BELOW active outbound trail and exclude shared stem so it never covers the start stem
+                        // 2. Draw both casings below both centerlines (identical full-opacity solid styling, duplicate stem trimmed by partition)
                         if (returnLatLngs) {
                             returnPolylineCasing = L.polyline(returnLatLngs, {
                                 color: colors.casing,
-                                weight: Math.max(3, weights.casing - 2),
-                                opacity: isHighContrast ? 0.60 : 0.45,
-                                dashArray: '6, 8',
-                                lineCap: 'round',
-                                lineJoin: 'round',
-                                renderer: mapCanvasRenderer
-                            }).addTo(map);
-
-                            returnPolyline = L.polyline(returnLatLngs, {
-                                color: colors.trail,
-                                weight: Math.max(2.5, weights.trail - 1.5),
-                                opacity: isHighContrast ? 0.65 : 0.50,
-                                dashArray: '6, 8',
+                                weight: weights.casing,
+                                opacity: isHighContrast ? 0.96 : 0.88,
                                 lineCap: 'round',
                                 lineJoin: 'round',
                                 renderer: mapCanvasRenderer
                             }).addTo(map);
                         }
 
-                        // 3. Render active outbound trail casing and centerline on top of steep shoulder ribs
                         currentPolylineCasing = L.polyline(upcomingLatLngs, {
                             color: colors.casing,
                             weight: weights.casing,
@@ -6960,6 +6942,18 @@
                             lineJoin: 'round',
                             renderer: mapCanvasRenderer
                         }).addTo(map);
+
+                        // 3. Draw both solid centerlines on top of casings for a seamless continuous loop
+                        if (returnLatLngs) {
+                            returnPolyline = L.polyline(returnLatLngs, {
+                                color: colors.trail,
+                                weight: weights.trail,
+                                opacity: 0.98,
+                                lineCap: 'round',
+                                lineJoin: 'round',
+                                renderer: mapCanvasRenderer
+                            }).addTo(map);
+                        }
 
                         currentPolyline = L.polyline(upcomingLatLngs, {
                             color: colors.trail,
@@ -7903,7 +7897,6 @@
                 }
             });
             document.getElementById('map-offline-pack-btn').addEventListener('click', () => downloadTrailOfflinePack());
-            document.getElementById('map-dir-toggle-btn').addEventListener('click', flipTrailDirection);
             document.getElementById('map-restart-btn').addEventListener('click', restartTrailNavigation);
 
             // Zoom Image Modal: Tap image to toggle 1x/2x zoom; tap close button or backdrop to close
