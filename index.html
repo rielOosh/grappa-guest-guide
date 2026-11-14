@@ -2575,7 +2575,78 @@
                     `;
                 }
 
-                case 'spa':
+                case 'spa': {
+                    const treatments = [
+                        {
+                            nameHe: 'עיסוי שוודי',
+                            nameEn: 'Swedish Massage',
+                            descHe: 'עיסוי קלאסי הוליסטי מרגיע, משחרר מתחים ומביא לאיזון גוף־נפש.',
+                            descEn: 'A classic, calming holistic massage that releases tension and restores mind–body balance.'
+                        },
+                        {
+                            nameHe: 'עיסוי רקמות עמוק',
+                            nameEn: 'Deep Tissue Massage',
+                            descHe: 'עיסוי המתאים לספורטאים ואנשים מתוחים ועמוסים במיוחד; עיסוי שנכנס לעומק רקמות הגוף, מרפא ומשחרר, מקל על כאבים ומגדיל טווחי תנועה.',
+                            descEn: 'Ideal for athletes and people carrying heavy tension or physical strain. Works deep into muscle tissue to heal and release tightness, relieve pain, and increase range of motion.'
+                        },
+                        {
+                            nameHe: 'עיסוי רפואי',
+                            nameEn: 'Medical Massage',
+                            descHe: 'עיסוי ממוקד לבעיות ספציפיות, בעיקר אורטופדיות, ושיקום אחרי פציעות ופעילות עצימה.',
+                            descEn: 'Targeted massage for specific issues—primarily orthopedic conditions—as well as recovery after injuries and intense physical activity.'
+                        },
+                        {
+                            nameHe: 'רפלקסולוגיה',
+                            nameEn: 'Reflexology',
+                            descHe: 'לחיצות ועיסוי בכף הרגל. מביא לשיפור תפקוד הגוף, איזון כללי ורגיעה.',
+                            descEn: 'Targeted pressure and massage on the feet that improves bodily function and promotes overall balance and relaxation.'
+                        },
+                        {
+                            nameHe: 'שיאצו',
+                            nameEn: 'Shiatsu',
+                            descHe: 'טיפול המבוסס על הפילוסופיה של הרפואה הסינית. מבוצע בבגדים נוחים; הטיפול מורכב מלחיצות, מניפולציות ומתיחות של הגוף כולו.',
+                            descEn: 'A treatment based on Chinese medicine philosophy, performed in comfortable clothing and combining acupressure, gentle manipulations, and full-body stretching.'
+                        },
+                        {
+                            nameHe: 'אבנים חמות',
+                            nameEn: 'Hot Stones',
+                            descHe: '',
+                            descEn: ''
+                        },
+                        {
+                            nameHe: 'מקלות טיבטים',
+                            nameEn: 'Tibetan Sticks',
+                            descHe: '',
+                            descEn: ''
+                        }
+                    ];
+
+                    const renderSpaItem = (t, num) => {
+                        const name = isHe ? t.nameHe : t.nameEn;
+                        const desc = isHe ? t.descHe : t.descEn;
+                        const badge = `<span class="w-6 h-6 rounded-full badge-champagne text-xs font-extrabold tabular-nums inline-flex items-center justify-center flex-shrink-0"><bdi dir="ltr">${num}</bdi></span>`;
+                        if (!desc) {
+                            return `
+                                <div class="surface-elevated p-2.5 rounded-xl flex items-center gap-2">
+                                    ${badge}
+                                    <span class="font-bold text-base sm:text-lg text-theme-primary leading-tight">${name}</span>
+                                </div>
+                            `;
+                        }
+                        return `
+                            <div class="surface-elevated p-3 rounded-xl space-y-1">
+                                <div class="flex items-center gap-2">
+                                    ${badge}
+                                    <h5 class="font-bold text-lg sm:text-xl text-theme-primary leading-snug">${name}</h5>
+                                </div>
+                                <p class="text-base sm:text-lg text-theme-secondary leading-snug">${desc}</p>
+                            </div>
+                        `;
+                    };
+
+                    const detailedTreatments = treatments.filter(t => t.descHe);
+                    const titleOnlyTreatments = treatments.filter(t => !t.descHe);
+
                     return `
                         <div class="space-y-3 ${alignClass}" dir="${dirAttr}">
                             <div class="surface-subtle p-3.5 rounded-2xl text-center space-y-2.5">
@@ -2599,12 +2670,26 @@
                                 </div>
                             </div>
 
-                            <div class="surface-subtle p-2 rounded-2xl">
-                                <img src="https://i.imgur.com/5vg5NXj.png" referrerpolicy="no-referrer" alt="Spa brochure" class="w-full rounded-xl cursor-pointer hover:opacity-95 transition-opacity" onclick="openZoomImage('https://i.imgur.com/5vg5NXj.png')" />
-                                <p class="text-sm font-semibold text-center text-theme-secondary mt-1">${isHe ? 'לחצו על התמונה להגדלה' : 'Tap brochure to zoom'}</p>
+                            <!-- Native Treatment Menu -->
+                            <div class="surface-subtle p-3.5 rounded-2xl space-y-2.5">
+                                <h4 class="font-bold text-lg sm:text-xl text-theme-primary flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined icon-gradient-text" style="font-size: 22px;" aria-hidden="true">spa</span>
+                                    <span>${isHe ? 'תפריט הטיפולים' : 'Treatment Menu'}</span>
+                                </h4>
+                                <div class="px-3 py-2 rounded-xl badge-champagne text-base font-bold flex items-center gap-2 leading-snug">
+                                    <span class="material-symbols-outlined flex-shrink-0" style="font-size: 18px;" aria-hidden="true">auto_awesome</span>
+                                    <span>${isHe ? 'ניתן לשלב בין סוגי הטיפולים' : 'Treatments can be combined'}</span>
+                                </div>
+                                <div class="space-y-2">
+                                    ${detailedTreatments.map((t, idx) => renderSpaItem(t, idx + 1)).join('')}
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    ${titleOnlyTreatments.map((t, idx) => renderSpaItem(t, detailedTreatments.length + idx + 1)).join('')}
+                                </div>
                             </div>
                         </div>
                     `;
+                }
 
                 case 'sushi':
                     return `

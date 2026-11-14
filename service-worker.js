@@ -30,7 +30,6 @@ const URLS_TO_CACHE = [
   './swimming_pool_rules_en-v2.pdf',
   './swimming_pool_rules_he-v2.pdf',
   'https://i.imgur.com/ChMRT7d.jpg', // Sushi menu
-  'https://i.imgur.com/5vg5NXj.png', // Spa info
 
   // Pre-parsed Offline Trail Data (all 4 desert hikes)
   './gpx_data.js'
