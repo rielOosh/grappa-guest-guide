@@ -3338,9 +3338,17 @@
 
         let deviceHeading = null;
         let compassAbsoluteUnavailable = false;
+        let sawAbsoluteOrientation = false;
+        let compassRawSamples = [];
+        let lastRawCompassHeading = null;
+        let lastRawCompassMs = 0;
         let continuousHeading = null;
         let lastRenderedHeading = null;
+        let lastRenderedHudHeading = null;
+        let lastRenderedSightlineLatLng = null;
+        let lastRenderedSightlineHeading = null;
         let lastHeadingUpdateMs = 0;
+        let lastSensorRebindMs = 0;
         let headingRafPending = false;
         let wakeLock = null;
 
@@ -3355,6 +3363,11 @@
         let userRequestedCenter = false;
         let followMode = 'off'; // 'off' | 'follow' | 'paused'
         let isFollowingUser = false;
+        let manualZoomActive = false;
+        let isAutoZoomBoosted = false;
+        let lastAutoZoomChangeMs = 0;
+        let autoFollowPendingFirstFix = false;
+        let explicitLocateRequested = false;
 
         let trackModel = null;
         let markerAnimRaf = null;
@@ -3384,6 +3397,7 @@
             filtLat: null,
             filtLon: null,
             filtAcc: null,
+            filtAltM: null,
             lastRawLat: null,
             lastRawLon: null,
             lastFixTimeMs: null,
@@ -3410,14 +3424,47 @@
             }
         };
 
-        // Re-acquire wake lock automatically when returning to foreground while map is open
-        document.addEventListener('visibilitychange', () => {
+        // Re-acquire wake lock, refresh compass listeners & recover throttled GPS watch on screen unlock/focus
+        const rebindCompassAndGpsOnWake = () => {
             const mapModal = document.getElementById('map-modal');
-            if (document.visibilityState === 'visible' && mapModal && !mapModal.classList.contains('hidden')) {
-                requestWakeLock();
-                updateDaylightMarginPill();
+            if (!mapModal || mapModal.classList.contains('hidden')) return;
+            if (document.visibilityState === 'hidden') return;
+
+            const nowMs = Date.now();
+            if (nowMs - lastSensorRebindMs < 400) return;
+            lastSensorRebindMs = nowMs;
+
+            requestWakeLock();
+            updateDaylightMarginPill();
+
+            if (!lastHeadingUpdateMs || (nowMs - lastHeadingUpdateMs) > 1500) {
+                continuousHeading = null;
+            }
+            lastHeadingUpdateMs = 0;
+            compassRawSamples = [];
+            sawAbsoluteOrientation = false;
+            lastRenderedHudHeading = null;
+            if (typeof requestCompassPermission === 'function') {
+                requestCompassPermission();
+            }
+
+            if ((locationWatcher || followMode !== 'off') && navigator.geolocation) {
+                const lastFixAgeMs = navState.lastFixTimeMs ? (nowMs - navState.lastFixTimeMs) : Infinity;
+                if (!locationWatcher || lastFixAgeMs > 12000) {
+                    if (typeof stopGpsWatch === 'function') stopGpsWatch();
+                    if (typeof startGpsWatch === 'function') startGpsWatch(false);
+                }
+            }
+        };
+        window.rebindCompassAndGpsOnWake = rebindCompassAndGpsOnWake;
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                rebindCompassAndGpsOnWake();
             }
         });
+        window.addEventListener('pageshow', rebindCompassAndGpsOnWake);
+        window.addEventListener('focus', rebindCompassAndGpsOnWake);
 
         const getDistance = (lat1, lon1, lat2, lon2) => {
             const R = 6371;
@@ -3728,17 +3775,17 @@
         };
         window.updateSightlineLayer = updateSightlineLayer;
 
-        const checkNearForkOrSharpTurn = (alongDistKm, lat, lon, perpDistM = 0) => {
+        const checkNearForkOrSharpTurn = (alongDistKm, lat, lon, perpDistM = 0, maxAlongM = 65, maxRadialM = 60, maxPerpM = 28) => {
             if (!trackModel) return false;
-            if (perpDistM > 28) return false;
+            if (perpDistM > maxPerpM) return false;
             const hasCoords = lat !== undefined && lon !== undefined && lat !== null && lon !== null;
             const hasAlong = alongDistKm !== null && alongDistKm !== undefined;
 
             const isWithinCue = (cueLat, cueLon, cueDistKm) => {
-                const alongOk = !hasAlong || cueDistKm === undefined || Math.abs(alongDistKm - cueDistKm) * 1000 <= 65;
+                const alongOk = !hasAlong || cueDistKm === undefined || Math.abs(alongDistKm - cueDistKm) * 1000 <= maxAlongM;
                 if (!alongOk) return false;
                 if (hasCoords && cueLat !== undefined && cueLon !== undefined) {
-                    return getDistance(lat, lon, cueLat, cueLon) * 1000 <= 60;
+                    return getDistance(lat, lon, cueLat, cueLon) * 1000 <= maxRadialM;
                 }
                 return true;
             };
@@ -5039,9 +5086,27 @@
             return matchUserToTrack(userLat, userLon, deviceHeading, 2);
         };
 
-        // Hardened Adaptive GPS Kalman Filter, Teleport Guard & Stationary Speed Suppression
-        const filterGpsFix = (rawLat, rawLon, rawAcc, rawSpeed, rawHeading, nowMs) => {
+        // Smooth live barometric/GPS altitude while rejecting gross vertical spikes
+        const updateFilteredAltitude = (rawAlt, rawAltAcc) => {
+            if (typeof rawAlt !== 'number' || !Number.isFinite(rawAlt)) return navState.filtAltM;
+            if (rawAlt < -450 || rawAlt > 6000) return navState.filtAltM;
+            const altAcc = (typeof rawAltAcc === 'number' && Number.isFinite(rawAltAcc) && rawAltAcc > 0) ? rawAltAcc : null;
+            if (navState.filtAltM === null) {
+                navState.filtAltM = rawAlt;
+            } else {
+                if (altAcc !== null && altAcc > 120) return navState.filtAltM;
+                const deltaAlt = rawAlt - navState.filtAltM;
+                if (Math.abs(deltaAlt) > 45 && (altAcc === null || altAcc > 20)) return navState.filtAltM;
+                const gain = (altAcc !== null && altAcc <= 15) ? 0.35 : 0.22;
+                navState.filtAltM = navState.filtAltM + gain * deltaAlt;
+            }
+            return navState.filtAltM;
+        };
+
+        // Hardened Adaptive GPS Kalman Filter, Teleport Guard & Stationary Speed/COG Suppression
+        const filterGpsFix = (rawLat, rawLon, rawAcc, rawSpeed, rawHeading, nowMs, rawAlt = null, rawAltAcc = null) => {
             const acc = Math.max(4, rawAcc || 15);
+            const filtAlt = updateFilteredAltitude(rawAlt, rawAltAcc);
             if (navState.filtLat === null || navState.filtLon === null || !trackModel) {
                 if (navState.lastRawLat !== null && navState.lastRawLon !== null) {
                     navState.lastMatchedSegIdx = -1;
@@ -5055,14 +5120,17 @@
                 navState.lastRawLon = rawLon;
                 navState.lastFixTimeMs = nowMs;
                 navState.recentPositions = [{ t: nowMs, lat: rawLat, lon: rawLon }];
-                navState.smoothedSpeedKmh = (rawSpeed !== null && rawSpeed !== undefined && rawSpeed >= 0.25) ? rawSpeed * 3.6 : 0;
-                if (rawHeading !== null && rawHeading !== undefined && !isNaN(rawHeading) && rawSpeed >= 0.5) {
-                    navState.gpsCogDeg = rawHeading;
+                navState.smoothedSpeedKmh = (rawSpeed !== null && rawSpeed !== undefined && rawSpeed >= 0.25 && acc <= 30) ? rawSpeed * 3.6 : 0;
+                if (acc <= 25 && rawHeading !== null && rawHeading !== undefined && !isNaN(rawHeading) && rawSpeed !== null && rawSpeed >= 0.72) {
+                    navState.gpsCogDeg = ((rawHeading % 360) + 360) % 360;
+                } else {
+                    navState.gpsCogDeg = null;
                 }
                 return {
                     lat: rawLat,
                     lon: rawLon,
                     accuracy: acc,
+                    altitudeM: filtAlt,
                     speedKmh: navState.smoothedSpeedKmh,
                     cogDeg: navState.gpsCogDeg,
                     dtSec: 2
@@ -5085,6 +5153,7 @@
                     lat: navState.filtLat,
                     lon: navState.filtLon,
                     accuracy: navState.filtAcc,
+                    altitudeM: navState.filtAltM,
                     speedKmh: navState.smoothedSpeedKmh,
                     cogDeg: navState.gpsCogDeg,
                     dtSec
@@ -5117,7 +5186,7 @@
             const rawPostAcc = Math.max(4, Math.sqrt(postVar));
             navState.filtAcc = isVeryPoorFix ? Math.min(Math.max(navState.filtAcc, 35), rawPostAcc) : rawPostAcc;
 
-            // Maintain >= 3s sliding window for stationary drift suppression
+            // Maintain >= 3s sliding window for stationary drift & random indoor COG suppression
             navState.recentPositions.push({ t: nowMs, lat: navState.filtLat, lon: navState.filtLon });
             while (navState.recentPositions.length > 2 && (nowMs - navState.recentPositions[0].t) > 7000) {
                 navState.recentPositions.shift();
@@ -5133,14 +5202,18 @@
             const winDistM = winRef
                 ? getDistance(winRef.lat, winRef.lon, navState.filtLat, navState.filtLon) * 1000
                 : stepDistM;
+            const moveThreshM = Math.max(8.5, 0.85 * Math.min(acc, 35));
             const isActuallyMoving = winRef
-                ? winDistM > Math.max(4.5, 0.55 * Math.min(acc, 30))
-                : stepDistM > Math.max(4.5, 0.55 * Math.min(acc, 30));
+                ? (winDistM > moveThreshM)
+                : (stepDistM > moveThreshM && dtSec >= 1.8);
 
             let instSpeedKmh = 0;
-            const hasExplicitZeroSpeed = (rawSpeed !== null && rawSpeed !== undefined && !isNaN(rawSpeed) && rawSpeed >= 0 && rawSpeed < 0.2);
-            if (rawSpeed !== null && rawSpeed !== undefined && rawSpeed >= 0) {
-                instSpeedKmh = hasExplicitZeroSpeed ? 0 : (rawSpeed * 3.6);
+            const hasExplicitZeroSpeed = (rawSpeed !== null && rawSpeed !== undefined && !isNaN(rawSpeed) && rawSpeed >= 0 && rawSpeed < 0.25);
+            const hasNoisyIndoorDoppler = (rawSpeed !== null && rawSpeed !== undefined && !isNaN(rawSpeed) && rawSpeed < 0.65 && acc > 12 && !isActuallyMoving);
+            if (hasExplicitZeroSpeed || hasNoisyIndoorDoppler) {
+                instSpeedKmh = 0;
+            } else if (rawSpeed !== null && rawSpeed !== undefined && rawSpeed >= 0) {
+                instSpeedKmh = rawSpeed * 3.6;
             } else if (dtSec > 0 && stepDistM < 80 && isActuallyMoving) {
                 const refDt = winRef ? ((nowMs - winRef.t) / 1000) : dtSec;
                 instSpeedKmh = ((winRef ? winDistM : stepDistM) / Math.max(0.5, refDt)) * 3.6;
@@ -5150,16 +5223,21 @@
                 navState.smoothedSpeedKmh = 0;
             } else {
                 navState.smoothedSpeedKmh = navState.smoothedSpeedKmh * 0.65 + instSpeedKmh * 0.35;
-                if (navState.smoothedSpeedKmh < 0.65 || (!rawSpeed && !isActuallyMoving && navState.smoothedSpeedKmh < 1.2)) {
+                if (navState.smoothedSpeedKmh < 0.65 || ((rawSpeed === null || rawSpeed < 0.65) && !isActuallyMoving && navState.smoothedSpeedKmh < 1.35)) {
                     navState.smoothedSpeedKmh = 0;
                 }
             }
 
-            if (!hasExplicitZeroSpeed && rawHeading !== null && rawHeading !== undefined && !isNaN(rawHeading) && navState.smoothedSpeedKmh >= 1.6) {
+            // Clear COG whenever stopped/noisy indoors so random bounces never spin the compass
+            if (navState.smoothedSpeedKmh < 1.5 || hasExplicitZeroSpeed || hasNoisyIndoorDoppler) {
+                navState.gpsCogDeg = null;
+            } else if (acc <= 30 && rawHeading !== null && rawHeading !== undefined && !isNaN(rawHeading) && navState.smoothedSpeedKmh >= 2.2) {
                 navState.gpsCogDeg = ((rawHeading % 360) + 360) % 360;
-            } else if (!hasExplicitZeroSpeed && stepDistM >= 2.8 && navState.smoothedSpeedKmh >= 1.6) {
-                const dLon = (navState.filtLon - prevLon) * Math.cos(prevLat * Math.PI / 180);
-                const dLat = navState.filtLat - prevLat;
+            } else if (acc <= 30 && isActuallyMoving && winDistM >= 7.5 && navState.smoothedSpeedKmh >= 2.2) {
+                const refLat = winRef ? winRef.lat : prevLat;
+                const refLon = winRef ? winRef.lon : prevLon;
+                const dLon = (navState.filtLon - refLon) * Math.cos(refLat * Math.PI / 180);
+                const dLat = navState.filtLat - refLat;
                 navState.gpsCogDeg = ((Math.atan2(dLon, dLat) * 180 / Math.PI) + 360) % 360;
             }
 
@@ -5171,6 +5249,7 @@
                 lat: navState.filtLat,
                 lon: navState.filtLon,
                 accuracy: navState.filtAcc,
+                altitudeM: filtAlt,
                 speedKmh: navState.smoothedSpeedKmh,
                 cogDeg: navState.gpsCogDeg,
                 dtSec
@@ -5221,6 +5300,56 @@
             }
         };
 
+        // Shortest-Arc Circular Median + Outlier Rejection for Raw Magnetometer Samples
+        const smoothRawCompassSample = (rawDeg, nowMs = Date.now()) => {
+            if (rawDeg === null || rawDeg === undefined || !Number.isFinite(rawDeg)) return null;
+            const normDeg = ((rawDeg % 360) + 360) % 360;
+            compassRawSamples = compassRawSamples.filter(s => nowMs >= s.t && (nowMs - s.t) <= 750);
+            compassRawSamples.push({ t: nowMs, deg: normDeg });
+            if (compassRawSamples.length > 11) {
+                compassRawSamples = compassRawSamples.slice(-11);
+            }
+            const len = compassRawSamples.length;
+            if (len === 1) return normDeg;
+            if (len === 2) {
+                const d = shortestAngleDelta(compassRawSamples[0].deg, normDeg);
+                if (Math.abs(d) > 75 && (nowMs - compassRawSamples[0].t) < 250) {
+                    return compassRawSamples[0].deg;
+                }
+                return ((compassRawSamples[0].deg + 0.5 * d) % 360 + 360) % 360;
+            }
+
+            let sumCos = 0, sumSin = 0;
+            for (let i = 0; i < len; i++) {
+                const rad = compassRawSamples[i].deg * Math.PI / 180;
+                sumCos += Math.cos(rad);
+                sumSin += Math.sin(rad);
+            }
+            const refDeg = Math.hypot(sumCos, sumSin) > 1e-6
+                ? (((Math.atan2(sumSin, sumCos) * 180 / Math.PI) % 360) + 360) % 360
+                : normDeg;
+
+            const deltas = compassRawSamples.map(s => shortestAngleDelta(refDeg, s.deg)).sort((a, b) => a - b);
+            const midIdx = Math.floor(deltas.length / 2);
+            const medianDelta = deltas.length % 2 === 1
+                ? deltas[midIdx]
+                : 0.5 * (deltas[midIdx - 1] + deltas[midIdx]);
+            const medianDeg = ((refDeg + medianDelta) % 360 + 360) % 360;
+
+            let inCos = 0, inSin = 0, inCount = 0;
+            for (let i = 0; i < len; i++) {
+                const sDeg = compassRawSamples[i].deg;
+                if (Math.abs(shortestAngleDelta(medianDeg, sDeg)) <= 35) {
+                    const rad = sDeg * Math.PI / 180;
+                    inCos += Math.cos(rad);
+                    inSin += Math.sin(rad);
+                    inCount++;
+                }
+            }
+            if (inCount === 0 || Math.hypot(inCos, inSin) <= 1e-6) return medianDeg;
+            return (((Math.atan2(inSin, inCos) * 180 / Math.PI) % 360) + 360) % 360;
+        };
+
         // Shortest-Arc Circular Compass Smoothing + rAF 1.5deg Deadband + dt-aware EMA Fusion
         const scheduleMarkerHeadingRender = () => {
             if (headingRafPending) return;
@@ -5228,14 +5357,29 @@
             requestAnimationFrame(() => {
                 headingRafPending = false;
                 if (deviceHeading === null || isNaN(deviceHeading)) {
+                    lastRenderedHudHeading = null;
+                    lastRenderedSightlineHeading = null;
                     updateCompassHudPill(null);
                     if (typeof updateSightlineLayer === 'function') updateSightlineLayer(markerCurrentLatLon || (userLocMarker ? userLocMarker.getLatLng() : null), null);
                     return;
                 }
-                updateCompassHudPill(deviceHeading);
+                const roundedDeg = ((Math.round(deviceHeading) % 360) + 360) % 360;
+                if (roundedDeg !== lastRenderedHudHeading) {
+                    updateCompassHudPill(deviceHeading);
+                    lastRenderedHudHeading = roundedDeg;
+                }
                 const origin = markerCurrentLatLon || (userLocMarker ? userLocMarker.getLatLng() : null);
-                if (userLocMarker && origin && typeof updateSightlineLayer === 'function') {
+                const originLat = origin ? (origin.lat !== undefined ? origin.lat : origin[0]) : null;
+                const originLng = origin ? (origin.lng !== undefined ? origin.lng : origin[1]) : null;
+                const originMoved = !lastRenderedSightlineLatLng || originLat === null ||
+                    Math.abs(lastRenderedSightlineLatLng[0] - originLat) > 1e-6 ||
+                    Math.abs(lastRenderedSightlineLatLng[1] - originLng) > 1e-6;
+                const headingMoved = lastRenderedSightlineHeading === null ||
+                    Math.abs(shortestAngleDelta(lastRenderedSightlineHeading, deviceHeading)) >= 1.0;
+                if (userLocMarker && origin && (originMoved || headingMoved) && typeof updateSightlineLayer === 'function') {
                     updateSightlineLayer(origin, deviceHeading);
+                    lastRenderedSightlineLatLng = [originLat, originLng];
+                    lastRenderedSightlineHeading = deviceHeading;
                 }
                 if (!userLocMarker) return;
                 if (!userMarkerSvgEl || !userMarkerSvgEl.isConnected) {
@@ -5256,25 +5400,28 @@
 
         const updateFusedHeading = (compassDeg, gpsCogDeg, speedKmh) => {
             let targetDeg = compassDeg;
-            if (speedKmh >= 1.8 && gpsCogDeg !== null && gpsCogDeg !== undefined) {
+            if (speedKmh >= 2.6 && gpsCogDeg !== null && gpsCogDeg !== undefined) {
                 if (compassDeg !== null && compassDeg !== undefined) {
                     const delta = shortestAngleDelta(compassDeg, gpsCogDeg);
-                    targetDeg = ((compassDeg + 0.65 * delta) % 360 + 360) % 360;
+                    targetDeg = ((compassDeg + 0.45 * delta) % 360 + 360) % 360;
                 } else {
                     targetDeg = gpsCogDeg;
                 }
             }
-            if (targetDeg === null || targetDeg === undefined || isNaN(targetDeg)) return;
+            if (targetDeg === null || targetDeg === undefined || !Number.isFinite(targetDeg)) return;
 
             const nowMs = Date.now();
             const dtSec = lastHeadingUpdateMs ? Math.min(1.0, Math.max(0.016, (nowMs - lastHeadingUpdateMs) / 1000)) : 0.2;
             lastHeadingUpdateMs = nowMs;
-            const blend = 1 - Math.exp(-dtSec / 0.18);
+            const blend = 1 - Math.exp(-dtSec / 0.34);
 
             if (continuousHeading === null) {
                 continuousHeading = targetDeg;
             } else {
                 const delta = shortestAngleDelta(continuousHeading, targetDeg);
+                if (speedKmh < 1.2 && Math.abs(delta) < 1.5) {
+                    return;
+                }
                 continuousHeading = continuousHeading + blend * delta;
             }
             deviceHeading = ((continuousHeading % 360) + 360) % 360;
@@ -6218,13 +6365,24 @@
             const prevLat = navState.lastRawLat;
             const prevLon = navState.lastRawLon;
             const prevAcc = navState.filtAcc || 10;
+            const prevAltM = navState.filtAltM;
             const prevFixTimeMs = navState.lastFixTimeMs || Date.now();
 
             navState = createInitialNavState();
             userRequestedCenter = true;
+            manualZoomActive = false;
+            isAutoZoomBoosted = false;
+            lastAutoZoomChangeMs = 0;
+            explicitLocateRequested = false;
             deviceHeading = null;
             continuousHeading = null;
+            compassRawSamples = [];
+            lastRawCompassHeading = null;
+            lastRawCompassMs = 0;
             lastRenderedHeading = null;
+            lastRenderedHudHeading = null;
+            lastRenderedSightlineLatLng = null;
+            lastRenderedSightlineHeading = null;
             updateCompassHudPill(null);
             if (typeof updateSightlineLayer === 'function') updateSightlineLayer(markerCurrentLatLon, null);
             if (walkedMaskPolyline && map) { map.removeLayer(walkedMaskPolyline); walkedMaskPolyline = null; }
@@ -6257,6 +6415,7 @@
                         latitude: prevLat,
                         longitude: prevLon,
                         accuracy: prevAcc,
+                        altitude: prevAltM,
                         speed: null,
                         heading: null
                     },
@@ -6497,6 +6656,7 @@
         const handleViewTrail = (trailName, gpxUrl, distance) => {
             closeDialog();
             requestWakeLock();
+            requestCompassPermission();
 
             if (!mapPopstateActive && typeof history !== 'undefined' && typeof history.pushState === 'function') {
                 try {
@@ -6557,6 +6717,22 @@
 
                         L.control.zoom({ position: 'topleft' }).addTo(map);
 
+                        // Mark manual zoom immediately on user zoom gestures so GPS fixes never snap zoom back
+                        const mapEl = map.getContainer();
+                        mapEl.addEventListener('wheel', () => { manualZoomActive = true; }, { passive: true });
+                        mapEl.addEventListener('dblclick', () => { manualZoomActive = true; }, { passive: true });
+                        mapEl.addEventListener('touchstart', (e) => {
+                            if (e.touches && e.touches.length >= 2) {
+                                manualZoomActive = true;
+                            }
+                        }, { passive: true });
+                        mapEl.addEventListener('click', (e) => {
+                            if (e.target && e.target.closest('.leaflet-control-zoom-in, .leaflet-control-zoom-out')) {
+                                manualZoomActive = true;
+                            }
+                        });
+                        map.on('boxzoomstart', () => { manualZoomActive = true; });
+
                         // Automatically pause auto-follow if hiker pans map manually
                         map.on('dragstart', () => {
                             if (followMode === 'follow') {
@@ -6584,6 +6760,11 @@
                         navState = createInitialNavState();
                         followMode = 'off';
                         isFollowingUser = false;
+                        manualZoomActive = false;
+                        isAutoZoomBoosted = false;
+                        lastAutoZoomChangeMs = 0;
+                        autoFollowPendingFirstFix = true;
+                        explicitLocateRequested = false;
                         syncFollowButtonUi();
                         markerCurrentLatLon = null;
 
@@ -6796,12 +6977,24 @@
             window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
             deviceHeading = null;
             compassAbsoluteUnavailable = false;
+            sawAbsoluteOrientation = false;
+            compassRawSamples = [];
+            lastRawCompassHeading = null;
+            lastRawCompassMs = 0;
             continuousHeading = null;
             lastRenderedHeading = null;
+            lastRenderedHudHeading = null;
+            lastRenderedSightlineLatLng = null;
+            lastRenderedSightlineHeading = null;
             lastHeadingUpdateMs = 0;
             userMarkerSvgEl = null;
             followMode = 'off';
             isFollowingUser = false;
+            manualZoomActive = false;
+            isAutoZoomBoosted = false;
+            lastAutoZoomChangeMs = 0;
+            autoFollowPendingFirstFix = false;
+            explicitLocateRequested = false;
             syncFollowButtonUi();
             updateCompassHudPill(null);
 
@@ -6858,6 +7051,7 @@
         });
 
         const handleOrientation = (e) => {
+            if (!e) return;
             let screenAdjustment = 0;
             if (window.screen && window.screen.orientation && window.screen.orientation.angle !== undefined) {
                 screenAdjustment = window.screen.orientation.angle;
@@ -6866,22 +7060,33 @@
             }
 
             let heading = null;
-            if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null && !isNaN(e.webkitCompassHeading)) {
+            if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null && Number.isFinite(e.webkitCompassHeading)) {
                 compassAbsoluteUnavailable = false;
                 heading = ((e.webkitCompassHeading + screenAdjustment) % 360 + 360) % 360;
-            } else if ((e.absolute === true || e.type === 'deviceorientationabsolute') && e.alpha !== null && e.alpha !== undefined) {
+            } else if ((e.absolute === true || e.type === 'deviceorientationabsolute') && e.alpha !== null && e.alpha !== undefined && Number.isFinite(e.alpha)) {
+                if (e.type === 'deviceorientationabsolute') {
+                    sawAbsoluteOrientation = true;
+                } else if (sawAbsoluteOrientation) {
+                    return;
+                }
                 compassAbsoluteUnavailable = false;
                 heading = computeTiltCompensatedHeading(e.alpha, e.beta, e.gamma, screenAdjustment);
             } else if (e.alpha !== null && e.alpha !== undefined && e.absolute === false) {
-                if (deviceHeading === null) {
+                if (!sawAbsoluteOrientation && deviceHeading === null) {
                     compassAbsoluteUnavailable = true;
                     updateCompassHudPill(null);
                 }
                 return;
             }
 
-            if (heading !== null && !isNaN(heading)) {
-                updateFusedHeading(heading, navState.gpsCogDeg, navState.smoothedSpeedKmh);
+            if (heading !== null && Number.isFinite(heading)) {
+                const nowMs = Date.now();
+                const smoothedRaw = smoothRawCompassSample(heading, nowMs);
+                if (smoothedRaw !== null && Number.isFinite(smoothedRaw)) {
+                    lastRawCompassHeading = smoothedRaw;
+                    lastRawCompassMs = nowMs;
+                    updateFusedHeading(smoothedRaw, navState.gpsCogDeg, navState.smoothedSpeedKmh);
+                }
             }
         };
 
@@ -6892,19 +7097,25 @@
             const rawLat = position.coords.latitude;
             const rawLon = position.coords.longitude;
             const rawAcc = position.coords.accuracy || 12;
+            const rawAlt = (position.coords.altitude !== undefined && position.coords.altitude !== null) ? position.coords.altitude : null;
+            const rawAltAcc = (position.coords.altitudeAccuracy !== undefined && position.coords.altitudeAccuracy !== null) ? position.coords.altitudeAccuracy : null;
             const rawSpeed = position.coords.speed !== undefined ? position.coords.speed : null;
             const rawHeading = position.coords.heading !== undefined ? position.coords.heading : null;
             const nowMs = position.timestamp || Date.now();
 
-            const filtered = filterGpsFix(rawLat, rawLon, rawAcc, rawSpeed, rawHeading, nowMs);
+            const filtered = filterGpsFix(rawLat, rawLon, rawAcc, rawSpeed, rawHeading, nowMs, rawAlt, rawAltAcc);
             const lat = filtered.lat;
             const lon = filtered.lon;
             const accuracy = filtered.accuracy;
             const speedKmh = filtered.speedKmh;
             const latlng = [lat, lon];
+            const liveAltValid = filtered.altitudeM !== null && Number.isFinite(filtered.altitudeM);
 
-            if (filtered.cogDeg !== null) {
-                updateFusedHeading(deviceHeading, filtered.cogDeg, speedKmh);
+            if (filtered.cogDeg !== null && speedKmh >= 2.6) {
+                const compassSrc = (lastRawCompassHeading !== null && (Date.now() - lastRawCompassMs) < 8000)
+                    ? lastRawCompassHeading
+                    : deviceHeading;
+                updateFusedHeading(compassSrc, filtered.cogDeg, speedKmh);
             }
 
             if (!userLocMarker) {
@@ -6936,24 +7147,77 @@
 
             const isNearTrail = match.distance <= 0.6; // within 600m corridor/trailhead
 
+            // If user opened a desert trail from far away (> 2km), preserve trail focus rather than yanking map
+            if (autoFollowPendingFirstFix) {
+                autoFollowPendingFirstFix = false;
+                if (!explicitLocateRequested && match.index >= 0 && match.distance > 2.0) {
+                    followMode = 'paused';
+                    isFollowingUser = false;
+                    userRequestedCenter = false;
+                    syncFollowButtonUi();
+                }
+            }
+
             // Synchronize Compass Pill, Cone Indicator, and 100m Sightline BEFORE camera/animation updates
-            const activeHeading = (deviceHeading !== null && !isNaN(deviceHeading))
+            const activeHeading = (deviceHeading !== null && Number.isFinite(deviceHeading))
                 ? deviceHeading
-                : (filtered.cogDeg !== null && !isNaN(filtered.cogDeg) ? filtered.cogDeg : null);
+                : ((filtered.cogDeg !== null && Number.isFinite(filtered.cogDeg) && speedKmh >= 2.6) ? filtered.cogDeg : null);
             if (activeHeading !== null) {
                 deviceHeading = activeHeading;
-                updateCompassHudPill(activeHeading);
+                const roundedHud = ((Math.round(activeHeading) % 360) + 360) % 360;
+                if (roundedHud !== lastRenderedHudHeading) {
+                    updateCompassHudPill(activeHeading);
+                    lastRenderedHudHeading = roundedHud;
+                }
                 scheduleMarkerHeadingRender();
-                updateSightlineLayer(markerCurrentLatLon || latlng, activeHeading);
+                const slOrigin = markerCurrentLatLon || latlng;
+                const slLat = slOrigin.lat !== undefined ? slOrigin.lat : slOrigin[0];
+                const slLng = slOrigin.lng !== undefined ? slOrigin.lng : slOrigin[1];
+                const slMoved = !lastRenderedSightlineLatLng ||
+                    Math.abs(lastRenderedSightlineLatLng[0] - slLat) > 1e-6 ||
+                    Math.abs(lastRenderedSightlineLatLng[1] - slLng) > 1e-6;
+                const slRotated = lastRenderedSightlineHeading === null ||
+                    Math.abs(shortestAngleDelta(lastRenderedSightlineHeading, activeHeading)) >= 1.0;
+                if (slMoved || slRotated) {
+                    updateSightlineLayer(slOrigin, activeHeading);
+                    lastRenderedSightlineLatLng = [slLat, slLng];
+                    lastRenderedSightlineHeading = activeHeading;
+                }
             } else {
+                lastRenderedSightlineHeading = null;
                 updateSightlineLayer(latlng, null);
             }
 
-            // Forward Look-Ahead Follow Camera (75% Ahead / 25% Behind) & Auto-Zoom Boost at Forks & Sharp Turns
-            if (followMode === 'follow' || (userRequestedCenter && isNearTrail)) {
-                const canAutoZoom = navState.hasEnteredTrailCorridor && !navState.isConfirmedOffTrail && match.index >= 0 && match.perpDistM <= 28;
-                const isNearJunction = canAutoZoom && checkNearForkOrSharpTurn(match.alongDistKm, lat, lon, match.perpDistM);
-                const targetZoom = isNearJunction ? 18.5 : 17.0;
+            // Forward Look-Ahead Follow Camera (75% Ahead / 25% Behind) & Hysteresis Auto-Zoom
+            const isUserInteracting = Boolean(map._animatingZoom || (map.dragging && map.dragging._draggable && map.dragging._draggable._moving));
+            if (!isUserInteracting && (followMode === 'follow' || (userRequestedCenter && isNearTrail))) {
+                let targetZoom = map.getZoom();
+                if (!manualZoomActive && isNearTrail) {
+                    const canAutoZoom = navState.hasEnteredTrailCorridor && !navState.isConfirmedOffTrail && match.index >= 0;
+                    if (!canAutoZoom) {
+                        if (isAutoZoomBoosted && Math.abs(nowMs - lastAutoZoomChangeMs) >= 2000) {
+                            isAutoZoomBoosted = false;
+                            lastAutoZoomChangeMs = nowMs;
+                        }
+                    } else if (!isAutoZoomBoosted) {
+                        if (match.perpDistM <= 25 && checkNearForkOrSharpTurn(match.alongDistKm, lat, lon, match.perpDistM, 58, 55, 25)) {
+                            if (lastAutoZoomChangeMs === 0 || Math.abs(nowMs - lastAutoZoomChangeMs) >= 2000) {
+                                isAutoZoomBoosted = true;
+                                lastAutoZoomChangeMs = nowMs;
+                            }
+                        }
+                    } else {
+                        const stillInExitZone = match.perpDistM <= 36 && checkNearForkOrSharpTurn(match.alongDistKm, lat, lon, match.perpDistM, 78, 75, 36);
+                        if (!stillInExitZone && Math.abs(nowMs - lastAutoZoomChangeMs) >= 2000) {
+                            isAutoZoomBoosted = false;
+                            lastAutoZoomChangeMs = nowMs;
+                        }
+                    }
+                    targetZoom = isAutoZoomBoosted ? 18.5 : 17.0;
+                } else if (userRequestedCenter && !manualZoomActive) {
+                    targetZoom = Math.max(map.getZoom(), 17.0);
+                }
+
                 const effectiveHeading = activeHeading !== null
                     ? activeHeading
                     : (navState.lastMatchedSegIdx >= 0 && trackModel && trackModel.segments[navState.lastMatchedSegIdx]
@@ -6961,7 +7225,9 @@
                         : 0);
                 const targetCenter = computeLookAheadTargetCenter(latlng, effectiveHeading, targetZoom);
 
-                if (userRequestedCenter || Math.abs(map.getZoom() - targetZoom) >= 0.35) {
+                const zoomDiff = Math.abs(map.getZoom() - targetZoom);
+                const needsZoomAdjust = !manualZoomActive && zoomDiff >= 0.45 && (isNearTrail || userRequestedCenter);
+                if (userRequestedCenter || needsZoomAdjust) {
                     map.setView(targetCenter, targetZoom, { animate: false });
                     userRequestedCenter = false;
                     lastLookAheadCenter = targetCenter;
@@ -6970,7 +7236,8 @@
                     const curPt = map.latLngToContainerPoint(curCenter);
                     const desiredPt = map.latLngToContainerPoint(targetCenter);
                     const driftPx = Math.hypot(desiredPt.x - curPt.x, desiredPt.y - curPt.y);
-                    if (driftPx > 42) {
+                    const panDriftThresh = speedKmh < 1.2 ? 58 : 42;
+                    if (driftPx > panDriftThresh) {
                         map.setView(targetCenter, targetZoom, { animate: false });
                         lastLookAheadCenter = targetCenter;
                     }
@@ -6978,11 +7245,15 @@
             }
 
             const badge = document.getElementById('map-status-badge');
+            const eleEl = document.getElementById('map-trail-elevation');
             const userDot = document.getElementById('ele-user-dot');
             const lookaheadBand = document.getElementById('ele-lookahead-band');
             const progressLabel = document.getElementById('ele-progress-label');
 
-            if (match.index < 0) return;
+            if (match.index < 0) {
+                if (eleEl && liveAltValid) eleEl.textContent = `${Math.round(filtered.altitudeM)}m`;
+                return;
+            }
 
             // Trailhead Approaching State: hiker <= 600m away BEFORE entering <= 25m of trail
             if (!navState.hasEnteredTrailCorridor) {
@@ -6992,7 +7263,8 @@
                     const startPt = activePoints[0];
                     const targetApproach = (match.distToStartM <= 600 && startPt) ? [startPt[0], startPt[1]] : [match.projLat, match.projLon];
                     document.getElementById('map-trail-distance').textContent = `0.0 / ${totalTrackDistance.toFixed(1)} km`;
-                    document.getElementById('map-trail-elevation').textContent = `${match.projEle.toFixed(0)}m`;
+                    const approachEle = liveAltValid ? Math.round(filtered.altitudeM) : match.projEle.toFixed(0);
+                    if (eleEl) eleEl.textContent = `${approachEle}m`;
                     if (badge) {
                         badge.className = 'px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded-full badge-champagne';
                         badge.textContent = isHe ? 'בגישה לשביל' : 'APPROACHING';
@@ -7108,7 +7380,6 @@
                     ? Math.max(0, trackModel.cumDescentM[segClimbIdx])
                     : Math.max(0, totalTrackAscent - trackModel.cumAscentM[segClimbIdx]);
 
-                document.getElementById('map-trail-elevation').textContent = `${match.projEle.toFixed(0)}m`;
                 document.getElementById('map-trail-distance').textContent = `${effCompletedKm.toFixed(1)} / ${totalTrackDistance.toFixed(1)} km`;
 
                 // Visual-Only 3-Tier Off-Trail Detection (Green <= 18m / Amber 18..30m / Red > 30m)
@@ -7128,6 +7399,13 @@
                     navState.offTrailCount = 0;
                     navState.isConfirmedOffTrail = false;
                     navState.isDrifting = false;
+                }
+
+                if (eleEl) {
+                    const trailEleVal = (navState.isConfirmedOffTrail && liveAltValid)
+                        ? Math.round(filtered.altitudeM)
+                        : match.projEle.toFixed(0);
+                    eleEl.textContent = `${trailEleVal}m`;
                 }
 
                 if (navState.isCompleted) {
@@ -7195,8 +7473,12 @@
                 }
             } else {
                 document.getElementById('map-trail-distance').textContent = `${totalTrackDistance.toFixed(1)} km`;
-                if (minElevation !== Infinity && maxElevation !== -Infinity) {
-                    document.getElementById('map-trail-elevation').textContent = `${minElevation.toFixed(0)}–${maxElevation.toFixed(0)}m`;
+                if (eleEl) {
+                    if (liveAltValid) {
+                        eleEl.textContent = `${Math.round(filtered.altitudeM)}m`;
+                    } else if (minElevation !== Infinity && maxElevation !== -Infinity) {
+                        eleEl.textContent = `${minElevation.toFixed(0)}–${maxElevation.toFixed(0)}m`;
+                    }
                 }
                 if (badge) {
                     badge.className = 'px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded-full surface-subtle text-theme-secondary';
@@ -7211,20 +7493,28 @@
         };
         window.processGpsPosition = processGpsPosition;
 
+        let iosCompassGranted = false;
+
+        const attachOrientationListeners = () => {
+            window.removeEventListener('deviceorientation', handleOrientation, true);
+            window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
+            window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+            window.addEventListener('deviceorientation', handleOrientation, true);
+        };
+
         const requestCompassPermission = () => {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission()
-                    .then(state => {
-                        if (state === 'granted') {
-                            window.addEventListener('deviceorientation', handleOrientation, true);
-                        }
-                    })
-                    .catch(() => {});
-            } else if (typeof DeviceOrientationEvent !== 'undefined') {
-                if ('ondeviceorientationabsolute' in window) {
-                    window.addEventListener('deviceorientationabsolute', handleOrientation, true);
-                }
-                window.addEventListener('deviceorientation', handleOrientation, true);
+            attachOrientationListeners();
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function' && !iosCompassGranted) {
+                try {
+                    DeviceOrientationEvent.requestPermission()
+                        .then(state => {
+                            if (state === 'granted') {
+                                iosCompassGranted = true;
+                                attachOrientationListeners();
+                            }
+                        })
+                        .catch(() => {});
+                } catch (e) {}
             }
         };
 
@@ -7244,9 +7534,14 @@
                 return;
             }
 
+            if (locationWatcher) {
+                navigator.geolocation.clearWatch(locationWatcher);
+                locationWatcher = null;
+            }
+
             if (fromUserGesture) {
                 requestCompassPermission();
-            } else if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission !== 'function') {
+            } else if (typeof DeviceOrientationEvent !== 'undefined' && (typeof DeviceOrientationEvent.requestPermission !== 'function' || iosCompassGranted)) {
                 requestCompassPermission();
             }
 
@@ -7279,6 +7574,10 @@
         // 3-State Follow Cycle: Off -> Follow -> Re-center if Paused
         const toggleLocationTracking = () => {
             requestCompassPermission();
+            explicitLocateRequested = true;
+            manualZoomActive = false;
+            isAutoZoomBoosted = false;
+            lastAutoZoomChangeMs = 0;
             followMode = 'follow';
             isFollowingUser = true;
             syncFollowButtonUi();
